@@ -1,14 +1,13 @@
-@extends('web::layouts.grids.12')
+@extends('ratting-manager::layouts.page')
 
 @section('title', trans('ratting-manager::leaderboard.title'))
 @section('page_header', trans('ratting-manager::leaderboard.title'))
 
-@push('head')
-    @include('ratting-manager::partials.head')
-@endpush
+@section('rm-tabs')
+    @include('ratting-manager::partials.page-tabs', ['active' => 'leaderboard'])
+@endsection
 
-@section('full')
-<div class="ratting-manager-dashboard">
+@section('rm-body')
     @if($notConfigured)
         @include('ratting-manager::partials.not-configured')
     @elseif($isDirector)
@@ -78,6 +77,9 @@
             </div>
         </div>
     @endif
-</div>
+@endsection
+
+@section('rm-after')
     @include('ratting-manager::partials.character-lookup')
 @endsection
+

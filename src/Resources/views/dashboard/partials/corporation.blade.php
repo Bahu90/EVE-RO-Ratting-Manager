@@ -124,7 +124,7 @@
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-chart-bar"></i> {{ trans('ratting-manager::dashboard.income_12_months') }}</h3>
             </div>
-            <div class="card-body"><div class="rm-chart"><canvas id="rm-corp-monthly"></canvas></div></div>
+            <div class="card-body"><div class="rm-chart"><canvas id="rm-corp-monthly"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.income_12_months_note') }}</p></div>
         </div>
     </div>
     <div class="col-lg-4">
@@ -132,7 +132,7 @@
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-chart-pie"></i> {{ trans('ratting-manager::dashboard.concentration') }}</h3>
             </div>
-            <div class="card-body"><div class="rm-chart"><canvas id="rm-corp-concentration"></canvas></div></div>
+            <div class="card-body"><div class="rm-chart"><canvas id="rm-corp-concentration"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.concentration_note') }}</p></div>
         </div>
     </div>
 </div>
@@ -151,7 +151,7 @@
             </div>
             <div class="card-body">
                 <div class="rm-chart"><canvas id="rm-corp-months"></canvas></div>
-                <small class="text-muted">{{ trans('ratting-manager::insights.earned_and_taxed_note') }}</small>
+                <p class="rm-chart-note">{{ trans('ratting-manager::insights.earned_and_taxed_note') }}</p>
             </div>
         </div>
     </div>
@@ -160,7 +160,7 @@
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-users"></i> {{ trans('ratting-manager::dashboard.active_ratters') }}</h3>
             </div>
-            <div class="card-body"><div class="rm-chart"><canvas id="rm-corp-active"></canvas></div></div>
+            <div class="card-body"><div class="rm-chart"><canvas id="rm-corp-active"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.active_ratters_note') }}</p></div>
         </div>
     </div>
 </div>
@@ -171,7 +171,7 @@
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-chart-line"></i> {{ trans('ratting-manager::dashboard.daily_income') }}</h3>
             </div>
-            <div class="card-body"><div class="rm-chart"><canvas id="rm-corp-daily"></canvas></div></div>
+            <div class="card-body"><div class="rm-chart"><canvas id="rm-corp-daily"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.daily_income_note') }}</p></div>
         </div>
     </div>
     <div class="col-lg-6">
@@ -181,6 +181,7 @@
             </div>
             <div class="card-body">
                 @include('ratting-manager::partials.heatmap', ['heatmap' => $heatmap, 'perPlayer' => true, 'title' => trans('ratting-manager::dashboard.when_corp_rats')])
+                <p class="rm-chart-note">{{ trans('ratting-manager::dashboard.when_corp_rats_note') }}</p>
             </div>
         </div>
     </div>
@@ -194,7 +195,7 @@
             </div>
             <div class="card-body">
                 <div class="rm-chart"><canvas id="rm-corp-weekdays"></canvas></div>
-                <small class="text-muted">{{ trans('ratting-manager::insights.time_note') }}</small>
+                <p class="rm-chart-note">{{ trans('ratting-manager::insights.time_note') }}</p>
             </div>
         </div>
     </div>
@@ -205,7 +206,7 @@
             </div>
             <div class="card-body">
                 <div class="rm-chart"><canvas id="rm-corp-hours"></canvas></div>
-                <small class="text-muted">{{ trans('ratting-manager::insights.players_by_hour_note') }}</small>
+                <p class="rm-chart-note">{{ trans('ratting-manager::insights.players_by_hour_note') }}</p>
             </div>
         </div>
     </div>
@@ -217,7 +218,7 @@
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-map-marker-alt"></i> {{ trans('ratting-manager::dashboard.systems') }}</h3>
             </div>
-            <div class="card-body"><div class="rm-chart-tall"><canvas id="rm-corp-systems"></canvas></div></div>
+            <div class="card-body"><div class="rm-chart-tall"><canvas id="rm-corp-systems"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.systems_note') }}</p></div>
         </div>
     </div>
     <div class="col-lg-6">
@@ -227,7 +228,7 @@
             </div>
             <div class="card-body">
                 <div class="rm-chart-tall"><canvas id="rm-corp-efficiency"></canvas></div>
-                <small class="text-muted">{{ trans('ratting-manager::insights.efficiency_note') }} {{ trans('ratting-manager::insights.efficiency_top', ['count' => \RattingManager\Http\Controllers\DashboardController::EFFICIENCY_SYSTEMS_CORPORATION]) }}</small>
+                <p class="rm-chart-note">{{ trans('ratting-manager::insights.efficiency_note') }} {{ trans('ratting-manager::insights.efficiency_top', ['count' => \RattingManager\Http\Controllers\DashboardController::EFFICIENCY_SYSTEMS_CORPORATION]) }}</p>
             </div>
         </div>
     </div>
@@ -256,6 +257,7 @@
                         <div class="rm-chart" style="height: 260px;"><canvas id="rm-corp-sizes"></canvas></div>
                     </div>
                 </div>
+                <p class="rm-chart-note">{{ trans('ratting-manager::dashboard.kills_note') }}</p>
             </div>
         </div>
     </div>
@@ -270,7 +272,7 @@
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-exchange-alt"></i> {{ trans('ratting-manager::dashboard.ratter_movement') }}</h3>
             </div>
-            <div class="card-body"><div class="rm-chart"><canvas id="rm-corp-movement"></canvas></div></div>
+            <div class="card-body"><div class="rm-chart"><canvas id="rm-corp-movement"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.ratter_movement_note') }}</p></div>
         </div>
     </div>
     <div class="col-lg-6">

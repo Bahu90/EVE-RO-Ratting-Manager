@@ -1,15 +1,17 @@
-@extends('web::layouts.grids.12')
+@extends('ratting-manager::layouts.page')
 
 @section('title', trans('ratting-manager::ratter.lookup_title'))
 @section('page_header', trans('ratting-manager::ratter.lookup_title'))
 
 @push('head')
-    @include('ratting-manager::partials.head')
     <link rel="stylesheet" href="{{ asset('vendor/ratting-manager/css/vendor/dataTables.bootstrap4.min.css') }}">
 @endpush
 
-@section('full')
-<div class="ratting-manager-dashboard">
+@section('rm-tabs')
+    @include('ratting-manager::partials.page-tabs', ['active' => 'ratters'])
+@endsection
+
+@section('rm-body')
     @if($notConfigured)
         @include('ratting-manager::partials.not-configured', ['isAdmin' => \RattingManager\Support\Access::isAdmin()])
     @else
@@ -50,9 +52,12 @@
             </div>
         </div>
     @endif
-</div>
+@endsection
+
+@section('rm-after')
     @include('ratting-manager::partials.character-lookup')
 @endsection
+
 
 @push('javascript')
 @include('ratting-manager::partials.datatables')

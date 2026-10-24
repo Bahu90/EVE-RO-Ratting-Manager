@@ -182,21 +182,49 @@
             });
         },
 
-        /** Each session's bounty ISK per hour over time, dot size by length. */
+        /**
+         * Each session's bounty ISK per hour in time order, as a line over a
+         * shaded area, with the period's median dashed across it. Points show
+         * on hover; a lone session keeps its point so it can be seen at all.
+         */
         sessions: function (id, points, t) {
+            points = (points || []).slice().sort(function (a, b) { return a.x - b.x; });
+            var sorted = points.map(function (p) { return p.y; }).sort(function (a, b) { return a - b; });
+            var n = sorted.length;
+            var median = n ? (n % 2 ? sorted[(n - 1) / 2] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2) : 0;
+            var first = n ? points[0].x : 0;
+            var last = n ? points[n - 1].x : 0;
+
             return make(id, {
-                type: 'bubble',
+                type: 'line',
                 data: {
                     datasets: [{
-                        label: t.session_isk_per_hour,
-                        data: (points || []).map(function (p) { return { x: p.x, y: p.y, r: Math.max(4, Math.min(14, Math.sqrt(p.minutes))), minutes: p.minutes }; }),
-                        backgroundColor: COLORS.s1 + 'aa',
-                        borderColor: COLORS.surface,
-                        borderWidth: 2
+                        label: t.series_session_rate,
+                        data: points.map(function (p) { return { x: p.x, y: p.y, minutes: p.minutes }; }),
+                        borderColor: COLORS.s1,
+                        backgroundColor: COLORS.s1 + '33',
+                        fill: 'origin',
+                        tension: 0.3,
+                        borderWidth: 2,
+                        pointRadius: n < 2 ? 4 : 0,
+                        pointHoverRadius: 5,
+                        pointHitRadius: 8,
+                        pointBackgroundColor: COLORS.s1
+                    }, {
+                        label: t.series_median,
+                        data: [{ x: first, y: median }, { x: last, y: median }],
+                        borderColor: COLORS.muted,
+                        borderDash: [5, 4],
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        pointHitRadius: 0,
+                        fill: false
                     }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'nearest', axis: 'x', intersect: false },
                     scales: {
                         x: {
                             type: 'linear',
@@ -206,13 +234,19 @@
                         y: iskScale(false)
                     },
                     plugins: {
-                        legend: legend(false),
+                        legend: legend(true),
                         tooltip: {
+                            filter: function (item) { return item.datasetIndex === 0; },
                             callbacks: {
+                                title: function (items) {
+                                    return items.length ? new Date(items[0].raw.x).toISOString().replace('T', ' ').slice(0, 16) + ' EVE' : '';
+                                },
                                 label: function (ctx) {
-                                    var raw = ctx.raw;
-                                    var when = new Date(raw.x).toISOString().replace('T', ' ').slice(0, 16);
-                                    return ' ' + when + ' EVE, ' + Math.round(raw.minutes) + ' min: ' + formatISK(raw.y) + ' ISK/h';
+                                    return [
+                                        ' ' + t.series_session_rate + ': ' + formatISK(ctx.raw.y) + ' ISK',
+                                        ' ' + hm(ctx.raw.minutes),
+                                        ' ' + t.series_median + ': ' + formatISK(median) + ' ISK'
+                                    ];
                                 }
                             }
                         }

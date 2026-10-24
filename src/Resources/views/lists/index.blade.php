@@ -1,20 +1,22 @@
-@extends('web::layouts.grids.12')
+@extends('ratting-manager::layouts.page')
 
 @section('title', $title)
 @section('page_header', $title)
 
 @push('head')
-    @include('ratting-manager::partials.head')
     <link rel="stylesheet" href="{{ asset('vendor/ratting-manager/css/vendor/dataTables.bootstrap4.min.css') }}">
 @endpush
 
-@section('full')
 @php
     // Filters worth offering: the period for lists that depend on it, and a
     // character or corporation when there is more than one to pick from.
     $filters = $byPeriod || count($characterOptions ?? []) > 1 || count($corporations ?? []) > 1;
 @endphp
-<div class="ratting-manager-dashboard">
+@section('rm-tabs')
+    @include('ratting-manager::partials.page-tabs', ['page' => ['icon' => 'fa-list', 'label' => $title]])
+@endsection
+
+@section('rm-body')
     <p><a href="{{ $back }}"><i class="fas fa-arrow-left"></i> {{ $backLabel }}</a></p>
 
     <div class="card card-dark">
@@ -56,9 +58,12 @@
             @include('ratting-manager::dashboard.partials.gone-quiet', ['rows' => $rows, 'tableId' => 'rm-list-table'])
             @break
     @endswitch
-</div>
+@endsection
+
+@section('rm-after')
     @include('ratting-manager::partials.character-lookup')
 @endsection
+
 
 @push('javascript')
 @include('ratting-manager::partials.datatables')

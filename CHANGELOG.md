@@ -20,7 +20,7 @@ All notable changes to Ratting Manager will be documented in this file.
 
 ### Pages
 
-- **My Ratting** for every member: income, ISK per hour, hours, rats, active days, rank by hours and the corporation tax their ratting paid, with charts of income and tax by month, income by day, systems, factions and sizes, a weekday by hour map, session ISK per hour, income by character, recent sessions, special spawns and personal records.
+- **My Ratting** for every member: income, ISK per hour, hours, rats, active days, rank by hours and the corporation tax their ratting paid, with charts of income and tax by month, income by day, systems, factions and sizes, a weekday by hour map, each session's ISK per hour against the median, income by character, recent sessions, special spawns and personal records. Every chart says what it shows in a line under it.
 - **Insights** on My Ratting: favourite and best-paying system, most active and best-paying day, most active and best-paying time of day, ratting streaks, sessions, rats per hour, favourite target and the ESS share of income. Hours by day of the week and by hour of the day, ISK per hour by system, every system ratted with its hours, share, income, ISK per hour and rats, and the NPCs killed most.
 - **Month by character** on My Ratting: what each character earned in a month, bounties, ESS, corporation tax, hours, ISK per hour, ticks and rats, with the month's total across all of them, any of the last 12 months a pick away. Below it, each character's income month by month.
 - **Corporation tab** for directors: totals, the corporation's cut, median ISK per hour, coverage, the leaderboard, income by month and day, who earns the income, when the corporation rats, active ratters per month, ratters coming and going, what the corporation kills, untracked ratters, players who have gone quiet, and special spawns.
@@ -29,6 +29,7 @@ All notable changes to Ratting Manager will be documented in this file.
 - **Leaderboard**: rank and hours for members, every column for directors.
 - Long lists on the dashboards (sessions, systems, special spawns, untracked ratters, players gone quiet and the Corporation tab's leaderboard) show their first 10 rows, with **View all** opening the whole list on its own page, searchable and sortable.
 - **Ratter Lookup** for directors.
+- The Ratter Lookup, ratter pages, Leaderboard and full lists sit in the same dark body as the dashboard, under a tab bar to move between the plugin's pages.
 - **Settings**, in sections: corporations to track, picked by searching SeAT's corporations and confirming after a look at each one's ticker, alliance, tax rate, members, characters on SeAT and journal; session gap, the Gone quiet lists, the members' leaderboard size and extra NPC types to watch; Webhooks; Notifications; and the Routing Map.
 - **Help**, and **Diagnostics** with Health Checks, Master Test, Settings Health, Data Integrity, Tick Trace and Notification Testing.
 

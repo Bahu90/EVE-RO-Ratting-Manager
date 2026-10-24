@@ -1,14 +1,13 @@
-@extends('web::layouts.grids.12')
+@extends('ratting-manager::layouts.page')
 
 @section('title', trans('ratting-manager::ratter.title', ['name' => $mainName]))
 @section('page_header', trans('ratting-manager::ratter.title', ['name' => $mainName]))
 
-@push('head')
-    @include('ratting-manager::partials.head')
-@endpush
+@section('rm-tabs')
+    @include('ratting-manager::partials.page-tabs', ['page' => ['icon' => 'fa-user', 'label' => $mainName]])
+@endsection
 
-@section('full')
-<div class="ratting-manager-dashboard">
+@section('rm-body')
     <p><a href="{{ route('ratting-manager.ratters.index') }}"><i class="fas fa-arrow-left"></i> {{ trans('ratting-manager::ratter.back') }}</a></p>
 
     @include('ratting-manager::dashboard.partials.personal', ['heading' => $mainName])
@@ -51,9 +50,12 @@
             </div>
         </div>
     </div>
-</div>
+@endsection
+
+@section('rm-after')
     @include('ratting-manager::partials.character-lookup')
 @endsection
+
 
 @push('javascript')
 <script src="{{ asset('vendor/ratting-manager/js/vendor/chart.min.js') }}"></script>

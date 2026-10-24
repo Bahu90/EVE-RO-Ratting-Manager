@@ -146,7 +146,7 @@
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-chart-bar"></i> {{ trans('ratting-manager::dashboard.income_12_months') }}</h3>
             </div>
-            <div class="card-body"><div class="rm-chart"><canvas id="rm-chart-monthly"></canvas></div></div>
+            <div class="card-body"><div class="rm-chart"><canvas id="rm-chart-monthly"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.income_12_months_note') }}</p></div>
         </div>
     </div>
     <div class="col-lg-4">
@@ -194,7 +194,7 @@
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-chart-line"></i> {{ trans('ratting-manager::dashboard.daily_income') }}</h3>
             </div>
-            <div class="card-body"><div class="rm-chart"><canvas id="rm-chart-daily"></canvas></div></div>
+            <div class="card-body"><div class="rm-chart"><canvas id="rm-chart-daily"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.daily_income_note') }}</p></div>
         </div>
     </div>
     <div class="col-lg-6">
@@ -204,6 +204,7 @@
             </div>
             <div class="card-body">
                 @include('ratting-manager::partials.heatmap', ['heatmap' => $heatmap, 'perPlayer' => false, 'title' => trans('ratting-manager::dashboard.when_i_rat')])
+                <p class="rm-chart-note">{{ trans('ratting-manager::dashboard.when_i_rat_note') }}</p>
             </div>
         </div>
     </div>
@@ -217,7 +218,7 @@
             </div>
             <div class="card-body">
                 <div class="rm-chart"><canvas id="rm-chart-weekdays"></canvas></div>
-                <small class="text-muted">{{ trans('ratting-manager::insights.time_note') }}</small>
+                <p class="rm-chart-note">{{ trans('ratting-manager::insights.time_note') }}</p>
             </div>
         </div>
     </div>
@@ -228,7 +229,7 @@
             </div>
             <div class="card-body">
                 <div class="rm-chart"><canvas id="rm-chart-hours"></canvas></div>
-                <small class="text-muted">{{ trans('ratting-manager::insights.time_note') }}</small>
+                <p class="rm-chart-note">{{ trans('ratting-manager::insights.time_note') }}</p>
             </div>
         </div>
     </div>
@@ -240,7 +241,7 @@
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-map-marker-alt"></i> {{ trans('ratting-manager::dashboard.where_i_rat') }}</h3>
             </div>
-            <div class="card-body"><div class="rm-chart"><canvas id="rm-chart-systems"></canvas></div></div>
+            <div class="card-body"><div class="rm-chart"><canvas id="rm-chart-systems"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.systems_note') }}</p></div>
         </div>
     </div>
     <div class="col-lg-6">
@@ -250,7 +251,7 @@
             </div>
             <div class="card-body">
                 <div class="rm-chart"><canvas id="rm-chart-efficiency"></canvas></div>
-                <small class="text-muted">{{ trans('ratting-manager::insights.efficiency_note') }} {{ trans('ratting-manager::insights.efficiency_top', ['count' => \RattingManager\Http\Controllers\DashboardController::EFFICIENCY_SYSTEMS_PERSONAL]) }}</small>
+                <p class="rm-chart-note">{{ trans('ratting-manager::insights.efficiency_note') }} {{ trans('ratting-manager::insights.efficiency_top', ['count' => \RattingManager\Http\Controllers\DashboardController::EFFICIENCY_SYSTEMS_PERSONAL]) }}</p>
             </div>
         </div>
     </div>
@@ -279,6 +280,7 @@
                         <div class="rm-chart" style="height: 260px;"><canvas id="rm-chart-sizes"></canvas></div>
                     </div>
                 </div>
+                <p class="rm-chart-note">{{ trans('ratting-manager::dashboard.kills_note') }}</p>
             </div>
         </div>
     </div>
@@ -292,9 +294,8 @@
         <div class="card card-dark">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-stopwatch"></i> {{ trans('ratting-manager::dashboard.session_isk_per_hour') }}</h3>
-                <div class="card-tools"><small class="text-muted">{{ trans('ratting-manager::dashboard.session_isk_per_hour_hint') }}</small></div>
             </div>
-            <div class="card-body"><div class="rm-chart"><canvas id="rm-chart-sessions"></canvas></div></div>
+            <div class="card-body"><div class="rm-chart"><canvas id="rm-chart-sessions"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.session_isk_per_hour_note') }}</p></div>
         </div>
     </div>
     @if(count($personalCharts['characters']['labels']) > 1)
@@ -303,7 +304,7 @@
                 <div class="card-header">
                     <h3 class="card-title"><i class="fas fa-users"></i> {{ trans('ratting-manager::dashboard.by_character') }}</h3>
                 </div>
-                <div class="card-body"><div class="rm-chart"><canvas id="rm-chart-characters"></canvas></div></div>
+                <div class="card-body"><div class="rm-chart"><canvas id="rm-chart-characters"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.by_character_note') }}</p></div>
             </div>
         </div>
     @endif
