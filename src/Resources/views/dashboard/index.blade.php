@@ -69,9 +69,9 @@
 @endsection
 
 @push('javascript')
-<script src="{{ asset('vendor/ratting-manager/js/vendor/chart.min.js') }}"></script>
-<script src="{{ asset('vendor/ratting-manager/js/eve-time.js') }}"></script>
-<script src="{{ asset('vendor/ratting-manager/js/ratting-charts.js') }}?v=2"></script>
+<script src="{{ \RattingManager\Support\Asset::url('js/vendor/chart.min.js') }}"></script>
+<script src="{{ \RattingManager\Support\Asset::url('js/eve-time.js') }}"></script>
+<script src="{{ \RattingManager\Support\Asset::url('js/ratting-charts.js') }}"></script>
 @if(!$notConfigured)
 @php
     $chartText = trans('ratting-manager::dashboard') + ['insights' => trans('ratting-manager::insights')];

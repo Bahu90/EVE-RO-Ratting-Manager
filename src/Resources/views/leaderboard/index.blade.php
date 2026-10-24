@@ -4,7 +4,7 @@
 @section('page_header', trans('ratting-manager::leaderboard.title'))
 
 @section('rm-tabs')
-    @include('ratting-manager::partials.page-tabs', ['active' => 'leaderboard'])
+    @include('ratting-manager::partials.page-tabs', ['icon' => 'fa-trophy', 'label' => trans('ratting-manager::menu.leaderboard')])
 @endsection
 
 @section('rm-body')

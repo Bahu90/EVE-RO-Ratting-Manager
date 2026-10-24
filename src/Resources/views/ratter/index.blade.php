@@ -4,11 +4,11 @@
 @section('page_header', trans('ratting-manager::ratter.lookup_title'))
 
 @push('head')
-    <link rel="stylesheet" href="{{ asset('vendor/ratting-manager/css/vendor/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ \RattingManager\Support\Asset::url('css/vendor/dataTables.bootstrap4.min.css') }}">
 @endpush
 
 @section('rm-tabs')
-    @include('ratting-manager::partials.page-tabs', ['active' => 'ratters'])
+    @include('ratting-manager::partials.page-tabs', ['icon' => 'fa-search', 'label' => trans('ratting-manager::menu.ratter_lookup')])
 @endsection
 
 @section('rm-body')

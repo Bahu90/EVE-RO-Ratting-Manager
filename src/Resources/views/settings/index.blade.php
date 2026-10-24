@@ -84,7 +84,7 @@
 @endsection
 
 @push('javascript')
-<script src="{{ asset('vendor/ratting-manager/js/eve-time.js') }}"></script>
+<script src="{{ \RattingManager\Support\Asset::url('js/eve-time.js') }}"></script>
 <script>
 (function ($) {
     // Sections switch in place and the address keeps the one open, so a

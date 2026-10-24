@@ -4,7 +4,7 @@
 @section('page_header', $title)
 
 @push('head')
-    <link rel="stylesheet" href="{{ asset('vendor/ratting-manager/css/vendor/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ \RattingManager\Support\Asset::url('css/vendor/dataTables.bootstrap4.min.css') }}">
 @endpush
 
 @php
@@ -13,7 +13,7 @@
     $filters = $byPeriod || count($characterOptions ?? []) > 1 || count($corporations ?? []) > 1;
 @endphp
 @section('rm-tabs')
-    @include('ratting-manager::partials.page-tabs', ['page' => ['icon' => 'fa-list', 'label' => $title]])
+    @include('ratting-manager::partials.page-tabs', ['icon' => 'fa-list', 'label' => $title])
 @endsection
 
 @section('rm-body')
@@ -67,7 +67,7 @@
 
 @push('javascript')
 @include('ratting-manager::partials.datatables')
-<script src="{{ asset('vendor/ratting-manager/js/eve-time.js') }}"></script>
+<script src="{{ \RattingManager\Support\Asset::url('js/eve-time.js') }}"></script>
 <script>
 $(function () {
     // Searchable and sortable, in the order the server gave. An empty list

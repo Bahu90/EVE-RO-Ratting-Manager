@@ -5,6 +5,6 @@
 --}}
 <script>
     if (!(window.jQuery && jQuery.fn.DataTable)) {
-        document.write('<script src="{{ asset('vendor/ratting-manager/js/vendor/jquery.dataTables.min.js') }}"><\/script>');
+        document.write('<script src="{{ \RattingManager\Support\Asset::url('js/vendor/jquery.dataTables.min.js') }}"><\/script>');
     }
 </script>

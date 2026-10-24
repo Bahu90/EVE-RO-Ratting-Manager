@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="{{ asset('vendor/ratting-manager/css/ratting-manager.css') }}?v=1">
+<link rel="stylesheet" href="{{ \RattingManager\Support\Asset::url('css/ratting-manager.css') }}">
 <style>
 /* Forced inline as Mining Manager does: some SeAT skins lighten cards and
    tables after the stylesheet loads, and the plugin's light text all but

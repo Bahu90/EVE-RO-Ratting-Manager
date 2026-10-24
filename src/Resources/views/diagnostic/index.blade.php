@@ -4,7 +4,7 @@
 @section('page_header', trans('ratting-manager::diagnostic.title'))
 
 @push('head')
-<link rel="stylesheet" href="{{ asset('vendor/ratting-manager/css/ratting-manager.css') }}?v=1">
+<link rel="stylesheet" href="{{ \RattingManager\Support\Asset::url('css/ratting-manager.css') }}">
 <style>
     /* Structure Manager's diagnostic chrome: underline tabs (.diag-tab), boxed
        sections (.diag-section) and key-value lists (.diag-kv). It lives in the

@@ -4,7 +4,7 @@
 @section('page_header', trans('ratting-manager::help.title'))
 
 @push('head')
-<link rel="stylesheet" href="{{ asset('vendor/ratting-manager/css/ratting-manager.css') }}?v=1">
+<link rel="stylesheet" href="{{ \RattingManager\Support\Asset::url('css/ratting-manager.css') }}">
 <style>
     .help-wrapper {
         display: flex;

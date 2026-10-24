@@ -29,7 +29,7 @@ All notable changes to Ratting Manager will be documented in this file.
 - **Leaderboard**: rank and hours for members, every column for directors.
 - Long lists on the dashboards (sessions, systems, special spawns, untracked ratters, players gone quiet and the Corporation tab's leaderboard) show their first 10 rows, with **View all** opening the whole list on its own page, searchable and sortable.
 - **Ratter Lookup** for directors.
-- The Ratter Lookup, ratter pages, Leaderboard and full lists sit in the same dark body as the dashboard, under a tab bar to move between the plugin's pages.
+- The Ratter Lookup, ratter pages, Leaderboard and full lists sit in the same dark body as the dashboard, under a tab naming the page.
 - **Settings**, in sections: corporations to track, picked by searching SeAT's corporations and confirming after a look at each one's ticker, alliance, tax rate, members, characters on SeAT and journal; session gap, the Gone quiet lists, the members' leaderboard size and extra NPC types to watch; Webhooks; Notifications; and the Routing Map.
 - **Help**, and **Diagnostics** with Health Checks, Master Test, Settings Health, Data Integrity, Tick Trace and Notification Testing.
 
