@@ -77,78 +77,21 @@ class ChartData
         return $data;
     }
 
-    /**
-     * When the ratting happens, weekday by hour in EVE time. For one player a
-     * cell counts the hours they ratted in it; for a corporation, the players
-     * ratting in it, added up over the period.
-     */
-    public function heatmap(Scope $scope, Period $period, bool $perPlayer): array
-    {
-        $ticks = $scope->apply(DB::table('ratting_manager_ticks'))
-            ->whereBetween('ticked_at', [$period->start, $period->end])
-            ->get(['character_id', 'ticked_at']);
-
-        $this->players->load($ticks->pluck('character_id')->map(fn ($id) => (int) $id)->all());
-
-        $seen = [];
-        $cells = array_fill(0, 7, array_fill(0, 24, 0));
-        foreach ($ticks as $t) {
-            $time = strtotime($t->ticked_at);
-            $who = $perPlayer ? $this->players->mainOf((int) $t->character_id) : 0;
-            $slot = $who . ':' . date('Y-m-d H', $time);
-            if (isset($seen[$slot])) {
-                continue;
-            }
-            $seen[$slot] = true;
-            $cells[(int) date('N', $time) - 1][(int) date('G', $time)]++;
-        }
-
-        $max = max(array_map('max', $cells)) ?: 0;
-        $levels = [];
-        foreach ($cells as $day => $hours) {
-            foreach ($hours as $hour => $value) {
-                $levels[$day][$hour] = $value === 0 || $max === 0 ? 0 : (int) max(1, ceil($value / $max * 5));
-            }
-        }
-
-        return ['values' => $cells, 'levels' => $levels, 'max' => $max];
-    }
-
-    /** Where the ISK was made, best systems first, with ISK per hour in each. */
+    /** Where the ISK was made, best systems first. */
     public function systems(Scope $scope, Period $period, int $limit = 15): array
     {
         $rows = $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->whereBetween('date', [$period->start->toDateString(), $period->end->toDateString()])
             ->groupBy('solar_system_id')
-            ->selectRaw('solar_system_id, SUM(bounty_net + ess_net) as income, SUM(ticks) as ticks, SUM(minutes) as minutes, COUNT(DISTINCT character_id) as characters')
+            ->selectRaw('solar_system_id, SUM(bounty_net + ess_net) as income, SUM(ticks) as ticks, COUNT(DISTINCT character_id) as characters')
             ->orderByDesc('income')
             ->limit($limit)
             ->get();
 
-        $ids = $rows->pluck('solar_system_id')->map(fn ($id) => (int) $id)->filter()->all();
-        $details = $this->systems->details($ids);
+        $details = $this->systems->details($rows->pluck('solar_system_id')->map(fn ($id) => (int) $id)->filter()->all());
 
-        // Time in a system is counted the way it is for a player: alts ratting
-        // there together are one stretch of the player's time, so a system's
-        // ISK per hour agrees with the ISK per hour of the players in it.
-        $ticks = $scope->apply(DB::table('ratting_manager_ticks'))
-            ->whereBetween('ticked_at', [$period->start, $period->end])
-            ->whereIn('solar_system_id', $ids ?: [0])
-            ->get(['character_id', 'solar_system_id', 'ticked_at']);
-        $this->players->load($ticks->pluck('character_id')->map(fn ($id) => (int) $id)->all());
-
-        $times = [];
-        foreach ($ticks as $t) {
-            $times[(int) $t->solar_system_id][$this->players->mainOf((int) $t->character_id)][] = strtotime($t->ticked_at);
-        }
-        $playerMinutes = [];
-        foreach ($times as $system => $byPlayer) {
-            $playerMinutes[$system] = array_sum(array_map([ActiveTime::class, 'minutes'], $byPlayer));
-        }
-
-        return $rows->map(function ($r) use ($details, $playerMinutes) {
+        return $rows->map(function ($r) use ($details) {
             $id = (int) $r->solar_system_id;
-            $minutes = (int) ($playerMinutes[$id] ?? 0);
 
             return [
                 'system_id' => $id,
@@ -156,8 +99,6 @@ class ChartData
                 'security' => $id ? ($details[$id]['security'] ?? null) : null,
                 'income' => round((float) $r->income, 2),
                 'ticks' => (int) $r->ticks,
-                'minutes' => $minutes,
-                'isk_per_hour' => $minutes > 0 ? round((float) $r->income / ($minutes / 60), 2) : 0.0,
                 'characters' => (int) $r->characters,
             ];
         })->all();
@@ -170,27 +111,13 @@ class ChartData
      */
     public function kills(Scope $scope, Period $period): array
     {
-        $base = $scope->apply(DB::table('ratting_manager_ticks as t'), 't')
-            ->join('ratting_manager_tick_kills as k', 'k.tick_id', '=', 't.id')
-            ->whereBetween('t.ticked_at', [$period->start, $period->end])
-            ->whereNotNull('t.kill_group')
-            ->select(['t.kill_group', 'k.npc_type_id', 'k.quantity'])
-            ->distinct();
-
-        $rows = DB::query()->fromSub($base, 'x')
-            ->leftJoin('ratting_manager_npc_types as n', 'n.type_id', '=', 'x.npc_type_id')
-            ->groupBy('n.faction', 'n.size', 'n.rank')
-            ->selectRaw('n.faction, n.size, n.rank, SUM(x.quantity) as quantity')
-            ->get();
-
         $factions = [];
         $sizes = array_fill_keys(['small', 'medium', 'large', 'capital', 'unknown'], 0);
         $ranks = array_fill_keys(NpcRegistry::RANKS, 0);
-        foreach ($rows as $r) {
-            $faction = $r->faction ?? 'other';
-            $factions[$faction] = ($factions[$faction] ?? 0) + (int) $r->quantity;
-            $sizes[$r->size ?? 'unknown'] = ($sizes[$r->size ?? 'unknown'] ?? 0) + (int) $r->quantity;
-            $ranks[$r->rank ?? 'regular'] = ($ranks[$r->rank ?? 'regular'] ?? 0) + (int) $r->quantity;
+        foreach (Ticks::kills($scope, $period->start, $period->end) as $r) {
+            $factions[$r['faction']] = ($factions[$r['faction']] ?? 0) + $r['quantity'];
+            $sizes[$r['size']] = ($sizes[$r['size']] ?? 0) + $r['quantity'];
+            $ranks[$r['rank']] = ($ranks[$r['rank']] ?? 0) + $r['quantity'];
         }
         arsort($factions);
 

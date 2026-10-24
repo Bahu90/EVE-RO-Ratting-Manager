@@ -2,8 +2,6 @@
 
 namespace RattingManager\Services\Ratting;
 
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use RattingManager\Services\Character\Players;
 use RattingManager\Services\Npc\NpcRegistry;
@@ -42,24 +40,18 @@ class Insights
 
     public function for(Scope $scope, Period $period, bool $corporation): array
     {
-        $key = 'rm:insights:' . $scope->cacheKey() . ':' . $period->cacheKey() . ':' . (int) $corporation;
+        $key = 'insights:' . $scope->cacheKey() . ':' . $period->cacheKey() . ':' . (int) $corporation;
 
-        return Cache::remember($key, config('ratting-manager.cache_seconds', 300), function () use ($scope, $period, $corporation) {
-            return $this->compute($scope, $period, $corporation);
-        });
+        return FigureCache::remember($key, fn () => $this->compute($scope, $period, $corporation));
     }
 
     private function compute(Scope $scope, Period $period, bool $corporation): array
     {
-        $ticks = $scope->apply(DB::table('ratting_manager_ticks'))
-            ->whereBetween('ticked_at', [$period->start, $period->end])
-            ->orderBy('ticked_at')
-            ->get(['character_id', 'ticked_at', 'solar_system_id', 'net_amount', 'kill_group', 'npc_kills']);
-
-        $this->players->load($ticks->pluck('character_id')->map(fn ($id) => (int) $id)->unique()->all());
+        $this->players->load(Ticks::characters($scope, $period->start, $period->end));
 
         $span = ActiveTime::TICK_MINUTES * 60;
         $coveredUntil = [];
+        $mains = [];
 
         $weekdaySeconds = array_fill(0, 7, 0);
         $weekdayBounty = array_fill(0, 7, 0.0);
@@ -68,15 +60,16 @@ class Insights
         $system = [];
         $groupsSeen = [];
         $rats = 0;
-        $dates = [];
-        $weekdayDates = array_fill(0, 7, []);
-        $playersByDate = [];
+        $days = [];
+        $weekdayDays = array_fill(0, 7, []);
+        $playersByDay = [];
         $playersBySlot = [];
         $playerSeconds = [];
 
+        $ticks = Ticks::stream($scope, $period->start, $period->end, ['character_id', 'solar_system_id', 'net_amount', 'kill_group', 'npc_kills'], true);
         foreach ($ticks as $t) {
-            $time = strtotime($t->ticked_at);
-            $main = $this->players->mainOf((int) $t->character_id);
+            $time = (int) $t->ts;
+            $main = $mains[(int) $t->character_id] ??= $this->players->mainOf((int) $t->character_id);
             $sys = (int) $t->solar_system_id;
 
             // The new time this tick adds to its player's ratting.
@@ -91,9 +84,11 @@ class Insights
             }
             $coveredUntil[$main] = max($until ?? $time, $time);
 
-            $dow = (int) date('N', $time) - 1;
-            $hour = (int) date('G', $time);
-            $date = date('Y-m-d', $time);
+            // Days and hours counted from the epoch, which began on a Thursday.
+            $day = intdiv($time, 86400);
+            $slot = intdiv($time, 3600);
+            $dow = ($day + 3) % 7;
+            $hour = $slot % 24;
             $net = (float) $t->net_amount;
 
             $weekdaySeconds[$dow] += $added;
@@ -102,13 +97,13 @@ class Insights
             $hourBounty[$hour] += $net;
             $playerSeconds[$main] = ($playerSeconds[$main] ?? 0) + $added;
 
-            $system[$sys] ??= ['seconds' => 0, 'bounty' => 0.0, 'ess' => 0.0, 'ticks' => 0, 'rats' => 0, 'players' => [], 'dates' => [], 'last' => null, 'playerSeconds' => []];
+            $system[$sys] ??= ['seconds' => 0, 'bounty' => 0.0, 'ess' => 0.0, 'ticks' => 0, 'rats' => 0, 'players' => [], 'days' => [], 'last' => null, 'playerSeconds' => []];
             $system[$sys]['seconds'] += $added;
             $system[$sys]['bounty'] += $net;
             $system[$sys]['ticks']++;
             $system[$sys]['players'][$main] = true;
-            $system[$sys]['dates'][$date] = true;
-            $system[$sys]['last'] = $t->ticked_at;
+            $system[$sys]['days'][$day] = true;
+            $system[$sys]['last'] = $time;
             $system[$sys]['playerSeconds'][$main] = ($system[$sys]['playerSeconds'][$main] ?? 0) + $added;
 
             if ($t->kill_group !== null && !isset($groupsSeen[$t->kill_group])) {
@@ -117,10 +112,10 @@ class Insights
                 $system[$sys]['rats'] += (int) $t->npc_kills;
             }
 
-            $dates[$date] = true;
-            $weekdayDates[$dow][$date] = true;
-            $playersByDate[$date][$main] = true;
-            $playersBySlot[date('Y-m-d H', $time)][$main] = true;
+            $days[$day] = true;
+            $weekdayDays[$dow][$day] = true;
+            $playersByDay[$day][$main] = true;
+            $playersBySlot[$slot][$main] = true;
         }
 
         $ess = $scope->apply(DB::table('ratting_manager_ess_payouts'))
@@ -130,7 +125,7 @@ class Insights
             ->pluck('net', 'solar_system_id');
         foreach ($ess as $sys => $net) {
             $sys = (int) $sys;
-            $system[$sys] ??= ['seconds' => 0, 'bounty' => 0.0, 'ess' => 0.0, 'ticks' => 0, 'rats' => 0, 'players' => [], 'dates' => [], 'last' => null, 'playerSeconds' => []];
+            $system[$sys] ??= ['seconds' => 0, 'bounty' => 0.0, 'ess' => 0.0, 'ticks' => 0, 'rats' => 0, 'players' => [], 'days' => [], 'last' => null, 'playerSeconds' => []];
             $system[$sys]['ess'] += (float) $net;
         }
 
@@ -140,7 +135,7 @@ class Insights
         $totalIncome = $totalBounty + $totalEss;
 
         $systems = $this->systemRows($system, $totalSeconds, $totalIncome);
-        $weekdays = $this->weekdayRows($weekdaySeconds, $weekdayBounty, $weekdayDates, $playersByDate);
+        $weekdays = $this->weekdayRows($weekdaySeconds, $weekdayBounty, $weekdayDays, $playersByDay);
         $hours = $this->hourRows($hourSeconds, $hourBounty, $playersBySlot);
         $sessions = $this->sessions($scope, $period);
         $npcs = $this->topNpcs($scope, $period);
@@ -155,8 +150,8 @@ class Insights
             'favourite_faction' => $npcs['favourite_faction'],
             'rats_per_hour' => $totalSeconds > 0 ? round($rats / ($totalSeconds / 3600), 1) : 0.0,
             'ess_share' => $totalIncome > 0 ? round($totalEss / $totalIncome * 100) : null,
-            'active_days' => count($dates),
-            'income_per_active_day' => count($dates) ? round($totalIncome / count($dates), 2) : 0.0,
+            'active_days' => count($days),
+            'income_per_active_day' => count($days) ? round($totalIncome / count($days), 2) : 0.0,
             'sessions' => $sessions,
         ];
 
@@ -164,16 +159,16 @@ class Insights
             $peak = null;
             foreach ($playersBySlot as $slot => $set) {
                 if ($peak === null || count($set) > $peak['players']) {
-                    $peak = ['players' => count($set), 'when' => $slot . ':00'];
+                    $peak = ['players' => count($set), 'when' => gmdate('Y-m-d H:00', $slot * 3600)];
                 }
             }
             $highlights['peak_concurrent'] = $peak;
-            $highlights['players_per_day'] = count($playersByDate)
-                ? round(array_sum(array_map('count', $playersByDate)) / count($playersByDate), 1)
+            $highlights['players_per_day'] = count($playersByDay)
+                ? round(array_sum(array_map('count', $playersByDay)) / count($playersByDay), 1)
                 : 0.0;
             $highlights['income_per_player'] = count($playerSeconds) ? round($totalIncome / count($playerSeconds), 2) : 0.0;
         } else {
-            $highlights += $this->streaks(array_keys($dates));
+            $highlights += $this->streaks(array_keys($days));
         }
 
         return [
@@ -182,6 +177,7 @@ class Insights
             'weekdays' => $weekdays,
             'hours' => $hours,
             'npcs' => $npcs['top'],
+            'heatmap' => $this->heatmap($playersBySlot, $corporation),
             'totals' => [
                 'minutes' => intdiv($totalSeconds + 30, 60),
                 'bounty' => round($totalBounty, 2),
@@ -219,8 +215,8 @@ class Insights
                 'ticks' => $s['ticks'],
                 'rats' => $s['rats'],
                 'players' => count($s['players']),
-                'active_days' => count($s['dates']),
-                'last' => $s['last'],
+                'active_days' => count($s['days']),
+                'last' => $s['last'] === null ? null : gmdate('Y-m-d H:i:s', $s['last']),
                 'top_main' => $topMain,
                 'hours_share' => $totalSeconds > 0 ? round($s['seconds'] / $totalSeconds * 100, 1) : 0.0,
                 'income_share' => $totalIncome > 0 ? round($income / $totalIncome * 100, 1) : 0.0,
@@ -232,15 +228,15 @@ class Insights
         return $rows;
     }
 
-    private function weekdayRows(array $seconds, array $bounty, array $weekdayDates, array $playersByDate): array
+    private function weekdayRows(array $seconds, array $bounty, array $weekdayDays, array $playersByDay): array
     {
         $rows = [];
         foreach (self::WEEKDAYS as $i => $name) {
             $minutes = intdiv($seconds[$i] + 30, 60);
-            $days = count($weekdayDates[$i]);
+            $days = count($weekdayDays[$i]);
             $players = 0;
-            foreach (array_keys($weekdayDates[$i]) as $date) {
-                $players += count($playersByDate[$date] ?? []);
+            foreach (array_keys($weekdayDays[$i]) as $day) {
+                $players += count($playersByDay[$day] ?? []);
             }
 
             $rows[] = [
@@ -262,7 +258,7 @@ class Insights
     {
         $playersByHour = array_fill(0, 24, 0);
         foreach ($playersBySlot as $slot => $set) {
-            $playersByHour[(int) substr($slot, 11, 2)] += count($set);
+            $playersByHour[$slot % 24] += count($set);
         }
 
         $rows = [];
@@ -338,37 +334,24 @@ class Insights
     /** The NPCs killed most often, a fleet's shared payout counted once. */
     private function topNpcs(Scope $scope, Period $period): array
     {
-        $base = $scope->apply(DB::table('ratting_manager_ticks as t'), 't')
-            ->join('ratting_manager_tick_kills as k', 'k.tick_id', '=', 't.id')
-            ->whereBetween('t.ticked_at', [$period->start, $period->end])
-            ->whereNotNull('t.kill_group')
-            ->select(['t.kill_group', 'k.npc_type_id', 'k.quantity'])
-            ->distinct();
-
-        $rows = DB::query()->fromSub($base, 'x')
-            ->leftJoin('ratting_manager_npc_types as n', 'n.type_id', '=', 'x.npc_type_id')
-            ->groupBy('x.npc_type_id', 'n.name', 'n.faction', 'n.size', 'n.rank')
-            ->selectRaw('x.npc_type_id, n.name, n.faction, n.size, n.rank, SUM(x.quantity) as killed')
-            ->orderByDesc('killed')
-            ->get();
+        $rows = Ticks::kills($scope, $period->start, $period->end);
 
         $byFaction = [];
         foreach ($rows as $r) {
-            $faction = $r->faction ?? 'other';
-            $byFaction[$faction] = ($byFaction[$faction] ?? 0) + (int) $r->killed;
+            $byFaction[$r['faction']] = ($byFaction[$r['faction']] ?? 0) + $r['quantity'];
         }
         arsort($byFaction);
         $favourite = array_key_first($byFaction);
 
         return [
-            'top' => $rows->take(10)->map(fn ($r) => [
-                'type_id' => (int) $r->npc_type_id,
-                'name' => $r->name ?? ('Type ' . $r->npc_type_id),
-                'faction' => $r->faction ?? 'other',
-                'size' => $r->size ?? 'unknown',
-                'rank' => $r->rank ?? 'regular',
-                'killed' => (int) $r->killed,
-            ])->all(),
+            'top' => array_map(fn ($r) => [
+                'type_id' => $r['npc_type_id'],
+                'name' => $r['name'] ?? ('Type ' . $r['npc_type_id']),
+                'faction' => $r['faction'],
+                'size' => $r['size'],
+                'rank' => $r['rank'],
+                'killed' => $r['quantity'],
+            ], array_slice($rows, 0, 10)),
             'favourite_faction' => $favourite === null ? null : [
                 'key' => $favourite,
                 'name' => NpcRegistry::FACTIONS[$favourite] ?? ucfirst($favourite),
@@ -378,27 +361,52 @@ class Insights
     }
 
     /**
+     * When the ratting happens, weekday by hour in EVE time. For one player a
+     * cell counts the hours they ratted in it; for a corporation, the players
+     * ratting in it, added up over the period.
+     *
+     * @param array<int, array<int, true>> $playersBySlot hour since the epoch => players ratting in it
+     */
+    private function heatmap(array $playersBySlot, bool $perPlayer): array
+    {
+        $cells = array_fill(0, 7, array_fill(0, 24, 0));
+        foreach ($playersBySlot as $slot => $set) {
+            $cells[(intdiv($slot, 24) + 3) % 7][$slot % 24] += $perPlayer ? count($set) : 1;
+        }
+
+        $max = max(array_map('max', $cells)) ?: 0;
+        $levels = [];
+        foreach ($cells as $day => $hours) {
+            foreach ($hours as $hour => $value) {
+                $levels[$day][$hour] = $value === 0 || $max === 0 ? 0 : (int) max(1, ceil($value / $max * 5));
+            }
+        }
+
+        return ['values' => $cells, 'levels' => $levels, 'max' => $max];
+    }
+
+    /**
      * Days in a row with at least one tick: the longest run in the period,
      * and the run still going, which counts today or yesterday as current.
      *
-     * @param string[] $dates
+     * @param int[] $days days since the epoch
      */
-    private function streaks(array $dates): array
+    private function streaks(array $days): array
     {
-        if ($dates === []) {
+        if ($days === []) {
             return ['longest_streak' => 0, 'current_streak' => 0];
         }
 
-        sort($dates);
+        sort($days);
         $longest = 1;
         $run = 1;
-        for ($i = 1; $i < count($dates); $i++) {
-            $run = Carbon::parse($dates[$i - 1])->addDay()->toDateString() === $dates[$i] ? $run + 1 : 1;
+        for ($i = 1; $i < count($days); $i++) {
+            $run = $days[$i - 1] + 1 === $days[$i] ? $run + 1 : 1;
             $longest = max($longest, $run);
         }
 
-        $last = end($dates);
-        $current = in_array($last, [now()->toDateString(), now()->subDay()->toDateString()], true) ? $run : 0;
+        $today = intdiv(now()->getTimestamp(), 86400);
+        $current = end($days) >= $today - 1 ? $run : 0;
 
         return ['longest_streak' => $longest, 'current_streak' => $current];
     }

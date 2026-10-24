@@ -4,7 +4,9 @@ namespace RattingManager\Console\Commands;
 
 use Illuminate\Console\Command;
 use RattingManager\Console\Commands\Concerns\HoldsThePipelineLock;
+use RattingManager\Services\Ratting\FigureWarmer;
 use RattingManager\Services\Ratting\Pipeline;
+use Throwable;
 
 /**
  * The scheduled run: reads the last two days of both journals and brings
@@ -23,9 +25,12 @@ class ProcessCommand extends Command
 
     protected $description = 'Import bounty ticks and ESS payouts and update sessions and daily summaries';
 
-    public function handle(Pipeline $pipeline)
+    public function handle(Pipeline $pipeline, FigureWarmer $warmer)
     {
-        return $this->underLock(1800, function () use ($pipeline) {
+        $ran = false;
+
+        $status = $this->underLock(1800, function () use ($pipeline, &$ran) {
+            $ran = true;
             $since = $this->since();
             $this->info('Ratting Manager - reading from ' . $since->toDateString());
 
@@ -59,5 +64,16 @@ class ProcessCommand extends Command
 
             return Command::SUCCESS;
         });
+
+        // After the lock, which moves the cached figures on when it is let go.
+        if ($ran) {
+            try {
+                $warmer->warm();
+            } catch (Throwable $e) {
+                $this->warn('The figures could not be worked out ahead of time: ' . $e->getMessage());
+            }
+        }
+
+        return $status;
     }
 }

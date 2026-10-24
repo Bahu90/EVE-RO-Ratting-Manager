@@ -54,3 +54,8 @@ All notable changes to Ratting Manager will be documented in this file.
 - `process` runs twice an hour over the last two days, and once a day over the last 31 so tokens added later pair with the corporation rows already imported.
 - `resolve-characters --requested` runs every minute for the characters pages asked for, and the full lookup every 10 minutes.
 - `ratting-manager:notify` checks the alerts twice an hour, five minutes after the import; `ratting-manager:poll-system-kills` keeps ESI's kill counts hourly; `ratting-manager:send-reports` sends the reports that are due daily at 11:20 EVE.
+
+### Speed
+
+- Every figure is read from the plugin's own tables, indexed for the way the pages and the import read them. Charts of income, systems and kills come from day by day totals; only time and player counts read the ticks, once per page, as a stream.
+- Figures are kept until the next import changes them, and the ones the Corporation tab opens with are worked out straight after each import. A year of a 200-character corporation opens in about two seconds the first time and at once after that.

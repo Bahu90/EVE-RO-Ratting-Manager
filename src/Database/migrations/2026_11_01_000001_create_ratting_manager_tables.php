@@ -61,7 +61,13 @@ class CreateRattingManagerTables extends Migration
                 $table->unique('character_journal_id', 'rm_ticks_char_journal');
                 $table->unique('corporation_journal_id', 'rm_ticks_corp_journal');
                 $table->index(['character_id', 'ticked_at'], 'rm_ticks_character_time');
-                $table->index(['corporation_id', 'ticked_at'], 'rm_ticks_corp_time');
+                // character_id rides along so who ratted when, for gone quiet
+                // and the like, is read from the index without the rows.
+                $table->index(['corporation_id', 'ticked_at', 'character_id'], 'rm_ticks_corp_time');
+                $table->index(['corporation_id', 'kind', 'ticked_at'], 'rm_ticks_corp_kind_time');
+                // The pipeline rebuilds days and sessions for every
+                // corporation at once, by time alone.
+                $table->index(['ticked_at', 'character_id'], 'rm_ticks_time');
                 $table->index(['solar_system_id', 'ticked_at'], 'rm_ticks_system_time');
                 $table->index(['character_id', 'solar_system_id', 'ticked_at'], 'rm_ticks_pair_key');
                 $table->index('kill_group', 'rm_ticks_kill_group');
@@ -101,6 +107,7 @@ class CreateRattingManagerTables extends Migration
                 $table->unique('corporation_journal_id', 'rm_ess_corp_journal');
                 $table->index(['character_id', 'paid_at'], 'rm_ess_character_time');
                 $table->index(['corporation_id', 'paid_at'], 'rm_ess_corp_time');
+                $table->index('paid_at', 'rm_ess_time');
                 $table->index(['character_id', 'solar_system_id', 'paid_at'], 'rm_ess_pair_key');
             });
         }
@@ -203,6 +210,7 @@ class CreateRattingManagerTables extends Migration
 
                 $table->unique(['kill_group', 'npc_type_id'], 'rm_spawns_group_type');
                 $table->index(['corporation_id', 'ticked_at'], 'rm_spawns_corp_time');
+                $table->index(['character_id', 'ticked_at'], 'rm_spawns_character_time');
             });
         }
 

@@ -3,7 +3,6 @@
 namespace RattingManager\Services\Ratting;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use RattingManager\Services\Character\Players;
 use RattingManager\Services\Configuration\Settings;
@@ -32,11 +31,9 @@ class RattingMetrics
      */
     public function collect(Scope $scope, Carbon $from, Carbon $to): array
     {
-        $key = 'rm:collect:' . $scope->cacheKey() . ':' . $from->getTimestamp() . ':' . intdiv($to->getTimestamp(), 300);
+        $key = 'collect:' . $scope->cacheKey() . ':' . FigureCache::range($from, $to);
 
-        $collected = Cache::remember($key, config('ratting-manager.cache_seconds', 300), function () use ($scope, $from, $to) {
-            return $this->compute($scope, $from, $to);
-        });
+        $collected = FigureCache::remember($key, fn () => $this->compute($scope, $from, $to));
 
         // Names go on after the cache, so a character still being looked up
         // when the figures were cached is named as soon as the lookup has them.
@@ -220,15 +217,10 @@ class RattingMetrics
             ->get()
             ->keyBy('character_id');
 
-        $ticks = $scope->apply(DB::table('ratting_manager_ticks'))
-            ->whereBetween('ticked_at', [$from, $to])
-            ->select(['character_id', 'ticked_at', 'kill_group', 'npc_kills', 'kind'])
-            ->get();
-
-        $this->players->load(array_unique(array_merge(
+        $this->players->load(array_merge(
             $money->keys()->map(fn ($id) => (int) $id)->all(),
-            $ticks->pluck('character_id')->map(fn ($id) => (int) $id)->all()
-        )));
+            Ticks::characters($scope, $from, $to)
+        ));
 
         $players = [];
         $blank = fn (int $main) => [
@@ -258,17 +250,20 @@ class RattingMetrics
         $days = [];
         $seenByCorp = [];
         $paired = [];
-        foreach ($ticks as $t) {
-            $main = $this->players->mainOf((int) $t->character_id);
+        $mains = [];
+        $last = [];
+        foreach (Ticks::stream($scope, $from, $to, ['character_id', 'kill_group', 'npc_kills', 'kind']) as $t) {
+            $main = $mains[(int) $t->character_id] ??= $this->players->mainOf((int) $t->character_id);
+            $time = (int) $t->ts;
             $players[$main] ??= $blank($main);
             $players[$main]['characters'][(int) $t->character_id] = true;
             $players[$main]['ticks']++;
-            if ($players[$main]['last_tick'] === null || $t->ticked_at > $players[$main]['last_tick']) {
-                $players[$main]['last_tick'] = $t->ticked_at;
+            if ($time > ($last[$main] ?? 0)) {
+                $last[$main] = $time;
             }
 
-            $times[$main][] = strtotime($t->ticked_at);
-            $days[$main][substr($t->ticked_at, 0, 10)] = true;
+            $times[$main][] = $time;
+            $days[$main][intdiv($time, 86400)] = true;
 
             if ($t->kill_group !== null) {
                 $groups[$main][$t->kill_group] = (int) $t->npc_kills;
@@ -297,6 +292,7 @@ class RattingMetrics
             $p['active_days'] = count($days[$main] ?? []);
             $p['coverage'] = isset($seenByCorp[$main]) ? round(($paired[$main] ?? 0) / $seenByCorp[$main] * 100) : null;
             $p['characters'] = array_keys($p['characters']);
+            $p['last_tick'] = isset($last[$main]) ? gmdate('Y-m-d H:i:s', $last[$main]) : null;
             $p['wallet_token'] = (bool) array_filter($p['characters'], fn ($id) => $this->players->hasWalletToken($id));
 
             foreach (['income', 'bounty', 'ess', 'estimated', 'corp_tax', 'ticks', 'minutes'] as $f) {
@@ -309,7 +305,7 @@ class RattingMetrics
         $totals['players'] = count($players);
         $totals['isk_per_hour'] = $totals['minutes'] > 0 ? round($totals['income'] / ($totals['minutes'] / 60), 2) : 0.0;
         $totals['coverage'] = $totals['seen_by_corp'] > 0 ? round($totals['paired'] / $totals['seen_by_corp'] * 100) : null;
-        $totals['active_days'] = count(array_unique(array_merge(...array_map('array_keys', array_values($days ?: [[]])))));
+        $totals['active_days'] = count(array_replace(...array_values($days ?: [[]])));
 
         return ['players' => $players, 'totals' => $totals];
     }

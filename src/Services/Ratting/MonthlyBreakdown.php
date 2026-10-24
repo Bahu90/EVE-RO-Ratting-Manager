@@ -56,17 +56,13 @@ class MonthlyBreakdown
             ->get()
             ->keyBy('character_id');
 
-        $ticks = $scope->apply(DB::table('ratting_manager_ticks'))
-            ->whereBetween('ticked_at', [$start, $end])
-            ->get(['character_id', 'ticked_at', 'kill_group', 'npc_kills']);
-
         $times = [];
         $groups = [];
         $allTimes = [];
         $allGroups = [];
-        foreach ($ticks as $t) {
+        foreach (Ticks::stream($scope, $start, $end, ['character_id', 'kill_group', 'npc_kills']) as $t) {
             $id = (int) $t->character_id;
-            $ts = strtotime($t->ticked_at);
+            $ts = (int) $t->ts;
             $times[$id][] = $ts;
             $allTimes[] = $ts;
             if ($t->kill_group !== null) {
@@ -165,6 +161,14 @@ class MonthlyBreakdown
      */
     public function corporationMonths(Scope $scope, int $months = 12): array
     {
+        return FigureCache::remember(
+            'months:' . $scope->cacheKey() . ':' . $months . ':' . now()->format('Y-m'),
+            fn () => $this->computeCorporationMonths($scope, $months)
+        );
+    }
+
+    private function computeCorporationMonths(Scope $scope, int $months): array
+    {
         $start = now()->subMonthsNoOverflow($months - 1)->startOfMonth();
 
         $money = $scope->apply(DB::table('ratting_manager_daily_summaries'))
@@ -174,17 +178,18 @@ class MonthlyBreakdown
             ->get()
             ->keyBy('month');
 
-        $ticks = $scope->apply(DB::table('ratting_manager_ticks'))
-            ->where('ticked_at', '>=', $start)
-            ->get(['character_id', 'ticked_at']);
-        $this->players->load($ticks->pluck('character_id')->map(fn ($id) => (int) $id)->unique()->all());
+        $end = now();
+        $this->players->load(Ticks::characters($scope, $start, $end));
 
         $times = [];
         $characters = [];
-        foreach ($ticks as $t) {
-            $key = substr($t->ticked_at, 0, 7);
-            $main = $this->players->mainOf((int) $t->character_id);
-            $times[$key][$main][] = strtotime($t->ticked_at);
+        $mains = [];
+        $monthOf = [];
+        foreach (Ticks::stream($scope, $start, $end, ['character_id']) as $t) {
+            $time = (int) $t->ts;
+            $key = $monthOf[intdiv($time, 86400)] ??= gmdate('Y-m', $time);
+            $main = $mains[(int) $t->character_id] ??= $this->players->mainOf((int) $t->character_id);
+            $times[$key][$main][] = $time;
             $characters[$key][(int) $t->character_id] = true;
         }
 

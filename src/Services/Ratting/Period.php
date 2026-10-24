@@ -86,6 +86,6 @@ final class Period
 
     public function cacheKey(): string
     {
-        return $this->key . ':' . $this->start->format('YmdH') . ':' . $this->end->format('YmdH');
+        return $this->key . ':' . FigureCache::range($this->start, $this->end);
     }
 }

@@ -51,7 +51,16 @@ class Players
     /** @param int[] $characterIds */
     public function load(array $characterIds): void
     {
-        $missing = array_values(array_diff(array_map('intval', $characterIds), array_keys($this->userOf)));
+        // Callers pass a column of ticks, so the same id comes thousands of
+        // times; each one is looked up once.
+        $missing = [];
+        foreach ($characterIds as $id) {
+            $id = (int) $id;
+            if (!array_key_exists($id, $this->userOf)) {
+                $missing[$id] = $id;
+            }
+        }
+        $missing = array_values($missing);
         if ($missing === []) {
             return;
         }
@@ -86,7 +95,9 @@ class Players
     /** The character a player is shown under: the user's main, or the character itself. */
     public function mainOf(int $characterId): int
     {
-        $this->load([$characterId]);
+        if (!array_key_exists($characterId, $this->userOf)) {
+            $this->load([$characterId]);
+        }
         $user = $this->userOf[$characterId];
 
         return $user && isset($this->mainOf[$user]) ? $this->mainOf[$user] : $characterId;
@@ -166,7 +177,9 @@ class Players
 
     public function hasWalletToken(int $characterId): bool
     {
-        $this->load([$characterId]);
+        if (!array_key_exists($characterId, $this->userOf)) {
+            $this->load([$characterId]);
+        }
 
         return $this->wallet[$characterId];
     }

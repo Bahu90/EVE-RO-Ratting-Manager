@@ -598,7 +598,7 @@
                     </ol>
                     <div class="info-box">
                         <i class="fas fa-clock"></i>
-                        <div>A tick reaches the pages about one to two hours after it pays out: ESI caches the wallet journal for an hour, SeAT pulls it about hourly, and the plugin reads it every half hour.</div>
+                        <div>A tick reaches the pages about one to two hours after it pays out: ESI caches the wallet journal for an hour, SeAT pulls it about hourly, and the plugin reads it every half hour. Figures are kept until the next import changes them, so a page shows the same figures between imports however often it is opened.</div>
                     </div>
                 </div>
             </div>

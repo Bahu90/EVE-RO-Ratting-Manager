@@ -4,11 +4,13 @@ namespace RattingManager\Console\Commands\Concerns;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
+use RattingManager\Services\Ratting\FigureCache;
 
 /**
  * Every command that writes ratting data takes the same lock, so a manual run
  * can never interleave with the scheduled one and pair or rebuild the same
- * rows twice at once.
+ * rows twice at once. Letting go of it tells the cached figures the data has
+ * moved on.
  */
 trait HoldsThePipelineLock
 {
@@ -24,6 +26,7 @@ trait HoldsThePipelineLock
         try {
             return $work();
         } finally {
+            FigureCache::changed();
             $lock->release();
         }
     }

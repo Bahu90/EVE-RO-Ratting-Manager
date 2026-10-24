@@ -15,9 +15,9 @@ return [
     // Public ESI, for names of characters SeAT holds no token for.
     'esi_base_url' => env('RATTING_MANAGER_ESI_URL', 'https://esi.evetech.net/latest'),
 
-    // How long dashboard and leaderboard figures are kept before they are
-    // worked out again. The journals only move every half hour, so a few
-    // minutes costs nothing and saves the heaviest queries on busy pages.
-    'cache_seconds' => 300,
+    // The longest dashboard and leaderboard figures are kept. They are worked
+    // out again after every import anyway, since that is the only time they
+    // change, so this only matters when imports stop.
+    'cache_seconds' => 3600,
 
 ];

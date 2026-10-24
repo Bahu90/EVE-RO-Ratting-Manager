@@ -166,6 +166,8 @@ The schedules are added once. Changes you make to them in SeAT are kept on updat
 
 A tick reaches the pages about one to two hours after it pays out: ESI caches the wallet journal for an hour, SeAT pulls it about hourly, and the plugin reads it every half hour.
 
+Dashboard figures are cached until the next import changes them, so a page shows the same figures between imports however often it is opened.
+
 ## License
 
 GPL-2.0-or-later. See [LICENSE](LICENSE).
