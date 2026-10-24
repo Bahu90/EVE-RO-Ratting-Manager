@@ -145,7 +145,7 @@
                 <div class="col-md-6 form-group">
                     <label for="rm-spawn-rank">{{ trans('ratting-manager::notification_settings.spawn_min_rank') }}</label>
                     <select class="form-control" id="rm-spawn-rank" name="spawn_min_rank">
-                        @foreach(['faction', 'commander', 'officer'] as $rank)
+                        @foreach(\RattingManager\Services\Npc\NpcRegistry::SPECIAL_RANKS as $rank)
                             <option value="{{ $rank }}" @if(old('spawn_min_rank', $notificationValues['spawn_min_rank']) === $rank) selected @endif>{{ trans('ratting-manager::common.rank_' . $rank) }}</option>
                         @endforeach
                     </select>

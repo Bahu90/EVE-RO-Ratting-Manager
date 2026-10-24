@@ -574,7 +574,7 @@
                         <li><strong>My Ratting</strong> for every member: income, ISK per hour, hours, sessions, systems, what they kill and their personal records.</li>
                         <li><strong>A Corporation tab</strong> for directors: totals, the leaderboard with every player's ISK and ISK per hour, efficiency by system, when the corporation rats, who has gone quiet and who rats without a wallet token.</li>
                         <li><strong>A leaderboard</strong> members see too, with rank and hours only.</li>
-                        <li><strong>Special spawns</strong>: officers, commanders, faction rats and capitals, listed as they are killed.</li>
+                        <li><strong>Special spawns</strong>: officers, commanders, clone soldiers and capital rats, listed as they are killed.</li>
                         <li><strong>Members with no wallet token still count.</strong> The corporation journal names the ratter on every tick it taxes, and their income is worked out exactly from the corporation's cut.</li>
                         <li><strong>Insights</strong> for members and directors: favourite and best-paying systems, the most active and best-paying days and times, ISK per hour in every system ratted, and the NPCs killed most.</li>
                         <li><strong>Month by month</strong>: what each of a member's characters earned in a month with the total, and for directors, what the players earned against what landed in the corporation's wallet.</li>
@@ -695,6 +695,7 @@
                     </p>
                     <h4>NPCs</h4>
                     <p>Each rat is placed by faction, size and rank from SeAT's SDE. Groups that mix sizes are sized by the NPC's mass. Anything that cannot be placed still counts, as Other, and Diagnostics lists it.</p>
+                    <p>The rank comes from the SDE group: officers and commanders have groups of their own, the faction-named belt rats such as Domination and Shadow Serpentis among the commanders. A rat with Commander or Officer only in its own name, such as Angel Commander, is a regular rat. Clone soldiers, which always drop a security tag, are told apart by name. An officer always drops officer modules and a dog tag, and a commander can drop faction modules. Capital rats drop nothing out of the ordinary but are listed for how rarely they spawn.</p>
                 </div>
             </div>
 
@@ -715,7 +716,7 @@
                     <h4>Alerts</h4>
                     <table class="table table-sm">
                         <tbody>
-                            <tr><td><strong>Special spawn</strong></td><td>An NPC of the chosen rank or above, a capital rat, or an NPC on the watch list, killed by a tracked ratter. One post per spawn, however many fleet members shared it.</td></tr>
+                            <tr><td><strong>Special spawn</strong></td><td>An NPC of the chosen rank or above (clone soldier, commander, officer), a capital rat, or an NPC on the watch list, killed by a tracked ratter. One post per spawn, however many fleet members shared it.</td></tr>
                             <tr><td><strong>Ratting ship lost</strong></td><td>A tracked pilot lost a ship in the system they had a tick in shortly before. Needs SeAT to hold the killmail. Links zKillboard.</td></tr>
                             <tr><td><strong>Outsiders in home space</strong></td><td>ESI's hourly count of NPCs killed in a home system, less what the tracked corporations killed there in that hour. Sent a few hours after the hour, once the journals for it are in.</td></tr>
                             <tr><td><strong>Data stalled</strong></td><td>A corporation's wallet journal has had no new row for the hours set, or the import has not run for three hours. Posts again when it is back.</td></tr>
@@ -742,7 +743,7 @@
                         <li><strong>Session gap</strong>: how long a pause ends a session. The default of {{ $sessionGap }} minutes lets one missed tick pass.</li>
                         <li><strong>Gone quiet after</strong> and <strong>Regular ratter window</strong>: who is listed under Gone quiet.</li>
                         <li><strong>Leaderboard size for members</strong>: how many places members see.</li>
-                        <li><strong>Extra NPC type IDs</strong>: rats to list as special spawns on top of officers, commanders, faction rats and capitals.</li>
+                        <li><strong>Extra NPC type IDs</strong>: rats to list as special spawns on top of officers, commanders, clone soldiers and capital rats.</li>
                         <li><strong>Webhooks</strong>, <strong>Notifications</strong> and the <strong>Routing Map</strong>: see Notifications. Notifications also holds the alert thresholds: the lowest special spawn rank, how old a spawn may be, when a journal counts as stalled, how many NPC kills count as outsiders, the home systems, how close a tick has to be to a loss, and how many players each ranking lists.</li>
                     </ul>
                 </div>

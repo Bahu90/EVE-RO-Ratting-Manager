@@ -77,10 +77,22 @@ class Pipeline
 
         $progress->step('NPC types', 1);
         $report['npc_types'] = $this->npcs->sync();
+        $reclassified = $this->npcs->reclassifyIfRulesChanged();
+        if ($reclassified !== null) {
+            $report['npc_types_reclassified'] = $reclassified;
+        }
         $progress->advance();
 
+        // New rules can change which rats count, back to the first tick, so
+        // the whole list is gone through once instead of the usual window.
         $progress->step('Special spawns', 1);
-        $report['special_spawns'] = $this->spawns->detect($since);
+        if ($reclassified !== null) {
+            $rebuilt = $this->spawns->rebuild();
+            $report['special_spawns'] = $rebuilt['found'];
+            $report['special_spawns_removed'] = $rebuilt['removed'];
+        } else {
+            $report['special_spawns'] = $this->spawns->detect($since);
+        }
         $progress->advance();
 
         $progress->step('Sessions', $count ? $this->sessions->characterCount($since) : 0);

@@ -3340,8 +3340,8 @@ div.ratting-manager-wrapper div[class*="col-"] div.card-body {
 
 .ratting-manager-dashboard .badge-rank-commander,
 .ratting-manager-wrapper .badge-rank-commander,
-.ratting-manager-dashboard .badge-rank-faction,
-.ratting-manager-wrapper .badge-rank-faction {
+.ratting-manager-dashboard .badge-rank-clone,
+.ratting-manager-wrapper .badge-rank-clone {
     background: linear-gradient(135deg, var(--rm-primary-start) 0%, var(--rm-primary-end) 100%);
     color: #ffffff !important;
     font-weight: 600;

@@ -52,7 +52,7 @@ return [
     'leaderboard_size_help' => 'How many places members see. Their own row is always shown, even further down.',
 
     'spawns' => 'Special spawns',
-    'spawns_intro' => 'Officers, commanders, faction rats and capitals are listed as special spawns on their own. Add any other NPC type IDs to watch here.',
+    'spawns_intro' => 'Officers, commanders, clone soldiers and capital rats are listed as special spawns on their own. Add any other NPC type IDs to watch here.',
     'watch_type_ids' => 'Extra NPC type IDs',
     'watch_type_ids_help' => 'Separated by commas or spaces.',
 

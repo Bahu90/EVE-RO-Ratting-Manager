@@ -69,7 +69,7 @@ return [
     'mention_invalid' => 'A mention has to be <@&ROLE_ID>, <@USER_ID>, a role ID, or none.',
     'thresholds' => 'Alert thresholds',
     'spawn_min_rank' => 'Special spawns from',
-    'spawn_min_rank_help' => 'This rank and above. NPCs on the watch list are always sent.',
+    'spawn_min_rank_help' => 'This rank and above, lowest first: clone soldiers, commanders, officers. NPCs on the watch list are always sent.',
     'spawn_capitals' => 'Capital rats count as special spawns',
     'spawn_max_age' => 'Special spawns no older than (hours)',
     'spawn_max_age_help' => 'A spawn first imported later than this, from an old journal row, is not sent.',

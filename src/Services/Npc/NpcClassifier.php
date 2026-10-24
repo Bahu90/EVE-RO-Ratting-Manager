@@ -3,13 +3,20 @@
 namespace RattingManager\Services\Npc;
 
 use Illuminate\Support\Facades\DB;
+use RattingManager\Services\Configuration\Settings;
 
 class NpcClassifier
 {
+    private Settings $settings;
+
+    public function __construct(Settings $settings)
+    {
+        $this->settings = $settings;
+    }
+
     /**
      * Classify every NPC type a tick has paid for that is not on file yet.
-     * A classified type is never changed here, so a later rule never
-     * rewrites what was already counted.
+     * A type on file keeps its classification until the rules change.
      */
     public function sync(): int
     {
@@ -60,6 +67,40 @@ class NpcClassifier
         return $written;
     }
 
+    /**
+     * When the rules have changed since the types on file were classified,
+     * classify every one of them again from what was kept of it. Returns how
+     * many changed, or null when the rules have not changed.
+     */
+    public function reclassifyIfRulesChanged(): ?int
+    {
+        if ((int) $this->settings->get('state.npc_rules') === NpcRegistry::RULES) {
+            return null;
+        }
+
+        $changed = 0;
+        DB::table('ratting_manager_npc_types')->orderBy('type_id')->chunk(500, function ($types) use (&$changed) {
+            foreach ($types as $type) {
+                $now = $this->classify(
+                    (int) $type->type_id,
+                    $type->name,
+                    $type->group_id === null ? null : (int) $type->group_id,
+                    $type->group_name,
+                    $type->mass === null ? null : (float) $type->mass
+                );
+
+                if ($now['faction'] !== $type->faction || $now['size'] !== $type->size || $now['rank'] !== $type->rank || $now['classified_by'] !== $type->classified_by) {
+                    DB::table('ratting_manager_npc_types')->where('type_id', $type->type_id)->update($now + ['updated_at' => now()]);
+                    $changed++;
+                }
+            }
+        });
+
+        $this->settings->set('state.npc_rules', NpcRegistry::RULES);
+
+        return $changed;
+    }
+
     /** @return array{faction: string, size: string, rank: string, classified_by: string} */
     public function classify(int $typeId, ?string $name, ?int $groupId, ?string $groupName, ?float $mass): array
     {
@@ -74,7 +115,9 @@ class NpcClassifier
         }
 
         $faction = NpcRegistry::GROUP_FACTIONS[$groupId] ?? $this->match(NpcRegistry::FACTION_PATTERNS, $groupName, $name) ?? 'other';
-        $rank = $this->match(NpcRegistry::RANK_PATTERNS, $groupName, $name) ?? 'regular';
+        $rank = $this->match(NpcRegistry::RANK_GROUP_PATTERNS, $groupName)
+            ?? $this->match(NpcRegistry::RANK_NAME_PATTERNS, $name)
+            ?? 'regular';
 
         $size = $this->match(NpcRegistry::SIZE_PATTERNS, $groupName, $name);
         $by = 'group';

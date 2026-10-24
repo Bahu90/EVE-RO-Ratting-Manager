@@ -23,7 +23,7 @@ return [
     'size_unknown' => 'Size not known',
 
     'rank_regular' => 'Regular',
-    'rank_faction' => 'Faction',
+    'rank_clone' => 'Clone soldier',
     'rank_commander' => 'Commander',
     'rank_officer' => 'Officer',
 

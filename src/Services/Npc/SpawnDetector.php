@@ -62,4 +62,34 @@ class SpawnDetector
 
         return $inserted;
     }
+
+    /**
+     * After the NPC types were classified again: drop the spawns that no
+     * longer count and find the ones that now do, over every tick on file.
+     *
+     * @return array{removed: int, found: int}
+     */
+    public function rebuild(): array
+    {
+        $watched = $this->settings->get('spawns.watch_type_ids');
+
+        $stale = DB::table('ratting_manager_special_spawns as s')
+            ->join('ratting_manager_npc_types as n', 'n.type_id', '=', 's.npc_type_id')
+            ->whereNotIn('n.rank', NpcRegistry::SPECIAL_RANKS)
+            ->whereNotIn('n.size', NpcRegistry::SPECIAL_SIZES)
+            ->whereNotIn('s.npc_type_id', $watched ?: [0])
+            ->pluck('s.id')
+            ->all();
+
+        foreach (array_chunk($stale, 1000) as $chunk) {
+            DB::table('ratting_manager_special_spawns')->whereIn('id', $chunk)->delete();
+        }
+
+        $first = DB::table('ratting_manager_ticks')->min('ticked_at');
+
+        return [
+            'removed' => count($stale),
+            'found' => $first ? $this->detect(Carbon::parse($first)) : 0,
+        ];
+    }
 }

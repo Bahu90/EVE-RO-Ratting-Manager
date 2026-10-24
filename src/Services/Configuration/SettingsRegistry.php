@@ -37,7 +37,7 @@ final class SettingsRegistry
         // Special spawns: this rank and above, capitals, and the watch list.
         // A spawn older than the age limit when it is first imported is not
         // sent, so a late import of old journal rows does not flood channels.
-        'notifications.spawn_min_rank' => [self::INSTALL, 'string', 'faction'],
+        'notifications.spawn_min_rank' => [self::INSTALL, 'string', 'clone'],
         'notifications.spawn_capitals' => [self::INSTALL, 'bool', true],
         'notifications.spawn_max_age_hours' => [self::INSTALL, 'int', 24],
 
@@ -63,6 +63,8 @@ final class SettingsRegistry
         'state.last_process_at' => [self::STATE, 'string', null],
         'state.last_process_report' => [self::STATE, 'json', null],
         'state.initialized_at' => [self::STATE, 'string', null],
+        // NpcRegistry::RULES the NPC types on file were classified under.
+        'state.npc_rules' => [self::STATE, 'int', 0],
     ];
 
     public static function has(string $key): bool

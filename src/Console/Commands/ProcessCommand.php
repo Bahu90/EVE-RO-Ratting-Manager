@@ -60,6 +60,12 @@ class ProcessCommand extends Command
                 'New NPC types: %d, new special spawns: %d, sessions built: %d, daily rows: %d',
                 $report['npc_types'], $report['special_spawns'], $report['sessions'], $report['daily']['summaries']
             ));
+            if (isset($report['npc_types_reclassified'])) {
+                $this->line(sprintf(
+                    'NPC rules changed: %d type(s) classified again, %d special spawn(s) no longer count',
+                    $report['npc_types_reclassified'], $report['special_spawns_removed']
+                ));
+            }
             $this->info('Done in ' . $report['seconds'] . 's');
 
             return Command::SUCCESS;

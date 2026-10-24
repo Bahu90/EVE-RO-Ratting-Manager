@@ -90,7 +90,13 @@ class SpawnAlert extends Alert
         $min = array_search($this->settings->get('notifications.spawn_min_rank'), $ranks, true);
         $rank = array_search($spawn->rank ?? 'regular', $ranks, true);
 
-        return $min !== false && $rank !== false && $min > 0 && $rank >= $min;
+        // A rank that is no longer one, kept from before the ranks changed,
+        // reads as the lowest special rank.
+        if ($min === false || $min === 0) {
+            $min = 1;
+        }
+
+        return $rank !== false && $rank >= $min;
     }
 
     private function message(array $npcs, array $characters, int $systemId, $when): Message

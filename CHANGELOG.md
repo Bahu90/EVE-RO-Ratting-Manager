@@ -13,7 +13,7 @@ All notable changes to Ratting Manager will be documented in this file.
 - A tick only the corporation journal has gets its income worked out exactly from the cut, at the corporation's tax rate for that day. The rate for each day is read back from that day's paired ticks, falling back to the nearest day that had some and then to the rate SeAT holds.
 - ESS payouts are paired and worked out the same way.
 - Each tick's kill list is kept and counted once per fleet payout.
-- NPCs are placed by faction, size and rank from SeAT's SDE, by group name, or by mass where a group mixes sizes.
+- NPCs are placed by faction, size and rank from SeAT's SDE, by group name, or by mass where a group mixes sizes. Officers and commanders come from their SDE groups and clone soldiers from their names; a rat with Commander or Officer only in its own name is a regular rat.
 - Ticks are grouped into sessions, and time is counted from the 20 minutes each tick stands for, once per player however many alts were ratting.
 - A character's ticks count for the corporation they were in at the time.
 - Names and corporations for ratters SeAT does not know come from the journal rows first, then a background lookup: ESI, with EVEWho and zKillboard behind it, the same lookup Mining Manager uses. Pages never wait on it; a character nobody has named yet shows as *Character info in progress*, and the page refreshes itself once the lookup has them.
@@ -37,7 +37,7 @@ All notable changes to Ratting Manager will be documented in this file.
 
 - Posts to Discord webhooks, and to Slack incoming webhooks as plain text. A webhook is for every tracked corporation or for one, and only gets that corporation's posts.
 - Each notification type has a switch and a default role, and is sent to the webhooks ticked for it, each with a role of its own if wanted. The webhook's own role comes first, then the default; *No ping* mentions nobody. Only the role or user named is ever pinged. Roles can be picked by name from SeAT Broadcast or SeAT Connector when either is installed. Nothing is bound on install.
-- **Special spawn**: an NPC of the chosen rank or above, a capital rat or an NPC on the watch list, one post per spawn however many fleet members shared it.
+- **Special spawn**: an NPC of the chosen rank or above (clone soldier, commander, officer), a capital rat or an NPC on the watch list, one post per spawn however many fleet members shared it.
 - **Ratting ship lost**: a tracked pilot lost a ship in the system they had a tick in shortly before, with a zKillboard link.
 - **Outsiders in home space**: ESI's hourly NPC kill count for a home system, less what the tracked corporations killed there, once the journals for that hour are in.
 - **Data stalled**: a corporation's wallet journal has stopped coming in, or the import has stopped running, and again when it is back.

@@ -28,11 +28,28 @@ final class NpcRegistry
 
     public const SIZES = ['small', 'medium', 'large', 'capital', 'unknown'];
 
-    public const RANKS = ['regular', 'faction', 'commander', 'officer'];
+    /**
+     * Lowest first, so a setting can ask for one rank and everything above.
+     * Each rank above regular is one whose kill drops something worth going
+     * back for: a clone soldier always drops a security tag, a commander can
+     * drop faction modules, and an officer always drops officer modules and
+     * a dog tag.
+     */
+    public const RANKS = ['regular', 'clone', 'commander', 'officer'];
 
-    /** Ranks and sizes that make a tick worth listing as a special spawn. */
-    public const SPECIAL_RANKS = ['faction', 'commander', 'officer'];
+    /**
+     * Ranks and sizes that make a tick worth listing as a special spawn.
+     * Capitals drop nothing out of the ordinary, but they are rare enough to
+     * list anyway.
+     */
+    public const SPECIAL_RANKS = ['clone', 'commander', 'officer'];
     public const SPECIAL_SIZES = ['capital'];
+
+    /**
+     * Raised whenever the patterns below change, so the types already on
+     * file are classified again under the new ones.
+     */
+    public const RULES = 2;
 
     /**
      * Checked against the group name first, then the type name. The type
@@ -59,10 +76,21 @@ final class NpcRegistry
         'small' => '/Frigate|Destroyer/i',
     ];
 
-    public const RANK_PATTERNS = [
-        'officer' => '/Officer/i',
-        'commander' => '/Commander/i',
-        'faction' => '/Dread Guristas|True Sansha|Dark Blood|Domination|Shadow Serpentis/i',
+    /**
+     * Officers and commanders are read from the group name only. The SDE keeps them
+     * in groups of their own ("Asteroid Guristas Officer",
+     * "Asteroid Serpentis Commander Battleship"), the faction-named belt rats
+     * among them, while plenty of ordinary rats have Commander or Officer in
+     * their own name ("Angel Commander", "Watch Officer").
+     */
+    public const RANK_GROUP_PATTERNS = [
+        'officer' => '/\bOfficer\b/i',
+        'commander' => '/\bCommander\b/i',
+    ];
+
+    /** Clone soldiers share the ordinary cruiser groups, so their own name is all that tells them apart. */
+    public const RANK_NAME_PATTERNS = [
+        'clone' => '/\bClone Soldier (Trainer|Recruiter|Transporter|Negotiator)\b/i',
     ];
 
     /** Upper mass bound in kg for each size, used when the names say nothing. */

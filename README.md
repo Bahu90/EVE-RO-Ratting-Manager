@@ -23,7 +23,7 @@ Release history lives in the [CHANGELOG](CHANGELOG.md).
 - **Members with no wallet token still count.** The corporation journal names the ratter on every tick it taxes, so a member who never added a wallet token still shows up, with their time exact and their income worked out exactly from the corporation's cut. They are listed under Untracked ratters so directors can ask them for a token.
 - **Character lookups** -- Names and corporations for ratters SeAT does not know come from the journal rows themselves first, then from a background lookup (`ratting-manager:resolve-characters`): ESI first, then EVEWho and zKillboard when ESI is down, and no ESI calls while the error budget it shares with SeAT is low. Pages only ever read what has been found, so none of them waits on ESI; a character nobody has named yet shows as *Character info in progress* and the page refreshes itself once the lookup has them. The same lookup Mining Manager uses.
 - **Fleets are counted properly.** Fleet members who share bounties each get a tick with the same time, system and list of rats. Their ISK adds up per character as it should, and the rats are counted once.
-- **Special spawns** -- Officers, commanders, faction rats and capitals are listed as they are killed, once per spawn however many fleet members shared it, along with any NPC types an admin adds to watch.
+- **Special spawns** -- Officers, commanders, clone soldiers and capital rats are listed as they are killed, once per spawn however many fleet members shared it, along with any NPC types an admin adds to watch.
 - **Discord and Slack notifications** *(Admin sets up)* -- Alerts for special spawns, ratting ships lost, outsiders ratting in home space, stalled data, untracked ratters and players gone quiet, and weekly and monthly reports. The **Director Report** has what the players earned, what landed in the corporation's wallet and the tax rate, and players ranked by income, hours, ISK per hour and corporation tax paid; the **Rankings** post ranks by hours only, with no ISK, for members' channels. Players are ranked as a main with all their alts. Each notification goes to the webhooks ticked for it, with a role of its own per webhook or a default; the **Routing Map** shows where everything goes and who it pings. Set up the way Structure Manager's are.
 - **Diagnostics** *(Admin)* -- Health Checks, a Master Test that follows the data from the journals to the figures (including how close worked-out income comes to what characters really received), Settings Health, Data Integrity, a Tick Trace that follows one journal row through everything the plugin does with it, and Notification Testing, which sends a sample of any notification to any webhook and shows each webhook's delivery health.
 
@@ -67,7 +67,7 @@ Nothing is sent until an admin sets it up:
 
 | Notification | When |
 |---|---|
-| **Special spawn** | An NPC of the chosen rank or above, a capital rat, or an NPC on the watch list is killed. One post per spawn. |
+| **Special spawn** | An NPC of the chosen rank or above (clone soldier, commander, officer), a capital rat, or an NPC on the watch list is killed. One post per spawn. |
 | **Ratting ship lost** | A tracked pilot loses a ship in the system they had a tick in shortly before. Needs SeAT to hold the killmail. |
 | **Outsiders in home space** | More NPCs died in a home system in an hour than the tracked corporations killed there, by ESI's hourly count. Sent once that hour's journals are in, a few hours later. |
 | **Data stalled** | A corporation's wallet journal stops coming in, or the import stops running. Again when it is back. |
@@ -112,7 +112,7 @@ flowchart TD
 | **ISK per hour** | Income over hours. A session shows bounty ISK per hour only, since ESS is not tied to one session. |
 | **Rats killed** | Each tick's kill list, counted once per fleet payout. |
 | **Coverage** | How many of the ticks the corporation journal saw are also in the character's own journal. |
-| **NPCs** | Placed by faction, size and rank from SeAT's SDE: the group name where it says ("Asteroid Guristas Battleship"), the NPC's mass where a group mixes sizes. Anything else still counts, as Other, and Diagnostics lists it. |
+| **NPCs** | Placed by faction, size and rank from SeAT's SDE: the group name where it says ("Asteroid Guristas Battleship"), the NPC's mass where a group mixes sizes. Officers and commanders are read from their SDE groups, clone soldiers from their names. Anything else still counts, as Other, and Diagnostics lists it. |
 
 Only the corporations picked in Settings are tracked. A character's ticks count for the corporation they were in at the time, so a member who leaves keeps their history where they earned it.
 

@@ -3,7 +3,7 @@
 return [
     // Types, as listed in Settings
     'type_special_spawn' => 'Special spawn',
-    'type_special_spawn_hint' => 'An officer, commander, faction rat or capital killed by a tracked ratter, or an NPC on the watch list. One post per spawn, however many fleet members shared it.',
+    'type_special_spawn_hint' => 'An officer, commander, clone soldier or capital rat killed by a tracked ratter, or an NPC on the watch list. One post per spawn, however many fleet members shared it.',
     'type_ship_lost' => 'Ratting ship lost',
     'type_ship_lost_hint' => 'A tracked ratter lost a ship in the system they were ratting in. Needs SeAT to hold the killmail.',
     'type_outsiders' => 'Outsiders in home space',
