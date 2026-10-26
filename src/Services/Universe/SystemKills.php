@@ -30,7 +30,7 @@ class SystemKills
     public function poll(array $systems): array
     {
         if ($systems === []) {
-            return ['ok' => true, 'hour' => null, 'stored' => 0, 'message' => 'No systems to watch.'];
+            return ['ok' => true, 'hour' => null, 'stored' => 0, 'message' => 'No home space is set for the Outsiders alert, so there are no systems to watch.'];
         }
 
         try {

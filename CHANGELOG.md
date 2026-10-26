@@ -40,7 +40,7 @@ All notable changes to Ratting Manager will be documented in this file.
 - What a webhook carries is ticked when adding it, and its edit button opens it with its URL and notifications filled in, to change any of them.
 - **Special spawn**: an NPC of the chosen rank or above (clone soldier, commander, officer), a capital rat or an NPC on the watch list, one post per spawn however many fleet members shared it.
 - **Ratting ship lost**: a tracked pilot lost a ship in the system they had a tick in shortly before, with a zKillboard link.
-- **Outsiders in home space**: ESI's hourly NPC kill count for a home system, less what the tracked corporations killed there, once the journals for that hour are in.
+- **Outsiders in home space**: ESI's hourly NPC kill count for each system of the home space, less what the tracked corporations killed there, once the journals for that hour are in. The home space is the regions, constellations and systems listed on the alert. With none listed it sends nothing even when switched on, and Settings, the Routing Map and Diagnostics say so.
 - **Data stalled**: a corporation's wallet journal has stopped coming in, or the import has stopped running, and again when it is back.
 - **Untracked ratter** and **Ratter gone quiet**: one post per corporation listing the characters or players new to the list.
 - **Director Report**, weekly and monthly: what the players earned, what landed in the corporation's wallet and the tax rate, the change on the period before, players, hours, median ISK per hour, rats and top systems, with players ranked by income (tax paid beside it), hours, ISK per hour and corporation tax paid.

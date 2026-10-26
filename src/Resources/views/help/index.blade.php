@@ -718,7 +718,7 @@
                         <tbody>
                             <tr><td><strong>Special spawn</strong></td><td>An NPC of the chosen rank or above (clone soldier, commander, officer), a capital rat, or an NPC on the watch list, killed by a tracked ratter. One post per spawn, however many fleet members shared it.</td></tr>
                             <tr><td><strong>Ratting ship lost</strong></td><td>A tracked pilot lost a ship in the system they had a tick in shortly before. Needs SeAT to hold the killmail. Links zKillboard.</td></tr>
-                            <tr><td><strong>Outsiders in home space</strong></td><td>ESI's hourly count of NPCs killed in a home system, less what the tracked corporations killed there in that hour. Sent a few hours after the hour, once the journals for it are in.</td></tr>
+                            <tr><td><strong>Outsiders in home space</strong></td><td>ESI's hourly count of NPCs killed in a system of the home space, less what the tracked corporations killed there in that hour. The home space is the regions, constellations and systems set on the alert under Settings, Notifications; with none set it sends nothing, even when switched on. Sent a few hours after the hour, once the journals for it are in.</td></tr>
                             <tr><td><strong>Data stalled</strong></td><td>A corporation's wallet journal has had no new row for the hours set, or the import has not run for three hours. Posts again when it is back.</td></tr>
                             <tr><td><strong>Untracked ratter</strong></td><td>Ratters the corporation journal pays with no wallet token on SeAT, in one post per corporation. Each is posted once.</td></tr>
                             <tr><td><strong>Ratter gone quiet</strong></td><td>Players newly on the Gone quiet list, in one post per corporation. A player who rats again leaves the list.</td></tr>
@@ -744,7 +744,8 @@
                         <li><strong>Gone quiet after</strong> and <strong>Regular ratter window</strong>: who is listed under Gone quiet.</li>
                         <li><strong>Leaderboard size for members</strong>: how many places members see.</li>
                         <li><strong>Extra NPC type IDs</strong>: rats to list as special spawns on top of officers, commanders, clone soldiers and capital rats.</li>
-                        <li><strong>Webhooks</strong>, <strong>Notifications</strong> and the <strong>Routing Map</strong>: see Notifications. Notifications also holds the alert thresholds: the lowest special spawn rank, how old a spawn may be, when a journal counts as stalled, how many NPC kills count as outsiders, the home systems, how close a tick has to be to a loss, and how many players each ranking lists.</li>
+                        <li><strong>Home space</strong>, on the Outsiders alert under Notifications: the regions, constellations and systems the alert watches, by name or ID. Until one is set the alert sends nothing and carries a warning badge.</li>
+                        <li><strong>Webhooks</strong>, <strong>Notifications</strong> and the <strong>Routing Map</strong>: see Notifications. Notifications also holds the alert thresholds: the lowest special spawn rank, how old a spawn may be, when a journal counts as stalled, how many NPC kills count as outsiders, how close a tick has to be to a loss, and how many players each ranking lists.</li>
                     </ul>
                 </div>
             </div>
@@ -761,7 +762,7 @@
                             <tr><td><code>ratting-manager:resolve-characters</code></td><td>Looks up names and corporations for ratters SeAT does not know, in the background, so no page waits on ESI. With <code>--requested</code> it takes only the characters pages asked for, which show as <em>Character info in progress</em> until then, and runs every minute; the full run every 10 minutes also takes ratters nobody has looked up yet and answers due another look. <code>--stats</code> shows what it holds. ESI comes first, then EVEWho and zKillboard when ESI is down, and it stops calling ESI while the error budget it shares with SeAT is low.</td></tr>
                             <tr><td><code>ratting-manager:trace-tick {id}</code></td><td>Shows what the plugin did with one journal row, the same as the Tick Trace tab.</td></tr>
                             <tr><td><code>ratting-manager:notify</code></td><td>Checks every alert and sends what is new. Runs twice an hour, five minutes after the import. <code>--only=special_spawn</code> runs one alert.</td></tr>
-                            <tr><td><code>ratting-manager:poll-system-kills</code></td><td>Keeps ESI's hourly NPC kill counts for the home systems, for the Outsiders alert. Runs hourly.</td></tr>
+                            <tr><td><code>ratting-manager:poll-system-kills</code></td><td>Keeps ESI's hourly NPC kill counts for the systems in the home space, for the Outsiders alert. Runs hourly.</td></tr>
                             <tr><td><code>ratting-manager:send-reports</code></td><td>Sends the Director Reports and Rankings that are due. Runs daily at 11:20 EVE; <code>--weekly</code> or <code>--monthly</code> for one kind, <code>--force</code> to send the last period again.</td></tr>
                         </tbody>
                     </table>
@@ -798,7 +799,7 @@
                     <h5>A ratter shows as Character info in progress.</h5>
                     <p>SeAT does not know them and the journal did not give a name, so they are being looked up in the background. The page refreshes itself when they are in. If it stays that way for more than a few minutes, Diagnostics, Health Checks shows whether the lookup is running.</p>
                     <h5>An alert I expected was not sent.</h5>
-                    <p>Check the Routing Map: the notification has to be switched on and ticked for a webhook that is switched on and for that corporation. Diagnostics, Notification Testing shows every send with Discord's answer, and what each alert has already sent for.</p>
+                    <p>Check the Routing Map: the notification has to be switched on and ticked for a webhook that is switched on and for that corporation, and the Outsiders alert also needs a home space. Diagnostics, Notification Testing shows every send with Discord's answer, and what each alert has already sent for.</p>
                     <h5>Why does the Outsiders alert arrive hours late?</h5>
                     <p>It compares ESI's count for an hour with what the tracked corporations killed in it, and their ticks take one to two hours to reach SeAT. An hour is looked at once it is three hours old, so members' own ratting is never mistaken for outsiders.</p>
                     <h5>A rat shows as Other or Size not known.</h5>

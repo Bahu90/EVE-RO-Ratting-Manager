@@ -5,6 +5,7 @@ namespace RattingManager\Services\Notification;
 use Illuminate\Support\Facades\DB;
 use RattingManager\Models\NotificationType;
 use RattingManager\Models\Webhook;
+use RattingManager\Services\Universe\HomeSpace;
 
 /**
  * Where each notification type goes and who it mentions there, worked out
@@ -14,7 +15,7 @@ use RattingManager\Models\Webhook;
 class RoutingMap
 {
     /**
-     * @return array<string, array{type: NotificationType, routes: array}>
+     * @return array<string, array{type: NotificationType, routes: array, blocked: ?string}>
      */
     public function build(?array $roleLookup = null): array
     {
@@ -31,6 +32,7 @@ class RoutingMap
                 continue;
             }
 
+            $blocked = $this->blocked($key);
             $routes = [];
             foreach ($type->webhooks->sortBy('description') as $webhook) {
                 $own = $webhook->pivot->role_mention;
@@ -40,17 +42,27 @@ class RoutingMap
                 $routes[] = [
                     'webhook' => $webhook,
                     'corporation' => $webhook->corporation_id ? ($corporationNames[$webhook->corporation_id] ?? 'Corporation #' . $webhook->corporation_id) : null,
-                    'live' => $type->enabled && $webhook->enabled && $webhook->pivot->enabled,
+                    'live' => $blocked === null && $type->enabled && $webhook->enabled && $webhook->pivot->enabled,
                     'binding_enabled' => (bool) $webhook->pivot->enabled,
                     'mention' => DiscordRoleResolver::describe($mention, $roleLookup),
                     'tier' => $tier,
                 ];
             }
 
-            $map[$key] = ['type' => $type, 'routes' => $routes];
+            $map[$key] = ['type' => $type, 'routes' => $routes, 'blocked' => $blocked];
         }
 
         return $map;
+    }
+
+    /** Why a type sends nothing whatever its switch and webhooks say, or null when nothing stops it. */
+    private function blocked(string $key): ?string
+    {
+        if ($key === 'outsiders' && !app(HomeSpace::class)->isSet()) {
+            return trans('ratting-manager::notification_settings.home_space_missing_body');
+        }
+
+        return null;
     }
 
     /**

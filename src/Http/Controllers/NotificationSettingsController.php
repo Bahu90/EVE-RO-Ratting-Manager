@@ -14,7 +14,7 @@ use RattingManager\Services\Notification\NotificationTypes;
 use RattingManager\Services\Notification\RoutingMap;
 use RattingManager\Services\Notification\WebhookDeliveryService;
 use RattingManager\Services\Npc\NpcRegistry;
-use RattingManager\Services\Universe\SolarSystems;
+use RattingManager\Services\Universe\HomeSpace;
 use Seat\Web\Http\Controllers\Controller;
 
 /**
@@ -108,7 +108,7 @@ class NotificationSettingsController extends Controller
      * The type switches, default roles, which webhook each type goes to with
      * its own role, and the alert thresholds, all in one form.
      */
-    public function update(Request $request, Settings $settings, SolarSystems $systems)
+    public function update(Request $request, Settings $settings, HomeSpace $homeSpace)
     {
         $data = $request->validate([
             'types' => ['array'],
@@ -119,7 +119,9 @@ class NotificationSettingsController extends Controller
             'spawn_max_age_hours' => ['required', 'integer', 'min:1', 'max:168'],
             'stalled_hours' => ['required', 'integer', 'min:2', 'max:168'],
             'outsider_min_kills' => ['required', 'integer', 'min:10', 'max:10000'],
-            'home_systems' => ['nullable', 'string', 'max:2000'],
+            'home_regions' => ['nullable', 'string', 'max:2000'],
+            'home_constellations' => ['nullable', 'string', 'max:2000'],
+            'home_systems' => ['nullable', 'string', 'max:4000'],
             'ship_lost_minutes' => ['required', 'integer', 'min:10', 'max:240'],
             'rankings_size' => ['required', 'integer', 'min:3', 'max:25'],
         ], [
@@ -158,17 +160,20 @@ class NotificationSettingsController extends Controller
         $settings->set('notifications.ship_lost_minutes', $data['ship_lost_minutes']);
         $settings->set('notifications.rankings_size', $data['rankings_size']);
 
-        // Home systems by name or ID; anything SeAT does not know is dropped.
-        $home = [];
-        foreach (preg_split('/[\s,;]+/', (string) ($data['home_systems'] ?? ''), -1, PREG_SPLIT_NO_EMPTY) as $token) {
-            $id = ctype_digit($token) ? (int) $token : $systems->idForName($token);
-            if ($id && DB::table('solar_systems')->where('system_id', $id)->exists()) {
-                $home[] = $id;
-            }
+        // The home space by name or ID. Anything SeAT does not know is left
+        // out, and the admin is told which, so a typo never passes as saved.
+        $unknown = [];
+        foreach (HomeSpace::KINDS as $kind => [$key]) {
+            [$ids, $missed] = $homeSpace->parse($kind, $data['home_' . $kind] ?? null);
+            $settings->set($key, $ids);
+            $unknown = array_merge($unknown, $missed);
         }
-        $settings->set('notifications.home_systems', array_values(array_unique($home)));
 
-        return $this->back('notifications', trans('ratting-manager::notification_settings.saved'));
+        $response = $this->back('notifications', trans('ratting-manager::notification_settings.saved'));
+
+        return $unknown === []
+            ? $response
+            : $response->with('error', trans('ratting-manager::notification_settings.home_space_unknown', ['names' => implode(', ', $unknown)]));
     }
 
     /** A mention as stored: the text, and where the role came from when a provider knows it. */

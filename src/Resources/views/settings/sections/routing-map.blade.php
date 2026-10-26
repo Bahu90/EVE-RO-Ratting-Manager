@@ -46,6 +46,11 @@
                                 <td>{!! $label !!}</td>
                                 <td colspan="3"><i class="fas fa-power-off"></i> {{ trans('ratting-manager::notification_settings.switched_off') }}</td>
                             </tr>
+                        @elseif($entry['blocked'])
+                            <tr>
+                                <td>{!! $label !!}</td>
+                                <td colspan="3" class="text-warning"><i class="fas fa-exclamation-triangle"></i> {{ $entry['blocked'] }}</td>
+                            </tr>
                         @elseif($routes === [])
                             <tr>
                                 <td>{!! $label !!}</td>

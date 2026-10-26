@@ -10,6 +10,7 @@ use RattingManager\Services\Character\Players;
 use RattingManager\Services\Configuration\Settings;
 use RattingManager\Services\Configuration\SettingsRegistry;
 use RattingManager\Services\Ratting\TaxRates;
+use RattingManager\Services\Universe\HomeSpace;
 
 /**
  * Every check the Diagnostics page runs. All of them only read.
@@ -23,7 +24,7 @@ class Checks
     public const SEAT_TABLES = [
         'corporation_wallet_journals', 'character_wallet_journals', 'character_affiliations',
         'character_corporation_histories', 'corporation_infos', 'refresh_tokens', 'users',
-        'character_infos', 'invTypes', 'invGroups', 'solar_systems',
+        'character_infos', 'invTypes', 'invGroups', 'solar_systems', 'constellations', 'regions',
     ];
 
     public const PLUGIN_TABLES = [
@@ -518,6 +519,13 @@ class Checks
             ];
         }
 
+        $outsiders = DB::table('ratting_manager_notification_types')->where('type_key', 'outsiders')->value('enabled');
+        if ($outsiders && !app(HomeSpace::class)->isSet()) {
+            $name = \RattingManager\Services\Notification\NotificationTypes::name('outsiders');
+            $nowhere = array_values(array_diff($nowhere, [$name]));
+            $nowhere[] = $name . ' (no home space set)';
+        }
+
         $message = "{$webhooks} webhook(s); {$sent} send(s) in the last 24 hours, all went through.";
         if ($nowhere !== []) {
             $message .= ' Switched on but sent nowhere: ' . implode(', ', $nowhere) . '.';
@@ -534,13 +542,25 @@ class Checks
         }
 
         $outsiders = DB::table('ratting_manager_notification_types')->where('type_key', 'outsiders')->value('enabled');
+        $watched = count(app(HomeSpace::class)->systems());
+
+        if ($watched === 0) {
+            return [
+                'label' => 'Kill counts from ESI',
+                'status' => $outsiders ? 'warn' : 'info',
+                'message' => $outsiders
+                    ? 'The Outsiders alert is switched on but no home space is set, so it watches nothing and sends nothing. Set regions, constellations or systems under Settings, Notifications.'
+                    : 'No home space is set, so none are kept. The Outsiders alert needs one.',
+            ];
+        }
+
         $last = DB::table('ratting_manager_system_kills')->max('updated_at');
 
         if ($last === null) {
             return [
                 'label' => 'Kill counts from ESI',
                 'status' => 'info',
-                'message' => 'None kept yet. ratting-manager:poll-system-kills keeps them hourly for the systems the corporations rat in; the Outsiders alert needs them.',
+                'message' => "None kept yet. ratting-manager:poll-system-kills keeps them hourly for the {$watched} system(s) in the home space; the Outsiders alert needs them.",
             ];
         }
 
@@ -549,7 +569,7 @@ class Checks
         return [
             'label' => 'Kill counts from ESI',
             'status' => $stale && $outsiders ? 'warn' : 'ok',
-            'message' => 'Last kept ' . \Carbon\Carbon::parse($last)->diffForHumans() . ', ' . DB::table('ratting_manager_system_kills')->distinct()->count('solar_system_id') . ' system(s) watched.'
+            'message' => 'Last kept ' . \Carbon\Carbon::parse($last)->diffForHumans() . ", for the {$watched} system(s) in the home space."
                 . ($stale && $outsiders ? ' Check that SeAT\'s scheduler runs ratting-manager:poll-system-kills.' : ''),
         ];
     }

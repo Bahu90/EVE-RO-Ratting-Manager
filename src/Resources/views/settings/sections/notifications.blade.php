@@ -62,6 +62,7 @@
                 @foreach($keys as $key)
                     @php
                         $type = $routing[$key]['type'];
+                        $blocked = $routing[$key]['blocked'];
                         $bound = $type->webhooks->keyBy('id');
                         $live = collect($routing[$key]['routes'])->where('live', true)->count();
                     @endphp
@@ -73,6 +74,9 @@
                             </div>
                             <i class="fas {{ $types::icon($key) }}"></i>
                             <span class="rm-notif-title">{{ $types::name($key) }}</span>
+                            @if($key === 'outsiders' && !$homeSpace['set'])
+                                <span class="badge badge-warning"><i class="fas fa-exclamation-triangle"></i> {{ trans('ratting-manager::notification_settings.home_space_missing') }}</span>
+                            @endif
                         </div>
                         <div class="rm-notif-body">
                             <div class="rm-notif-desc">{{ $types::description($key) }}</div>
@@ -84,6 +88,9 @@
                                     'placeholder' => trans('ratting-manager::notification_settings.default_role_placeholder'),
                                 ])
                             </div>
+                            @if($key === 'outsiders')
+                                @include('ratting-manager::settings.partials.home-space')
+                            @endif
                             @if($webhooks->isEmpty())
                                 <p class="text-muted small mb-0"><a href="#webhooks" class="rm-section-link" data-section="webhooks">{{ trans('ratting-manager::notification_settings.add_webhooks_first') }}</a></p>
                             @else
@@ -125,7 +132,8 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                @if($type->enabled && $live === 0)
+                                {{-- A blocked type says why in its own card, so "goes nowhere" would only mislead. --}}
+                                @if($type->enabled && $live === 0 && !$blocked)
                                     <small class="text-warning"><i class="fas fa-exclamation-triangle"></i> {{ trans('ratting-manager::notification_settings.goes_nowhere') }}</small>
                                 @endif
                             @endif
@@ -168,11 +176,6 @@
                         <small class="form-text text-muted">{{ trans('ratting-manager::notification_settings.' . $label . '_help') }}</small>
                     </div>
                 @endforeach
-                <div class="col-12 form-group">
-                    <label for="rm-home-systems">{{ trans('ratting-manager::notification_settings.home_systems') }}</label>
-                    <input type="text" class="form-control" id="rm-home-systems" name="home_systems" value="{{ old('home_systems', $notificationValues['home_systems']) }}">
-                    <small class="form-text text-muted">{{ trans('ratting-manager::notification_settings.home_systems_help') }}</small>
-                </div>
             </div>
         </div>
     </div>

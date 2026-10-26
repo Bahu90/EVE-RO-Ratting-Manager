@@ -47,10 +47,12 @@ final class SettingsRegistry
         'notifications.stalled_hours' => [self::INSTALL, 'int', 12],
 
         // Outsiders: NPC kills in an hour, beyond the tracked corporations'
-        // own, that count as someone else ratting there. With no home
-        // systems listed, the systems the corporations ratted in over the
-        // last 14 days are watched.
+        // own, that count as someone else ratting there, and the home space
+        // it watches: every system in the regions and constellations listed,
+        // and the systems listed. With none listed it watches nothing.
         'notifications.outsider_min_kills' => [self::INSTALL, 'int', 100],
+        'notifications.home_regions' => [self::INSTALL, 'int_list', []],
+        'notifications.home_constellations' => [self::INSTALL, 'int_list', []],
         'notifications.home_systems' => [self::INSTALL, 'int_list', []],
 
         // A loss counts as a ratting ship lost when the pilot had a tick in

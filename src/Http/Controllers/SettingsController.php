@@ -11,7 +11,7 @@ use RattingManager\Services\Notification\DiscordRoleResolver;
 use RattingManager\Services\Notification\NotificationTypes;
 use RattingManager\Services\Notification\RoutingMap;
 use RattingManager\Services\Notification\WebhookDeliveryService;
-use RattingManager\Services\Universe\SolarSystems;
+use RattingManager\Services\Universe\HomeSpace;
 use Seat\Web\Http\Controllers\Controller;
 
 class SettingsController extends Controller
@@ -80,8 +80,7 @@ class SettingsController extends Controller
     {
         $roles = DiscordRoleResolver::roles();
         $lookup = array_column($roles, null, 'id');
-        $systems = app(SolarSystems::class);
-        $home = $settings->get('notifications.home_systems');
+        $homeSpace = app(HomeSpace::class);
 
         return [
             'webhooks' => Webhook::orderBy('description')->get(),
@@ -100,9 +99,15 @@ class SettingsController extends Controller
                 'spawn_max_age_hours' => $settings->get('notifications.spawn_max_age_hours'),
                 'stalled_hours' => $settings->get('notifications.stalled_hours'),
                 'outsider_min_kills' => $settings->get('notifications.outsider_min_kills'),
-                'home_systems' => implode(', ', array_map(fn ($id) => $systems->name($id), $home)),
                 'ship_lost_minutes' => $settings->get('notifications.ship_lost_minutes'),
                 'rankings_size' => $settings->get('notifications.rankings_size'),
+            ],
+            'homeSpace' => [
+                'set' => $homeSpace->isSet(),
+                'systems_watched' => count($homeSpace->systems()),
+                'regions' => $homeSpace->names('regions'),
+                'constellations' => $homeSpace->names('constellations'),
+                'systems' => $homeSpace->names('systems'),
             ],
         ];
     }

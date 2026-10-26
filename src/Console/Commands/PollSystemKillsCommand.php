@@ -15,7 +15,7 @@ class PollSystemKillsCommand extends Command
 {
     protected $signature = 'ratting-manager:poll-system-kills';
 
-    protected $description = 'Keep the last hour\'s NPC kills from ESI for the home systems, for the Outsiders alert';
+    protected $description = 'Keep the last hour\'s NPC kills from ESI for the home space, for the Outsiders alert';
 
     public function handle(SystemKills $kills): int
     {

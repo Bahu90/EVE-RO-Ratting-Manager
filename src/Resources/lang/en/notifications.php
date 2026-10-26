@@ -7,7 +7,7 @@ return [
     'type_ship_lost' => 'Ratting ship lost',
     'type_ship_lost_hint' => 'A tracked ratter lost a ship in the system they were ratting in. Needs SeAT to hold the killmail.',
     'type_outsiders' => 'Outsiders in home space',
-    'type_outsiders_hint' => 'More NPCs were killed in a home system in an hour than the tracked corporations account for. From public ESI, a few hours after the hour, once the journals are in.',
+    'type_outsiders_hint' => 'More NPCs were killed in a system of the home space in an hour than the tracked corporations account for. From public ESI, a few hours after the hour, once the journals are in.',
     'type_data_stalled' => 'Data stalled',
     'type_data_stalled_hint' => 'A corporation\'s wallet journal has stopped coming in, or the import has stopped running. Posts again when it is back.',
     'type_untracked_ratter' => 'Untracked ratter',

@@ -69,7 +69,7 @@ Nothing is sent until an admin sets it up:
 |---|---|
 | **Special spawn** | An NPC of the chosen rank or above (clone soldier, commander, officer), a capital rat, or an NPC on the watch list is killed. One post per spawn. |
 | **Ratting ship lost** | A tracked pilot loses a ship in the system they had a tick in shortly before. Needs SeAT to hold the killmail. |
-| **Outsiders in home space** | More NPCs died in a home system in an hour than the tracked corporations killed there, by ESI's hourly count. Sent once that hour's journals are in, a few hours later. |
+| **Outsiders in home space** | More NPCs died in a system of the home space in an hour than the tracked corporations killed there, by ESI's hourly count. Sent once that hour's journals are in, a few hours later. The home space is the regions, constellations and systems set on the alert; with none set it sends nothing. |
 | **Data stalled** | A corporation's wallet journal stops coming in, or the import stops running. Again when it is back. |
 | **Untracked ratter** | Ratters with no wallet token on SeAT, each posted once. |
 | **Ratter gone quiet** | Players new to the Gone quiet list. |
@@ -136,7 +136,7 @@ Each tier includes the ones below it, so a director does not also need Member.
 | `ratting-manager:resolve-characters` | Looks up names and corporations for ratters SeAT does not know. `--requested` takes only the characters pages asked for; `--stats` shows what the lookups hold |
 | `ratting-manager:trace-tick {journal_id}` | Shows what the plugin did with one journal row |
 | `ratting-manager:notify` | Checks every alert and sends what is new. `--only=special_spawn` runs one |
-| `ratting-manager:poll-system-kills` | Keeps ESI's hourly NPC kill counts for the home systems, for the Outsiders alert |
+| `ratting-manager:poll-system-kills` | Keeps ESI's hourly NPC kill counts for the systems in the home space, for the Outsiders alert |
 | `ratting-manager:send-reports` | Sends the Director Reports and Rankings that are due. `--weekly` or `--monthly` for one kind, `--force` to send the last period again |
 | `ratting-manager:import-corp-journal` | The corporation journal step of `process` on its own |
 | `ratting-manager:import-character-journal` | The character journal step on its own |

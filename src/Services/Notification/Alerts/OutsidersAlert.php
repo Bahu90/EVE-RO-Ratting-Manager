@@ -5,10 +5,14 @@ namespace RattingManager\Services\Notification\Alerts;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use RattingManager\Services\Notification\Message;
+use RattingManager\Services\Universe\HomeSpace;
 
 /**
  * More NPCs died in a home system in an hour than the tracked corporations'
  * ratters killed there: someone else is ratting in their space.
+ *
+ * Home is the space listed under Notifications. With none listed nothing is
+ * watched and nothing is sent, whatever the switch says.
  *
  * ESI's counts are kept hourly by ratting-manager:poll-system-kills. An hour
  * is looked at once it is three hours old, when the journals for it are in,
@@ -19,8 +23,8 @@ class OutsidersAlert extends Alert
     private const SETTLE_HOURS = 3;
     private const LOOK_BACK_HOURS = 24;
 
-    /** With no home systems set, the systems ratted in over this many days are watched. */
-    public const RATTED_DAYS = 14;
+    /** The corporation that rats in a system most over this many days hears about outsiders there. */
+    private const RATTED_DAYS = 14;
 
     public function type(): string
     {
@@ -30,19 +34,7 @@ class OutsidersAlert extends Alert
     /** @return int[] */
     public function watchedSystems(): array
     {
-        $home = $this->settings->get('notifications.home_systems');
-        if ($home !== []) {
-            return $home;
-        }
-
-        return DB::table('ratting_manager_ticks')
-            ->whereIn('corporation_id', $this->corporations() ?: [0])
-            ->where('ticked_at', '>=', Carbon::now()->subDays(self::RATTED_DAYS))
-            ->where('solar_system_id', '>', 0)
-            ->distinct()
-            ->pluck('solar_system_id')
-            ->map(fn ($id) => (int) $id)
-            ->all();
+        return app(HomeSpace::class)->systems();
     }
 
     public function run(): int
