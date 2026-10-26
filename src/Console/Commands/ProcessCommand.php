@@ -35,6 +35,10 @@ class ProcessCommand extends Command
             $this->info('Ratting Manager - reading from ' . $since->toDateString());
 
             $report = $pipeline->run($since, fn ($step) => $this->line('  ' . $step . '...'));
+            // Only a run that wrote something the figures are built from
+            // drops the cached figures when the lock is let go.
+            $changed = Pipeline::changedAnything($report);
+            $this->dataUnchanged = !$changed;
 
             if (isset($report['note'])) {
                 $this->warn($report['note']);
@@ -72,12 +76,18 @@ class ProcessCommand extends Command
                     $report['npc_types_reclassified'], $report['special_spawns_removed']
                 ));
             }
+            if (!$changed) {
+                $this->line('Nothing new: the cached figures are kept.');
+            }
             $this->info('Done in ' . $report['seconds'] . 's');
 
             return Command::SUCCESS;
         });
 
-        // After the lock, which moves the cached figures on when it is let go.
+        // After the lock, which moves the cached figures on when it is let go
+        // and the run changed something. Warming after a quiet run is nearly
+        // free: what is still cached is read back, and only figures whose
+        // cache time ran out are worked out again.
         if ($ran) {
             try {
                 $warmer->warm();

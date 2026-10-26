@@ -10,12 +10,20 @@ use RattingManager\Services\Ratting\FigureCache;
  * Every command that writes ratting data takes the same lock, so a manual run
  * can never interleave with the scheduled one and pair or rebuild the same
  * rows twice at once. Letting go of it tells the cached figures the data has
- * moved on.
+ * moved on, unless the command marked its run as having changed nothing.
  */
 trait HoldsThePipelineLock
 {
+    /**
+     * Set by a command whose run turned out to write nothing the figures
+     * are built from, so the cached figures are kept instead of thrown away.
+     */
+    protected bool $dataUnchanged = false;
+
     protected function underLock(int $seconds, callable $work): int
     {
+        $this->dataUnchanged = false;
+
         $lock = Cache::lock('ratting-manager:pipeline', $seconds);
 
         if (!$lock->get()) {
@@ -26,7 +34,9 @@ trait HoldsThePipelineLock
         try {
             return $work();
         } finally {
-            FigureCache::changed();
+            if (!$this->dataUnchanged) {
+                FigureCache::changed();
+            }
             $lock->release();
         }
     }

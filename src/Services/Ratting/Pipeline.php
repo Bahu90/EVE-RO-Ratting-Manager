@@ -143,6 +143,28 @@ class Pipeline
     }
 
     /**
+     * Whether a run's report shows anything the dashboards are built from
+     * was written: ticks or payouts, special spawns, or NPC types
+     * classified again. A run that only read rows it already had changes
+     * none of the figures.
+     */
+    public static function changedAnything(array $report): bool
+    {
+        if (isset($report['note'])) {
+            return false;
+        }
+
+        $changed = $report['changed'] ?? 'all';
+        if (!is_array($changed) || $changed['characters'] > 0 || $changed['days'] > 0) {
+            return true;
+        }
+
+        return ($report['special_spawns'] ?? 0) > 0
+            || ($report['special_spawns_removed'] ?? 0) > 0
+            || isset($report['npc_types_reclassified']);
+    }
+
+    /**
      * The characters whose ticks and the days whose ticks or payouts were
      * written since $touchedSince, within the window.
      *
