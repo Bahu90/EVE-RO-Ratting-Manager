@@ -22,17 +22,33 @@ class ChartData
         $this->systems = $systems;
     }
 
+    /**
+     * A query's rows, kept with the other figures until the next import
+     * changes the data. Only the rows are kept: names and system details
+     * are put on after, so a character still being looked up is named as
+     * soon as the lookup has them.
+     *
+     * @param callable(): \Illuminate\Support\Collection $query
+     */
+    private function rows(string $name, Scope $scope, string $extra, callable $query): \Illuminate\Support\Collection
+    {
+        return collect(FigureCache::remember(
+            'chart:' . $name . ':' . $scope->cacheKey() . ':' . $extra,
+            fn () => $query()->all()
+        ));
+    }
+
     /** Income per month for the last twelve months, split by what was read and what was worked out. */
     public function monthly(Scope $scope, bool $withCorpTax = false): array
     {
         $start = now()->subMonthsNoOverflow(11)->startOfMonth();
 
-        $rows = $scope->apply(DB::table('ratting_manager_daily_summaries'))
+        $rows = $this->rows('monthly', $scope, $start->format('Y-m'), fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->where('date', '>=', $start->toDateString())
             ->groupBy(DB::raw("DATE_FORMAT(date, '%Y-%m')"))
             ->selectRaw("DATE_FORMAT(date, '%Y-%m') as month, SUM(bounty_net) as bounty, SUM(bounty_estimated) as bounty_estimated, SUM(ess_net) as ess, SUM(ess_estimated) as ess_estimated, SUM(bounty_corp_tax + ess_corp_tax) as corp_tax")
             ->get()
-            ->keyBy('month');
+            ->keyBy('month'));
 
         $data = ['labels' => [], 'bounty' => [], 'bounty_estimated' => [], 'ess' => [], 'ess_estimated' => [], 'corp_tax' => []];
         for ($m = $start->copy(); $m->lte(now()); $m->addMonthNoOverflow()) {
@@ -55,11 +71,11 @@ class ChartData
     /** Income per day across the period, with a trailing seven-day average. */
     public function daily(Scope $scope, Period $period): array
     {
-        $rows = $scope->apply(DB::table('ratting_manager_daily_summaries'))
+        $rows = $this->rows('daily', $scope, FigureCache::range($period->start, $period->end), fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->whereBetween('date', [$period->start->toDateString(), $period->end->toDateString()])
             ->groupBy('date')
             ->selectRaw('date, SUM(bounty_net + ess_net) as income')
-            ->pluck('income', 'date');
+            ->pluck('income', 'date'));
 
         $data = ['labels' => [], 'income' => [], 'average' => []];
         $window = [];
@@ -80,13 +96,13 @@ class ChartData
     /** Where the ISK was made, best systems first. */
     public function systems(Scope $scope, Period $period, int $limit = 15): array
     {
-        $rows = $scope->apply(DB::table('ratting_manager_daily_summaries'))
+        $rows = $this->rows('systems', $scope, FigureCache::range($period->start, $period->end) . ':' . $limit, fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->whereBetween('date', [$period->start->toDateString(), $period->end->toDateString()])
             ->groupBy('solar_system_id')
             ->selectRaw('solar_system_id, SUM(bounty_net + ess_net) as income, SUM(ticks) as ticks, COUNT(DISTINCT character_id) as characters')
             ->orderByDesc('income')
             ->limit($limit)
-            ->get();
+            ->get());
 
         $details = $this->systems->details($rows->pluck('solar_system_id')->map(fn ($id) => (int) $id)->filter()->all());
 
@@ -138,12 +154,12 @@ class ChartData
     /** Income per character, for a player with alts. */
     public function byCharacter(Scope $scope, Period $period): array
     {
-        $rows = $scope->apply(DB::table('ratting_manager_daily_summaries'))
+        $rows = $this->rows('by-character', $scope, FigureCache::range($period->start, $period->end), fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->whereBetween('date', [$period->start->toDateString(), $period->end->toDateString()])
             ->groupBy('character_id')
             ->selectRaw('character_id, SUM(bounty_net + ess_net) as income')
             ->orderByDesc('income')
-            ->get();
+            ->get());
 
         $this->players->load($rows->pluck('character_id')->map(fn ($id) => (int) $id)->all());
 
@@ -155,10 +171,10 @@ class ChartData
 
     public function sessions(Scope $scope, Period $period, int $limit = 20): array
     {
-        $rows = $scope->apply(DB::table('ratting_manager_sessions'))
+        $rows = $this->rows('sessions', $scope, FigureCache::range($period->start, $period->end), fn () => $scope->apply(DB::table('ratting_manager_sessions'))
             ->whereBetween('started_at', [$period->start->copy()->subMinutes(ActiveTime::TICK_MINUTES), $period->end])
             ->orderByDesc('started_at')
-            ->get();
+            ->get());
 
         $this->players->load($rows->pluck('character_id')->map(fn ($id) => (int) $id)->all());
         $details = $this->systems->details($rows->pluck('primary_system_id')->map(fn ($id) => (int) $id)->all());
@@ -189,6 +205,11 @@ class ChartData
     /** Best tick, session, day and month, and the longest session, over all time. */
     public function records(Scope $scope): array
     {
+        return FigureCache::remember('chart:records:' . $scope->cacheKey(), fn () => $this->computeRecords($scope));
+    }
+
+    private function computeRecords(Scope $scope): array
+    {
         $tick = $scope->apply(DB::table('ratting_manager_ticks'))->orderByDesc('net_amount')->first(['net_amount', 'ticked_at', 'character_id']);
         $session = $scope->apply(DB::table('ratting_manager_sessions'))->orderByDesc('net_amount')->first(['net_amount', 'started_at', 'minutes']);
         $longest = $scope->apply(DB::table('ratting_manager_sessions'))->orderByDesc('minutes')->first(['minutes', 'started_at', 'net_amount']);
@@ -210,16 +231,19 @@ class ChartData
     /** How many special spawns the scope has in all. */
     public function spawnCount(Scope $scope): int
     {
-        return $scope->apply(DB::table('ratting_manager_special_spawns as s'), 's')->count();
+        return (int) FigureCache::remember(
+            'chart:spawn-count:' . $scope->cacheKey(),
+            fn () => $scope->apply(DB::table('ratting_manager_special_spawns as s'), 's')->count()
+        );
     }
 
     public function spawns(Scope $scope, int $limit = 25): array
     {
-        $rows = $scope->apply(DB::table('ratting_manager_special_spawns as s'), 's')
+        $rows = $this->rows('spawns', $scope, (string) $limit, fn () => $scope->apply(DB::table('ratting_manager_special_spawns as s'), 's')
             ->leftJoin('ratting_manager_npc_types as n', 'n.type_id', '=', 's.npc_type_id')
             ->orderByDesc('s.ticked_at')
             ->limit($limit)
-            ->get(['s.ticked_at', 's.character_id', 's.solar_system_id', 's.quantity', 'n.type_id', 'n.name', 'n.faction', 'n.rank', 'n.size']);
+            ->get(['s.ticked_at', 's.character_id', 's.solar_system_id', 's.quantity', 'n.type_id', 'n.name', 'n.faction', 'n.rank', 'n.size']));
 
         $this->players->load($rows->pluck('character_id')->map(fn ($id) => (int) $id)->all());
         $details = $this->systems->details($rows->pluck('solar_system_id')->map(fn ($id) => (int) $id)->all());
@@ -243,11 +267,11 @@ class ChartData
      */
     public function ratterMovement(Scope $scope): array
     {
-        $rows = $scope->apply(DB::table('ratting_manager_daily_summaries'))
+        $rows = $this->rows('movement', $scope, '', fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->where('ticks', '>', 0)
             ->groupBy('character_id', DB::raw("DATE_FORMAT(date, '%Y-%m')"))
             ->selectRaw("character_id, DATE_FORMAT(date, '%Y-%m') as month")
-            ->get();
+            ->get());
 
         $this->players->load($rows->pluck('character_id')->map(fn ($id) => (int) $id)->all());
 

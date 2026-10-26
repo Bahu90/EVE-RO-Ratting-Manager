@@ -46,6 +46,23 @@ class MonthlyBreakdown
      */
     public function byCharacter(Scope $scope, Carbon $month): array
     {
+        $result = FigureCache::remember(
+            'month-by-character:' . $scope->cacheKey() . ':' . $month->format('Y-m') . ':' . now()->format('Y-m'),
+            fn () => $this->computeByCharacter($scope, $month)
+        );
+
+        // Names go on after the cache, as RattingMetrics::collect() does.
+        $this->players->load(array_column($result['rows'], 'character_id'));
+        foreach ($result['rows'] as &$row) {
+            $row['name'] = $this->players->name($row['character_id']);
+        }
+        unset($row);
+
+        return $result;
+    }
+
+    private function computeByCharacter(Scope $scope, Carbon $month): array
+    {
         $start = $month->copy()->startOfMonth();
         $end = $month->copy()->endOfMonth();
 
@@ -131,6 +148,23 @@ class MonthlyBreakdown
      * the month's total.
      */
     public function characterMatrix(Scope $scope, int $months = 12): array
+    {
+        $result = FigureCache::remember(
+            'character-matrix:' . $scope->cacheKey() . ':' . $months . ':' . now()->format('Y-m'),
+            fn () => $this->computeCharacterMatrix($scope, $months)
+        );
+
+        // Names go on after the cache, as RattingMetrics::collect() does.
+        $this->players->load(array_column($result['characters'], 'id'));
+        foreach ($result['characters'] as &$character) {
+            $character['name'] = $this->players->name($character['id']);
+        }
+        unset($character);
+
+        return $result;
+    }
+
+    private function computeCharacterMatrix(Scope $scope, int $months): array
     {
         $start = now()->subMonthsNoOverflow($months - 1)->startOfMonth();
 
