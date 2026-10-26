@@ -27,20 +27,12 @@ final class ActiveTime
         }
 
         sort($times);
-        $span = self::TICK_MINUTES * 60;
-        $seconds = 0;
-        $coveredUntil = null;
 
+        $counter = new ActiveTimeCounter();
         foreach ($times as $t) {
-            $start = $t - $span;
-            if ($coveredUntil === null || $start >= $coveredUntil) {
-                $seconds += $span;
-            } elseif ($t > $coveredUntil) {
-                $seconds += $t - $coveredUntil;
-            }
-            $coveredUntil = max($coveredUntil ?? $t, $t);
+            $counter->add($t);
         }
 
-        return intdiv($seconds + 30, 60);
+        return $counter->minutes();
     }
 }

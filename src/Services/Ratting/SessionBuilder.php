@@ -4,7 +4,6 @@ namespace RattingManager\Services\Ratting;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use RattingManager\Models\RattingSession;
 use RattingManager\Models\Tick;
 use RattingManager\Services\Configuration\Settings;
 
@@ -68,80 +67,144 @@ class SessionBuilder
     {
         $from = $since->copy();
 
-        $open = RattingSession::where('character_id', $characterId)
+        $openStart = DB::table('ratting_manager_sessions')
+            ->where('character_id', $characterId)
             ->where('ended_at', '>=', $since->copy()->subSeconds($gap))
             ->where('started_at', '<', $since)
             ->orderBy('started_at')
-            ->first();
+            ->value('started_at');
 
-        if ($open) {
-            $from = $open->started_at->copy();
+        if ($openStart !== null) {
+            $from = Carbon::parse($openStart);
         }
 
-        $ticks = Tick::where('character_id', $characterId)
+        // Plain rows, read one at a time in time order, each folded into the
+        // session it belongs to as it arrives. Only the running totals of the
+        // session being built are held, never the ticks themselves, so a
+        // character with a year of ticks costs no more memory than one with
+        // a day of them.
+        $ticks = DB::table('ratting_manager_ticks')
+            ->where('character_id', $characterId)
             ->where('ticked_at', '>=', $from)
             ->orderBy('ticked_at')
-            ->get(['id', 'corporation_id', 'solar_system_id', 'ticked_at', 'net_amount', 'net_is_estimated', 'npc_kills']);
+            ->select(['corporation_id', 'solar_system_id', 'ticked_at', 'net_amount', 'net_is_estimated', 'npc_kills'])
+            ->selectRaw("TIMESTAMPDIFF(SECOND, '1970-01-01 00:00:00', ticked_at) as ts")
+            ->cursor();
 
-        return DB::transaction(function () use ($characterId, $from, $ticks, $gap) {
-            $old = RattingSession::where('character_id', $characterId)->where('ended_at', '>=', $from)->pluck('id');
-            Tick::whereIn('session_id', $old)->update(['session_id' => null]);
-            RattingSession::whereIn('id', $old)->delete();
+        $now = now();
+        $sessions = [];
+        $current = null;
+        $last = null;
 
-            $groups = [];
-            $current = [];
-            $last = null;
-            foreach ($ticks as $tick) {
-                $t = $tick->ticked_at->getTimestamp();
-                if ($last !== null && $t - $last > $gap) {
-                    $groups[] = $current;
-                    $current = [];
-                }
-                $current[] = $tick;
-                $last = $t;
+        foreach ($ticks as $tick) {
+            $t = (int) $tick->ts;
+            if ($current !== null && $t - $last > $gap) {
+                $sessions[] = $this->finish($characterId, $current, $now);
+                $current = null;
             }
-            if ($current !== []) {
-                $groups[] = $current;
+            $current ??= $this->begin($tick);
+            $this->add($current, $tick, $t);
+            $last = $t;
+        }
+        if ($current !== null) {
+            $sessions[] = $this->finish($characterId, $current, $now);
+        }
+
+        DB::transaction(function () use ($characterId, $from, $sessions) {
+            $old = DB::table('ratting_manager_sessions')
+                ->where('character_id', $characterId)
+                ->where('ended_at', '>=', $from)
+                ->pluck('id')
+                ->all();
+
+            foreach (array_chunk($old, 1000) as $chunk) {
+                DB::table('ratting_manager_ticks')->whereIn('session_id', $chunk)->update(['session_id' => null]);
+                DB::table('ratting_manager_sessions')->whereIn('id', $chunk)->delete();
             }
 
-            foreach ($groups as $group) {
-                $this->store($characterId, $group);
+            foreach (array_chunk($sessions, 500) as $chunk) {
+                DB::table('ratting_manager_sessions')->insert($chunk);
             }
 
-            return count($groups);
+            if ($sessions === []) {
+                return;
+            }
+
+            // Every tick of a session lies between its first tick (started_at
+            // plus the tick length) and its last (ended_at), and sessions are
+            // apart by more than the gap, so one update by time sets every
+            // tick's session at once.
+            DB::table('ratting_manager_ticks as t')
+                ->join('ratting_manager_sessions as s', function ($join) {
+                    $join->on('s.character_id', '=', 't.character_id')
+                        ->whereRaw('t.ticked_at >= DATE_ADD(s.started_at, INTERVAL ' . ActiveTime::TICK_MINUTES . ' MINUTE)')
+                        ->whereColumn('t.ticked_at', '<=', 's.ended_at');
+                })
+                ->where('t.character_id', $characterId)
+                ->where('t.ticked_at', '>=', $from)
+                ->where('s.ended_at', '>=', $from)
+                ->update(['t.session_id' => DB::raw('s.id')]);
         });
+
+        return count($sessions);
     }
 
-    private function store(int $characterId, array $ticks): void
+    /** A new session, opened by its first tick. */
+    private function begin(object $tick): array
     {
-        $first = $ticks[0];
-        $last = end($ticks);
+        return [
+            'corporation_id' => (int) $tick->corporation_id,
+            'first' => (string) $tick->ticked_at,
+            'last' => (string) $tick->ticked_at,
+            'time' => new ActiveTimeCounter(),
+            'ticks' => 0,
+            'net' => 0.0,
+            'estimated' => 0.0,
+            'kills' => 0,
+            'systems' => [],
+        ];
+    }
 
-        $minutes = ActiveTime::minutes(array_map(fn ($t) => $t->ticked_at->getTimestamp(), $ticks));
-        $net = array_sum(array_map(fn ($t) => (float) $t->net_amount, $ticks));
-        $estimated = array_sum(array_map(fn ($t) => $t->net_is_estimated ? (float) $t->net_amount : 0.0, $ticks));
-
-        $bySystem = [];
-        foreach ($ticks as $t) {
-            $bySystem[$t->solar_system_id] = ($bySystem[$t->solar_system_id] ?? 0) + 1;
+    private function add(array &$session, object $tick, int $timestamp): void
+    {
+        $session['last'] = (string) $tick->ticked_at;
+        $session['time']->add($timestamp);
+        $session['ticks']++;
+        $session['net'] += (float) $tick->net_amount;
+        if ((bool) $tick->net_is_estimated) {
+            $session['estimated'] += (float) $tick->net_amount;
         }
+        $session['kills'] += (int) $tick->npc_kills;
+        $system = (int) $tick->solar_system_id;
+        $session['systems'][$system] = ($session['systems'][$system] ?? 0) + 1;
+    }
+
+    /** The session's row, worked out the same way the old per-model code did. */
+    private function finish(int $characterId, array $session, Carbon $now): array
+    {
+        $minutes = $session['time']->minutes();
+        $net = $session['net'];
+
+        // Most ticks first; a tie keeps the system seen first, as arsort()
+        // is stable.
+        $bySystem = $session['systems'];
         arsort($bySystem);
 
-        $session = RattingSession::create([
+        return [
             'character_id' => $characterId,
-            'corporation_id' => $first->corporation_id,
-            'started_at' => $first->ticked_at->copy()->subMinutes(ActiveTime::TICK_MINUTES),
-            'ended_at' => $last->ticked_at,
+            'corporation_id' => $session['corporation_id'],
+            'started_at' => Carbon::parse($session['first'])->subMinutes(ActiveTime::TICK_MINUTES)->format('Y-m-d H:i:s'),
+            'ended_at' => substr($session['last'], 0, 19),
             'minutes' => $minutes,
-            'tick_count' => count($ticks),
+            'tick_count' => $session['ticks'],
             'primary_system_id' => (int) array_key_first($bySystem),
             'system_count' => count($bySystem),
             'net_amount' => round($net, 2),
-            'estimated_amount' => round($estimated, 2),
-            'npc_kills' => array_sum(array_map(fn ($t) => (int) $t->npc_kills, $ticks)),
+            'estimated_amount' => round($session['estimated'], 2),
+            'npc_kills' => $session['kills'],
             'isk_per_hour' => $minutes > 0 ? round($net / ($minutes / 60), 2) : 0,
-        ]);
-
-        Tick::whereIn('id', array_map(fn ($t) => $t->id, $ticks))->update(['session_id' => $session->id]);
+            'created_at' => $now,
+            'updated_at' => $now,
+        ];
     }
 }
