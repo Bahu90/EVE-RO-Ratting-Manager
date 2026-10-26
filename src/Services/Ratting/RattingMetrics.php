@@ -121,12 +121,18 @@ class RattingMetrics
         $regular = now()->subDays((int) $this->settings->get('data.regular_ratter_days'));
         $quiet = now()->subDays((int) $this->settings->get('data.gone_quiet_days'));
 
-        $last = DB::table('ratting_manager_ticks')
-            ->whereIn('corporation_id', $corporations ?: [0])
-            ->where('ticked_at', '>=', $regular)
-            ->groupBy('character_id')
-            ->selectRaw('character_id, MAX(ticked_at) as last_tick, COUNT(*) as ticks')
-            ->get();
+        // The rows are kept with the other figures; who counts as gone
+        // quiet is still decided below against the time now.
+        $last = collect(FigureCache::remember(
+            'gone-quiet:' . md5(json_encode($corporations)) . ':' . $regular->toDateString(),
+            fn () => DB::table('ratting_manager_ticks')
+                ->whereIn('corporation_id', $corporations ?: [0])
+                ->where('ticked_at', '>=', $regular)
+                ->groupBy('character_id')
+                ->selectRaw('character_id, MAX(ticked_at) as last_tick, COUNT(*) as ticks')
+                ->get()
+                ->all()
+        ));
 
         $this->players->load($last->pluck('character_id')->map(fn ($id) => (int) $id)->all());
 
@@ -154,13 +160,20 @@ class RattingMetrics
      */
     public function untracked(array $corporations, int $days = 90): array
     {
-        $rows = DB::table('ratting_manager_ticks')
-            ->whereIn('corporation_id', $corporations ?: [0])
-            ->where('kind', 'corporation')
-            ->where('ticked_at', '>=', now()->subDays($days))
-            ->groupBy('character_id')
-            ->selectRaw('character_id, COUNT(*) as ticks, SUM(net_amount) as net, MAX(ticked_at) as last_tick')
-            ->get();
+        // The rows are kept with the other figures; whether each ratter has
+        // a wallet token yet is still checked below on every read.
+        $since = now()->subDays($days);
+        $rows = collect(FigureCache::remember(
+            'untracked:' . md5(json_encode($corporations)) . ':' . $days . ':' . $since->toDateString(),
+            fn () => DB::table('ratting_manager_ticks')
+                ->whereIn('corporation_id', $corporations ?: [0])
+                ->where('kind', 'corporation')
+                ->where('ticked_at', '>=', $since)
+                ->groupBy('character_id')
+                ->selectRaw('character_id, COUNT(*) as ticks, SUM(net_amount) as net, MAX(ticked_at) as last_tick')
+                ->get()
+                ->all()
+        ));
 
         $this->players->load($rows->pluck('character_id')->map(fn ($id) => (int) $id)->all());
 
