@@ -11,7 +11,7 @@ use RattingManager\Services\Character\AffiliationResolutionService;
  * can show them without calling out to anything.
  *
  * With --requested it only takes the characters pages have asked for, which
- * is quick enough to run every minute. A full run also takes ratters SeAT has
+ * is quick enough to run every couple of minutes. A full run also takes ratters SeAT has
  * no affiliation for, and answers due another look.
  */
 class ResolveCharactersCommand extends Command

@@ -39,12 +39,18 @@ class ScheduleSeeder extends AbstractScheduleSeeder
                 'ping_after' => null,
             ],
             // Ratters SeAT does not know are looked up in the background, so no
-            // page waits on ESI: the ones pages asked for every minute, the
-            // rest with answers due another look every 10 minutes. Same
+            // page waits on ESI: the ones pages asked for every two minutes,
+            // the rest with answers due another look every 10 minutes. Same
             // pattern as Mining Manager.
+            //
+            // AbstractScheduleSeeder adds new entries before it removes
+            // deprecated ones, both matched by command text, so the new
+            // two-minute entry needs a command text of its own (--quiet,
+            // which the scheduler never shows anyway) or it would be removed
+            // with the old every-minute one.
             [
-                'command' => 'ratting-manager:resolve-characters --requested',
-                'expression' => '* * * * *',
+                'command' => 'ratting-manager:resolve-characters --requested --quiet',
+                'expression' => '*/2 * * * *',
                 'allow_overlap' => false,
                 'allow_maintenance' => false,
                 'ping_before' => null,
@@ -91,6 +97,9 @@ class ScheduleSeeder extends AbstractScheduleSeeder
 
     public function getDeprecatedSchedules(): array
     {
-        return [];
+        return [
+            // Ran every minute; replaced by the two-minute entry above.
+            'ratting-manager:resolve-characters --requested',
+        ];
     }
 }

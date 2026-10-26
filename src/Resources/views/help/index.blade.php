@@ -691,7 +691,7 @@
                         (<em>Encounter Surveillance System in ... transferred funds to {name}</em>), and the background lookup adds the
                         corporation they are in now, from ESI, or from EVEWho or zKillboard when ESI is down. Pages only ever read what
                         has been found. A character nobody has named yet shows as <em>Character info in progress</em>, and the page
-                        refreshes itself once the lookup has them, usually within a minute.
+                        refreshes itself once the lookup has them, usually within two minutes.
                     </p>
                     <h4>NPCs</h4>
                     <p>Each rat is placed by faction, size and rank from SeAT's SDE. Groups that mix sizes are sized by the NPC's mass. Anything that cannot be placed still counts, as Other, and Diagnostics lists it.</p>
@@ -759,7 +759,7 @@
                         <tbody>
                             <tr><td><code>ratting-manager:initialize</code></td><td>Checks the setup and imports the last 365 days SeAT already holds, the most any page shows. Run once after picking the corporations. <code>--from=YYYY-MM-DD</code> starts later.</td></tr>
                             <tr><td><code>ratting-manager:process</code></td><td>The scheduled run: reads the last two days of both journals and updates everything. <code>--days=N</code> or <code>--from=YYYY-MM-DD</code> reads further back.</td></tr>
-                            <tr><td><code>ratting-manager:resolve-characters</code></td><td>Looks up names and corporations for ratters SeAT does not know, in the background, so no page waits on ESI. With <code>--requested</code> it takes only the characters pages asked for, which show as <em>Character info in progress</em> until then, and runs every minute; the full run every 10 minutes also takes ratters nobody has looked up yet and answers due another look. <code>--stats</code> shows what it holds. ESI comes first, then EVEWho and zKillboard when ESI is down, and it stops calling ESI while the error budget it shares with SeAT is low.</td></tr>
+                            <tr><td><code>ratting-manager:resolve-characters</code></td><td>Looks up names and corporations for ratters SeAT does not know, in the background, so no page waits on ESI. With <code>--requested</code> it takes only the characters pages asked for, which show as <em>Character info in progress</em> until then, and runs every two minutes; the full run every 10 minutes also takes ratters nobody has looked up yet and answers due another look. <code>--stats</code> shows what it holds. ESI comes first, then EVEWho and zKillboard when ESI is down, and it stops calling ESI while the error budget it shares with SeAT is low.</td></tr>
                             <tr><td><code>ratting-manager:trace-tick {id}</code></td><td>Shows what the plugin did with one journal row, the same as the Tick Trace tab.</td></tr>
                             <tr><td><code>ratting-manager:notify</code></td><td>Checks every alert and sends what is new. Runs twice an hour, five minutes after the import. <code>--only=special_spawn</code> runs one alert.</td></tr>
                             <tr><td><code>ratting-manager:poll-system-kills</code></td><td>Keeps ESI's hourly NPC kill counts for the systems in the home space, for the Outsiders alert. Runs hourly.</td></tr>
