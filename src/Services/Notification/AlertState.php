@@ -72,4 +72,36 @@ class AlertState
             ->mapWithKeys(fn ($r) => [$r->alert_key => (array) json_decode((string) $r->payload, true)])
             ->all();
     }
+
+    /**
+     * Alert keys sent for one event only and never closed: each is checked
+     * again only for a short time after it happens (outsiders within a day,
+     * a ship lost within two, a report for the period that just ended), so
+     * long after that the row can never be read again.
+     */
+    private const ONE_SHOT_PREFIXES = ['outsiders:', 'ship_lost:', 'director_report_', 'rankings_'];
+
+    /**
+     * Drop rows that can no longer change what is sent: closed keys, which
+     * isOpen() and opened() treat the same as no row at all, and one-shot
+     * keys long past the time they are checked for.
+     */
+    public function prune(int $days = 90): int
+    {
+        $before = Carbon::now()->subDays($days);
+
+        $removed = DB::table(self::TABLE)
+            ->where('state', 'closed')
+            ->where('closed_at', '<', $before)
+            ->delete();
+
+        foreach (self::ONE_SHOT_PREFIXES as $prefix) {
+            $removed += DB::table(self::TABLE)
+                ->where('alert_key', 'like', str_replace(['%', '_'], ['\%', '\_'], $prefix) . '%')
+                ->where('last_sent_at', '<', $before)
+                ->delete();
+        }
+
+        return $removed;
+    }
 }

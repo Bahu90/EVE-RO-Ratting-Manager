@@ -5,6 +5,7 @@ namespace RattingManager\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use RattingManager\Services\Notification\Alerts\Alerts;
+use RattingManager\Services\Notification\AlertState;
 use RattingManager\Services\Notification\NotificationTypes;
 use RattingManager\Services\Notification\WebhookDeliveryService;
 
@@ -56,6 +57,7 @@ class NotifyCommand extends Command
             }
 
             WebhookDeliveryService::prune();
+            app(AlertState::class)->prune();
         } finally {
             $lock->release();
         }
