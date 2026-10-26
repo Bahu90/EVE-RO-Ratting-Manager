@@ -39,6 +39,30 @@ class DailySummaryBuilder
         return $result;
     }
 
+    /**
+     * Rebuild only the days given, for a run that knows which days its
+     * import touched.
+     *
+     * @param string[] $dates Y-m-d
+     */
+    public function rebuildDays(array $dates, ?Progress $progress = null): array
+    {
+        $progress ??= Progress::none();
+        $result = ['summaries' => 0, 'kills' => 0];
+
+        $dates = array_values(array_unique($dates));
+        sort($dates);
+
+        foreach ($dates as $date) {
+            [$summaries, $kills] = $this->rebuildDay(Carbon::parse($date));
+            $result['summaries'] += $summaries;
+            $result['kills'] += $kills;
+            $progress->advance();
+        }
+
+        return $result;
+    }
+
     private function rebuildDay(Carbon $day): array
     {
         $date = $day->toDateString();

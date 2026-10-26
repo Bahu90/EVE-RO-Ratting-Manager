@@ -56,6 +56,12 @@ class ProcessCommand extends Command
                 'Corp-only rows worked out: %d, waiting on a tax rate: %d',
                 $report['estimates']['worked_out'], $report['estimates']['no_rate']
             ));
+            if (is_array($report['changed'])) {
+                $this->line(sprintf(
+                    'Changed by this run: %d character(s), %d day(s)',
+                    $report['changed']['characters'], $report['changed']['days']
+                ));
+            }
             $this->line(sprintf(
                 'New NPC types: %d, new special spawns: %d, sessions built: %d, daily rows: %d',
                 $report['npc_types'], $report['special_spawns'], $report['sessions'], $report['daily']['summaries']

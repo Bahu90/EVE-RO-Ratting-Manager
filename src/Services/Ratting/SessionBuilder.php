@@ -26,19 +26,34 @@ class SessionBuilder
     }
 
     /** How many characters rebuild() will go through, for a progress bar. */
-    public function characterCount(Carbon $since): int
+    public function characterCount(Carbon $since, ?array $characters = null): int
     {
+        if ($characters !== null) {
+            return count($characters);
+        }
+
         return Tick::where('ticked_at', '>=', $since)->distinct()->count('character_id');
     }
 
-    public function rebuild(Carbon $since, ?Progress $progress = null): int
+    /** The session gap in minutes, as the builder uses it. */
+    public function gapMinutes(): int
+    {
+        return max(20, (int) $this->settings->get('data.session_gap_minutes'));
+    }
+
+    /**
+     * @param int[]|null $characters only these characters, or null for every
+     *                               character with a tick since $since
+     */
+    public function rebuild(Carbon $since, ?Progress $progress = null, ?array $characters = null): int
     {
         $progress ??= Progress::none();
-        $gap = max(20, (int) $this->settings->get('data.session_gap_minutes')) * 60;
+        $gap = $this->gapMinutes() * 60;
 
-        $characters = Tick::where('ticked_at', '>=', $since)
+        $characters ??= Tick::where('ticked_at', '>=', $since)
             ->distinct()
-            ->pluck('character_id');
+            ->pluck('character_id')
+            ->all();
 
         $built = 0;
         foreach ($characters as $characterId) {

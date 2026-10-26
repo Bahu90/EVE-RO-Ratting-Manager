@@ -97,7 +97,8 @@ class InitializeCommand extends Command
             // The pipeline's steps, then the two kinds of character lookup.
             [$progress, $close] = $this->progressBars(Pipeline::STEPS + 2);
 
-            $report = $pipeline->run($since, $progress);
+            // The first import builds every session and day in the window.
+            $report = $pipeline->run($since, $progress, false);
             $counts = $lookups->resolve($lookups->due(), $progress);
             $close();
 

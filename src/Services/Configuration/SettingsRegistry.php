@@ -67,6 +67,9 @@ final class SettingsRegistry
         'state.initialized_at' => [self::STATE, 'string', null],
         // NpcRegistry::RULES the NPC types on file were classified under.
         'state.npc_rules' => [self::STATE, 'int', 0],
+        // The session gap the stored sessions were built with, so the
+        // scheduled run knows to rebuild every character when it changes.
+        'state.session_gap_built' => [self::STATE, 'int', 0],
     ];
 
     public static function has(string $key): bool
