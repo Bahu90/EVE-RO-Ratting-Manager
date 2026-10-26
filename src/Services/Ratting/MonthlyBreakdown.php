@@ -56,18 +56,34 @@ class MonthlyBreakdown
             ->get()
             ->keyBy('character_id');
 
+        // Oldest first, counted as the ticks arrive; see RattingMetrics for
+        // why only the current second's kill groups need remembering.
         $times = [];
-        $groups = [];
-        $allTimes = [];
-        $allGroups = [];
-        foreach (Ticks::stream($scope, $start, $end, ['character_id', 'kill_group', 'npc_kills']) as $t) {
+        $rats = [];
+        $allTime = new ActiveTimeCounter();
+        $allRats = 0;
+        $second = null;
+        $groupsThisSecond = [];
+        $characterGroupsThisSecond = [];
+        foreach (Ticks::stream($scope, $start, $end, ['character_id', 'kill_group', 'npc_kills'], true) as $t) {
             $id = (int) $t->character_id;
             $ts = (int) $t->ts;
-            $times[$id][] = $ts;
-            $allTimes[] = $ts;
+            ($times[$id] ??= new ActiveTimeCounter())->add($ts);
+            $allTime->add($ts);
+            if ($ts !== $second) {
+                $second = $ts;
+                $groupsThisSecond = [];
+                $characterGroupsThisSecond = [];
+            }
             if ($t->kill_group !== null) {
-                $groups[$id][$t->kill_group] = (int) $t->npc_kills;
-                $allGroups[$t->kill_group] = (int) $t->npc_kills;
+                if (!isset($characterGroupsThisSecond[$id][$t->kill_group])) {
+                    $characterGroupsThisSecond[$id][$t->kill_group] = true;
+                    $rats[$id] = ($rats[$id] ?? 0) + (int) $t->npc_kills;
+                }
+                if (!isset($groupsThisSecond[$t->kill_group])) {
+                    $groupsThisSecond[$t->kill_group] = true;
+                    $allRats += (int) $t->npc_kills;
+                }
             }
         }
 
@@ -78,7 +94,7 @@ class MonthlyBreakdown
         foreach ($ids as $id) {
             $m = $money->get($id);
             $income = (float) ($m->bounty ?? 0) + (float) ($m->ess ?? 0);
-            $minutes = ActiveTime::minutes($times[$id] ?? []);
+            $minutes = isset($times[$id]) ? $times[$id]->minutes() : 0;
             $rows[] = [
                 'character_id' => $id,
                 'name' => $this->players->name($id),
@@ -90,7 +106,7 @@ class MonthlyBreakdown
                 'ticks' => (int) ($m->ticks ?? 0),
                 'minutes' => $minutes,
                 'isk_per_hour' => $minutes > 0 ? round($income / ($minutes / 60), 2) : 0.0,
-                'rats' => array_sum($groups[$id] ?? []),
+                'rats' => $rats[$id] ?? 0,
             ];
         }
         usort($rows, fn ($a, $b) => $b['income'] <=> $a['income']);
@@ -102,8 +118,8 @@ class MonthlyBreakdown
             'estimated' => round(array_sum(array_column($rows, 'estimated')), 2),
             'corp_tax' => round(array_sum(array_column($rows, 'corp_tax')), 2),
             'ticks' => array_sum(array_column($rows, 'ticks')),
-            'minutes' => ActiveTime::minutes($allTimes),
-            'rats' => array_sum($allGroups),
+            'minutes' => $allTime->minutes(),
+            'rats' => $allRats,
         ];
         $total['isk_per_hour'] = $total['minutes'] > 0 ? round($total['income'] / ($total['minutes'] / 60), 2) : 0.0;
 
@@ -185,11 +201,13 @@ class MonthlyBreakdown
         $characters = [];
         $mains = [];
         $monthOf = [];
-        foreach (Ticks::stream($scope, $start, $end, ['character_id']) as $t) {
+        // Oldest first, so each player's time in each month is counted as
+        // the ticks arrive instead of keeping a year of timestamps.
+        foreach (Ticks::stream($scope, $start, $end, ['character_id'], true) as $t) {
             $time = (int) $t->ts;
             $key = $monthOf[intdiv($time, 86400)] ??= gmdate('Y-m', $time);
             $main = $mains[(int) $t->character_id] ??= $this->players->mainOf((int) $t->character_id);
-            $times[$key][$main][] = $time;
+            ($times[$key][$main] ??= new ActiveTimeCounter())->add($time);
             $characters[$key][(int) $t->character_id] = true;
         }
 
@@ -198,7 +216,7 @@ class MonthlyBreakdown
             $m = $money->get($key);
             $income = (float) ($m->bounty ?? 0) + (float) ($m->ess ?? 0);
             $tax = (float) ($m->corp_tax ?? 0);
-            $minutes = array_sum(array_map([ActiveTime::class, 'minutes'], $times[$key] ?? []));
+            $minutes = array_sum(array_map(fn (ActiveTimeCounter $c) => $c->minutes(), $times[$key] ?? []));
             $players = count($times[$key] ?? []);
 
             $rows[] = [

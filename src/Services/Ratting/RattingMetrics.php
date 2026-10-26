@@ -244,15 +244,23 @@ class RattingMetrics
             unset($p);
         }
 
-        $times = [];
-        $groups = [];
-        $allGroups = [];
+        // Ticks come oldest first, so each player's time is counted as they
+        // arrive (ActiveTimeCounter) instead of keeping every timestamp. A
+        // kill group is one second, one system and one kill list, so it never
+        // spans two seconds: only the groups of the current second need
+        // remembering to count each group once.
+        $counters = [];
+        $rats = [];
+        $allRats = 0;
+        $groupsThisSecond = [];
+        $playerGroupsThisSecond = [];
+        $second = null;
         $days = [];
         $seenByCorp = [];
         $paired = [];
         $mains = [];
         $last = [];
-        foreach (Ticks::stream($scope, $from, $to, ['character_id', 'kill_group', 'npc_kills', 'kind']) as $t) {
+        foreach (Ticks::stream($scope, $from, $to, ['character_id', 'kill_group', 'npc_kills', 'kind'], true) as $t) {
             $main = $mains[(int) $t->character_id] ??= $this->players->mainOf((int) $t->character_id);
             $time = (int) $t->ts;
             $players[$main] ??= $blank($main);
@@ -262,12 +270,23 @@ class RattingMetrics
                 $last[$main] = $time;
             }
 
-            $times[$main][] = $time;
+            ($counters[$main] ??= new ActiveTimeCounter())->add($time);
             $days[$main][intdiv($time, 86400)] = true;
 
+            if ($time !== $second) {
+                $second = $time;
+                $groupsThisSecond = [];
+                $playerGroupsThisSecond = [];
+            }
             if ($t->kill_group !== null) {
-                $groups[$main][$t->kill_group] = (int) $t->npc_kills;
-                $allGroups[$t->kill_group] = (int) $t->npc_kills;
+                if (!isset($playerGroupsThisSecond[$main][$t->kill_group])) {
+                    $playerGroupsThisSecond[$main][$t->kill_group] = true;
+                    $rats[$main] = ($rats[$main] ?? 0) + (int) $t->npc_kills;
+                }
+                if (!isset($groupsThisSecond[$t->kill_group])) {
+                    $groupsThisSecond[$t->kill_group] = true;
+                    $allRats += (int) $t->npc_kills;
+                }
             }
 
             if ($t->kind !== 'character') {
@@ -280,15 +299,15 @@ class RattingMetrics
 
         $totals = [
             'income' => 0.0, 'bounty' => 0.0, 'ess' => 0.0, 'estimated' => 0.0, 'corp_tax' => 0.0,
-            'ticks' => 0, 'minutes' => 0, 'rats' => array_sum($allGroups), 'players' => 0, 'characters' => 0,
+            'ticks' => 0, 'minutes' => 0, 'rats' => $allRats, 'players' => 0, 'characters' => 0,
             'seen_by_corp' => array_sum($seenByCorp), 'paired' => array_sum($paired),
         ];
 
         foreach ($players as $main => &$p) {
             $p['income'] = round($p['bounty'] + $p['ess'], 2);
-            $p['minutes'] = ActiveTime::minutes($times[$main] ?? []);
+            $p['minutes'] = isset($counters[$main]) ? $counters[$main]->minutes() : 0;
             $p['isk_per_hour'] = $p['minutes'] > 0 ? round($p['income'] / ($p['minutes'] / 60), 2) : 0.0;
-            $p['rats'] = array_sum($groups[$main] ?? []);
+            $p['rats'] = $rats[$main] ?? 0;
             $p['active_days'] = count($days[$main] ?? []);
             $p['coverage'] = isset($seenByCorp[$main]) ? round(($paired[$main] ?? 0) / $seenByCorp[$main] * 100) : null;
             $p['characters'] = array_keys($p['characters']);

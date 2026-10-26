@@ -58,7 +58,11 @@ class Insights
         $hourSeconds = array_fill(0, 24, 0);
         $hourBounty = array_fill(0, 24, 0.0);
         $system = [];
+        // A kill group is one second, one system and one kill list, and the
+        // ticks come oldest first, so only the current second's groups need
+        // remembering to count each group once.
         $groupsSeen = [];
+        $groupSecond = null;
         $rats = 0;
         $days = [];
         $weekdayDays = array_fill(0, 7, []);
@@ -106,6 +110,10 @@ class Insights
             $system[$sys]['last'] = $time;
             $system[$sys]['playerSeconds'][$main] = ($system[$sys]['playerSeconds'][$main] ?? 0) + $added;
 
+            if ($time !== $groupSecond) {
+                $groupSecond = $time;
+                $groupsSeen = [];
+            }
             if ($t->kill_group !== null && !isset($groupsSeen[$t->kill_group])) {
                 $groupsSeen[$t->kill_group] = true;
                 $rats += (int) $t->npc_kills;
