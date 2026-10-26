@@ -38,7 +38,7 @@ return [
     'stat_journal_none' => ':count token(s) with corporation wallet access',
     'preview_ready' => 'SeAT already holds its bounty rows. Track it, then run the initial import to bring in its history.',
     'already_tracked' => 'Already tracked.',
-    'now_tracking' => 'Now tracking :name. Run the initial import to bring in its history: php artisan ratting-manager:initialize',
+    'now_tracking' => 'Now tracking :name. Run the initial import to bring in its last year: php artisan ratting-manager:initialize',
     'stopped_tracking' => 'Stopped tracking :name.',
 
     'data' => 'Sessions and lists',
@@ -63,7 +63,7 @@ return [
     'initialized' => 'Initial import',
     'not_initialized' => 'Not run yet',
     'never' => 'Never',
-    'initialize_intro' => 'After picking the corporations, bring in what SeAT already holds. Without it, the schedule brings in the last 31 days within a day.',
+    'initialize_intro' => 'After picking the corporations, bring in the last 365 days SeAT already holds, the most any page shows. Without it, the schedule brings in the last 31 days within a day.',
     'last_report' => 'Last run',
     'report_line' => ':read rows read, :created new, :paired paired',
     'open_diagnostics' => 'Open Diagnostics',

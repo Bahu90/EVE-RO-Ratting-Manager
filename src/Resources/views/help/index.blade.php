@@ -590,7 +590,7 @@
                     <ol class="step-by-step">
                         <li><strong>Add the corporations to track</strong> under Ratting Manager, Settings. Search by name or ticker, or open the list; picking one shows its ticker, alliance, tax rate, members, how many of its characters are on SeAT, and whether SeAT holds its bounty rows, and you confirm from there. Only ticks from tracked corporations are imported.</li>
                         <li><strong>Make sure SeAT has a director token with wallet access</strong> for each one. The corporation journal is what shows members who have not added a wallet token of their own.</li>
-                        <li><strong>Run the initial import</strong> once, to bring in everything SeAT already holds:
+                        <li><strong>Run the initial import</strong> once, to bring in the last 365 days SeAT already holds, the most any page shows:
                             <pre><code>docker exec -it seat-docker-front-1 php artisan ratting-manager:initialize</code></pre>
                             Without it, the schedule brings in the last 31 days within a day.
                         </li>
@@ -756,7 +756,7 @@
                     <p>Run them inside SeAT's front container, for example <code>docker exec -it seat-docker-front-1 php artisan ratting-manager:process</code>.</p>
                     <table class="table table-sm">
                         <tbody>
-                            <tr><td><code>ratting-manager:initialize</code></td><td>Checks the setup and imports everything SeAT already holds. Run once after picking the corporations.</td></tr>
+                            <tr><td><code>ratting-manager:initialize</code></td><td>Checks the setup and imports the last 365 days SeAT already holds, the most any page shows. Run once after picking the corporations. <code>--from=YYYY-MM-DD</code> starts later.</td></tr>
                             <tr><td><code>ratting-manager:process</code></td><td>The scheduled run: reads the last two days of both journals and updates everything. <code>--days=N</code> or <code>--from=YYYY-MM-DD</code> reads further back.</td></tr>
                             <tr><td><code>ratting-manager:resolve-characters</code></td><td>Looks up names and corporations for ratters SeAT does not know, in the background, so no page waits on ESI. With <code>--requested</code> it takes only the characters pages asked for, which show as <em>Character info in progress</em> until then, and runs every minute; the full run every 10 minutes also takes ratters nobody has looked up yet and answers due another look. <code>--stats</code> shows what it holds. ESI comes first, then EVEWho and zKillboard when ESI is down, and it stops calling ESI while the error budget it shares with SeAT is low.</td></tr>
                             <tr><td><code>ratting-manager:trace-tick {id}</code></td><td>Shows what the plugin did with one journal row, the same as the Tick Trace tab.</td></tr>

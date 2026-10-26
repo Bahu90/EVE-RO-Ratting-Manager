@@ -50,7 +50,7 @@ All notable changes to Ratting Manager will be documented in this file.
 
 ### Commands and schedule
 
-- `ratting-manager:initialize` for the first import, with a progress bar for each step, `ratting-manager:process` for the scheduled one, `ratting-manager:trace-tick` to follow one journal row, and a command for each step of the import.
+- `ratting-manager:initialize` for the first import, of the last 365 days SeAT holds since no page shows more, with a progress bar for each step, `ratting-manager:process` for the scheduled one, `ratting-manager:trace-tick` to follow one journal row, and a command for each step of the import.
 - `process` runs twice an hour over the last two days, and once a day over the last 31 so tokens added later pair with the corporation rows already imported.
 - `resolve-characters --requested` runs every minute for the characters pages asked for, and the full lookup every 10 minutes.
 - `ratting-manager:notify` checks the alerts twice an hour, five minutes after the import; `ratting-manager:poll-system-kills` keeps ESI's kill counts hourly; `ratting-manager:send-reports` sends the reports that are due daily at 11:20 EVE.

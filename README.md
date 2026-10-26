@@ -48,7 +48,7 @@ After installation:
 
 1. Open SeAT and go to **Ratting Manager > Settings**
 2. Add the **corporations to track**: search by name or ticker, or open the list, and check the corporation's details before confirming: ticker, alliance, tax rate, members, how many of its characters are on SeAT and whether SeAT holds its bounty rows
-3. Run the initial import, which brings in everything SeAT already holds:
+3. Run the initial import, which brings in the last 365 days SeAT already holds, the most any page shows:
 
 ```bash
 docker exec -it seat-docker-front-1 php artisan ratting-manager:initialize
@@ -131,7 +131,7 @@ Each tier includes the ones below it, so a director does not also need Member.
 
 | Command | Description |
 |---|---|
-| `ratting-manager:initialize` | Checks the setup and imports every bounty tick and ESS payout SeAT already holds |
+| `ratting-manager:initialize` | Checks the setup and imports the last 365 days of bounty ticks and ESS payouts SeAT already holds. `--from=YYYY-MM-DD` starts later |
 | `ratting-manager:process` | Imports both journals and updates everything built on them. Reads two days by default; `--days=N` or `--from=YYYY-MM-DD` reads further back |
 | `ratting-manager:resolve-characters` | Looks up names and corporations for ratters SeAT does not know. `--requested` takes only the characters pages asked for; `--stats` shows what the lookups hold |
 | `ratting-manager:trace-tick {journal_id}` | Shows what the plugin did with one journal row |

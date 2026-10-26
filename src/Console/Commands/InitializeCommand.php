@@ -13,19 +13,22 @@ use RattingManager\Services\Ratting\Progress;
 
 /**
  * First run after install: checks what SeAT holds for the configured
- * corporations, then imports all of it.
+ * corporations, then imports the last year of it.
  *
- * SeAT keeps journal rows long after ESI's 30 days, so the history reaches
- * back to when each token was first added.
+ * SeAT keeps journal rows long after ESI's 30 days, back to when each token
+ * was first added, but no page shows more than a year, so anything older
+ * would only be imported to sit unread.
  */
 class InitializeCommand extends Command
 {
     use HoldsThePipelineLock;
 
-    protected $signature = 'ratting-manager:initialize
-                            {--from= : Import from this date instead of the oldest row SeAT holds (YYYY-MM-DD)}';
+    private const DAYS = 365;
 
-    protected $description = 'Check the setup and import every bounty tick and ESS payout SeAT already holds';
+    protected $signature = 'ratting-manager:initialize
+                            {--from= : Import from this date instead, within the last 365 days (YYYY-MM-DD)}';
+
+    protected $description = 'Check the setup and import the last 365 days of bounty ticks and ESS payouts SeAT holds';
 
     public function handle(Settings $settings, Pipeline $pipeline, AffiliationResolutionService $lookups)
     {
@@ -80,7 +83,12 @@ class InitializeCommand extends Command
             return Command::SUCCESS;
         }
 
+        $floor = Carbon::now()->subDays(self::DAYS)->startOfDay();
         $since = $this->option('from') ? Carbon::parse($this->option('from'))->startOfDay() : Carbon::parse($oldest)->startOfDay();
+        if ($since->lt($floor)) {
+            $this->line(($this->option('from') ? 'Asked for ' : 'SeAT holds rows from ') . $since->toDateString() . '. The pages show a year at most, so the import starts at ' . $floor->toDateString() . '.');
+            $since = $floor;
+        }
 
         return $this->underLock(7200, function () use ($since, $pipeline, $lookups, $settings) {
             $this->info('Importing from ' . $since->toDateString() . '. A long history can take several minutes.');
