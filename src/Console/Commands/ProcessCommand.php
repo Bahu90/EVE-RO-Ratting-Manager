@@ -29,7 +29,15 @@ class ProcessCommand extends Command
     {
         $ran = false;
 
-        $status = $this->underLock(1800, function () use ($pipeline, &$ran) {
+        // The lock runs out after this long even if the run is still going.
+        // The daily 31-day read (or a manual --from) can take longer than the
+        // half hour between scheduled runs, so it holds the lock longer and a
+        // :10 or :40 run that starts meanwhile waits its turn instead of
+        // working on the same rows.
+        $wide = $this->option('from') || (int) $this->option('days') > 2;
+        $lockSeconds = $wide ? 7200 : 1800;
+
+        $status = $this->underLock($lockSeconds, function () use ($pipeline, &$ran) {
             $ran = true;
             $since = $this->since();
             $this->info('Ratting Manager - reading from ' . $since->toDateString());
