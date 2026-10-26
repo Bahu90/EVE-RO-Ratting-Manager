@@ -236,18 +236,31 @@ class JournalImporter
             ->groupBy('character_id');
 
         DB::transaction(function () use ($items, $existing, &$candidates, $model, $side, $stream, $timeColumn, $ownColumn, &$report) {
+            $isBounty = $stream === 'bounty';
+            // Rows not seen before are written together at the end of the
+            // chunk, with their kill group already on them, instead of one
+            // INSERT each and a second UPDATE for the kills.
+            $new = [];
+            $newKills = [];
+            $killRows = [];
+
             foreach ($items as $item) {
                 $record = $existing->get($item['journal_id']);
 
                 if ($record) {
                     $this->fill($record, $side, $item, false);
+                    $updated = $record->isDirty();
+                    $kills = $isBounty ? $this->kills->prepare($record, $item['reason']) : [];
                     if ($record->isDirty()) {
                         $record->save();
+                    }
+                    if ($updated) {
                         $report[$stream]['updated']++;
                     }
                 } elseif ($record = $this->takeMatch($candidates, $item, $timeColumn)) {
                     $record->{$ownColumn} = $item['journal_id'];
                     $this->fill($record, $side, $item, true);
+                    $kills = $isBounty ? $this->kills->prepare($record, $item['reason']) : [];
                     $record->save();
                     $report[$stream]['paired']++;
                 } else {
@@ -260,13 +273,58 @@ class JournalImporter
                         $ownColumn => $item['journal_id'],
                     ]);
                     $this->fill($record, $side, $item, false);
-                    $record->save();
+                    if ($isBounty) {
+                        $kills = $this->kills->prepare($record, $item['reason']);
+                        if ($kills !== []) {
+                            $newKills[$item['journal_id']] = $kills;
+                        }
+                    }
+                    $new[] = $record;
                     $report[$stream]['created']++;
+                    continue;
                 }
 
-                if ($stream === 'bounty') {
-                    $this->kills->record($record, $item['reason']);
+                if ($kills !== []) {
+                    array_push($killRows, ...$this->kills->rows((int) $record->id, $kills));
                 }
+            }
+
+            if ($new !== []) {
+                $now = (new $model())->freshTimestampString();
+                $table = (new $model())->getTable();
+                $rows = array_map(function ($record) use ($now) {
+                    return $record->getAttributes() + ['created_at' => $now, 'updated_at' => $now];
+                }, $new);
+
+                // Every row of a chunk carries the same columns, but a
+                // tick with no kill list has no kill_group or npc_kills set,
+                // so the rows are given one shape before the batch insert.
+                $columns = array_keys(array_merge(...$rows));
+                $defaults = array_fill_keys($columns, null);
+                $rows = array_map(fn ($row) => array_replace($defaults, $row), $rows);
+                if (in_array('npc_kills', $columns, true)) {
+                    foreach ($rows as &$row) {
+                        $row['npc_kills'] ??= 0;
+                    }
+                    unset($row);
+                }
+
+                foreach (array_chunk($rows, 500) as $chunk) {
+                    DB::table($table)->insert($chunk);
+                }
+
+                if ($newKills !== []) {
+                    $ids = DB::table($table)
+                        ->whereIn($ownColumn, array_keys($newKills))
+                        ->pluck('id', $ownColumn);
+                    foreach ($newKills as $journalId => $kills) {
+                        array_push($killRows, ...$this->kills->rows((int) $ids[$journalId], $kills));
+                    }
+                }
+            }
+
+            foreach (array_chunk($killRows, 1000) as $chunk) {
+                DB::table('ratting_manager_tick_kills')->insertOrIgnore($chunk);
             }
         });
     }

@@ -13,13 +13,33 @@ class KillRecorder
      */
     public function record(Tick $tick, ?string $reason): void
     {
-        if ($tick->kill_group !== null) {
+        $kills = $this->prepare($tick, $reason);
+        if ($kills === []) {
             return;
+        }
+
+        $tick->save();
+        DB::table('ratting_manager_tick_kills')->insertOrIgnore($this->rows((int) $tick->id, $kills));
+    }
+
+    /**
+     * Put the kill group and kill count on a tick without saving it, so the
+     * caller can write the tick once with everything on it.
+     *
+     * @return array<int, int> npc_type_id => quantity to store once the tick
+     *                         has an id; empty when there is nothing to store
+     *                         (no kill list, or the other journal's row
+     *                         already recorded it)
+     */
+    public function prepare(Tick $tick, ?string $reason): array
+    {
+        if ($tick->kill_group !== null) {
+            return [];
         }
 
         $kills = ReasonParser::kills($reason);
         if ($kills === []) {
-            return;
+            return [];
         }
 
         $tick->kill_group = ReasonParser::killGroup(
@@ -28,13 +48,22 @@ class KillRecorder
             $kills
         );
         $tick->npc_kills = array_sum($kills);
-        $tick->save();
 
+        return $kills;
+    }
+
+    /**
+     * The tick_kills rows for a tick's kills.
+     *
+     * @param array<int, int> $kills npc_type_id => quantity, from prepare()
+     */
+    public function rows(int $tickId, array $kills): array
+    {
         $rows = [];
         foreach ($kills as $typeId => $quantity) {
-            $rows[] = ['tick_id' => $tick->id, 'npc_type_id' => $typeId, 'quantity' => $quantity];
+            $rows[] = ['tick_id' => $tickId, 'npc_type_id' => $typeId, 'quantity' => $quantity];
         }
 
-        DB::table('ratting_manager_tick_kills')->insertOrIgnore($rows);
+        return $rows;
     }
 }
