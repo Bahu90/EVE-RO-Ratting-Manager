@@ -706,8 +706,8 @@
                     <p>Ratting Manager posts to Discord webhooks, and to Slack incoming webhooks as plain text. Nothing is sent anywhere until an admin adds a webhook and ticks what it should carry.</p>
                     <h4>Setting up</h4>
                     <ol class="step-by-step">
-                        <li><strong>Add a webhook</strong> under Settings, Webhooks: a name, the URL from Discord, and whether it is for one corporation or all tracked corporations. A webhook for one corporation only gets that corporation's posts.</li>
-                        <li><strong>Pick what it carries</strong> under Settings, Notifications. Each notification has a switch, a default role, and a row per webhook with a tick and a role of its own.</li>
+                        <li><strong>Add a webhook</strong> under Settings, Webhooks: a name, the URL from Discord, whether it is for one corporation or all tracked corporations, and the notifications it carries. A webhook for one corporation only gets that corporation's posts. Its edit button changes any of these later.</li>
+                        <li><strong>Set who gets mentioned</strong> under Settings, Notifications. Each notification has a switch, a default role, and a row per webhook with a tick and a role of its own.</li>
                         <li><strong>Check the Routing Map</strong>: where each notification goes now and who it mentions.</li>
                         <li><strong>Send a sample</strong> of any notification to any webhook from Diagnostics, Notification Testing, to see it as it will look.</li>
                     </ol>

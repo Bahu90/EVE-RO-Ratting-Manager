@@ -1,4 +1,4 @@
-{{-- Add or edit a webhook. Moved to <body> by the page script; filled for editing from the row's button. --}}
+{{-- Add or edit a webhook and what it is sent. Moved to <body> by the page script; filled for editing from the row's button. --}}
 <div class="modal fade rm-modal" id="rm-webhook-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -18,8 +18,8 @@
                     </div>
                     <div class="form-group">
                         <label for="rm-wh-url">{{ trans('ratting-manager::notification_settings.url') }}</label>
-                        <input type="url" class="form-control" id="rm-wh-url" name="webhook_url" maxlength="500" placeholder="https://discord.com/api/webhooks/..." autocomplete="off">
-                        <small class="form-text">{{ trans('ratting-manager::notification_settings.url_help') }} <span class="rm-url-keep" style="display: none;">{{ trans('ratting-manager::notification_settings.url_keep') }}</span></small>
+                        <input type="url" class="form-control" id="rm-wh-url" name="webhook_url" maxlength="500" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" required>
+                        <small class="form-text">{{ trans('ratting-manager::notification_settings.url_help') }}</small>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-8">
@@ -38,13 +38,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="rm-new-only">
+                    <div>
                         <label>{{ trans('ratting-manager::notification_settings.send_these') }}</label>
                         <div class="row">
                             @foreach(\RattingManager\Services\Notification\NotificationTypes::keys() as $key)
+                                @php $suggested = in_array($key, ['special_spawn', 'data_stalled'], true); @endphp
                                 <div class="col-md-6">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="rm-wh-type-{{ $key }}" name="types[]" value="{{ $key }}" @if(in_array($key, ['special_spawn', 'data_stalled'], true)) checked @endif>
+                                        <input type="checkbox" class="custom-control-input rm-wh-type" id="rm-wh-type-{{ $key }}" name="types[]" value="{{ $key }}" data-suggested="{{ $suggested ? 1 : 0 }}" @if($suggested) checked @endif>
                                         <label class="custom-control-label" for="rm-wh-type-{{ $key }}">{{ \RattingManager\Services\Notification\NotificationTypes::name($key) }}</label>
                                     </div>
                                 </div>

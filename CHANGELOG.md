@@ -37,6 +37,7 @@ All notable changes to Ratting Manager will be documented in this file.
 
 - Posts to Discord webhooks, and to Slack incoming webhooks as plain text. A webhook is for every tracked corporation or for one, and only gets that corporation's posts.
 - Each notification type has a switch and a default role, and is sent to the webhooks ticked for it, each with a role of its own if wanted. The webhook's own role comes first, then the default; *No ping* mentions nobody. Only the role or user named is ever pinged. Roles can be picked by name from SeAT Broadcast or SeAT Connector when either is installed. Nothing is bound on install.
+- What a webhook carries is ticked when adding it, and its edit button opens it with its URL and notifications filled in, to change any of them.
 - **Special spawn**: an NPC of the chosen rank or above (clone soldier, commander, officer), a capital rat or an NPC on the watch list, one post per spawn however many fleet members shared it.
 - **Ratting ship lost**: a tracked pilot lost a ship in the system they had a tick in shortly before, with a zKillboard link.
 - **Outsiders in home space**: ESI's hourly NPC kill count for a home system, less what the tracked corporations killed there, once the journals for that hour are in.

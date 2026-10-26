@@ -60,7 +60,7 @@ Without it, the schedule brings in the last 31 days within a day.
 
 Nothing is sent until an admin sets it up:
 
-1. **Settings > Webhooks**: add a Discord webhook (or a Slack incoming webhook, which gets plain text), for all tracked corporations or one.
+1. **Settings > Webhooks**: add a Discord webhook (or a Slack incoming webhook, which gets plain text), for all tracked corporations or one, and tick the notifications it carries. Its edit button changes any of it later.
 2. **Settings > Notifications**: switch each notification on or off, tick the webhooks it goes to, and set who it mentions. A webhook's own role comes first, then the notification's default; *No ping* mentions nobody. With SeAT Broadcast or SeAT Connector installed, roles are picked by name.
 3. **Settings > Routing Map**: check where everything goes.
 4. **Diagnostics > Notification Testing**: send a sample of any notification to any webhook.

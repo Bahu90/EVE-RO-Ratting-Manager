@@ -80,6 +80,8 @@
                                     <button type="button" class="btn btn-xs btn-rm-secondary rm-webhook-edit" title="{{ trans('ratting-manager::notification_settings.edit') }}"
                                             data-url="{{ route('ratting-manager.settings.webhooks.update', $wh->id) }}"
                                             data-description="{{ $wh->description }}"
+                                            data-webhook-url="{{ $wh->webhook_url }}"
+                                            data-types="{{ json_encode(array_values($sends)) }}"
                                             data-corporation="{{ $wh->corporation_id }}"
                                             data-enabled="{{ $wh->enabled ? 1 : 0 }}"><i class="fas fa-edit"></i></button>
                                     <form method="POST" action="{{ route('ratting-manager.settings.webhooks.destroy', $wh->id) }}" class="d-inline rm-confirm" data-confirm="{{ trans('ratting-manager::notification_settings.delete_confirm') }}">

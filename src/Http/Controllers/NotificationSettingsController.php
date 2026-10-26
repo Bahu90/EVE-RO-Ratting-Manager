@@ -50,15 +50,30 @@ class NotificationSettingsController extends Controller
     public function edit(Request $request, int $webhook)
     {
         $model = Webhook::findOrFail($webhook);
-        $data = $this->validateWebhook($request, true);
+        $data = $this->validateWebhook($request);
+        NotificationTypes::ensureRows();
 
-        $model->update([
-            'description' => $data['description'],
-            // A blank URL on edit keeps the one stored, which the page never shows in full.
-            'webhook_url' => trim((string) ($data['webhook_url'] ?? '')) ?: $model->webhook_url,
-            'corporation_id' => ($data['corporation_id'] ?? null) ?: null,
-            'enabled' => $request->boolean('enabled'),
-        ]);
+        DB::transaction(function () use ($model, $data, $request) {
+            $model->update([
+                'description' => $data['description'],
+                'webhook_url' => trim($data['webhook_url']),
+                'corporation_id' => ($data['corporation_id'] ?? null) ?: null,
+                'enabled' => $request->boolean('enabled'),
+            ]);
+
+            $wanted = $data['types'] ?? [];
+            $existing = $model->types()->get()->keyBy('id');
+            foreach (NotificationType::all() as $type) {
+                $on = in_array($type->type_key, $wanted, true);
+
+                if (isset($existing[$type->id])) {
+                    // Unticking keeps the binding, switched off, so its role is not lost.
+                    $model->types()->updateExistingPivot($type->id, ['enabled' => $on]);
+                } elseif ($on) {
+                    $model->types()->attach($type->id, ['enabled' => true]);
+                }
+            }
+        });
 
         return $this->back('webhooks', trans('ratting-manager::notification_settings.webhook_saved', ['name' => $model->description]));
     }
@@ -176,14 +191,14 @@ class NotificationSettingsController extends Controller
         ];
     }
 
-    private function validateWebhook(Request $request, bool $editing = false): array
+    private function validateWebhook(Request $request): array
     {
         $configured = app(Settings::class)->configuredCorporations();
 
         return $request->validate([
             'description' => ['required', 'string', 'max:255'],
-            'webhook_url' => [$editing ? 'nullable' : 'required', 'string', 'max:500', function ($attribute, $value, $fail) {
-                if ($value !== null && trim($value) !== '' && !WebhookDeliveryService::isValidUrl(trim($value))) {
+            'webhook_url' => ['required', 'string', 'max:500', function ($attribute, $value, $fail) {
+                if (!WebhookDeliveryService::isValidUrl(trim($value))) {
                     $fail(trans('ratting-manager::notification_settings.url_invalid'));
                 }
             }],
