@@ -155,12 +155,15 @@ class DashboardController extends Controller
         $collected = $this->metrics->collect($scope, $period->start, $period->end);
         $insights = $this->insights->for($scope, $period, false);
         $pickedMonth = MonthlyBreakdown::month($month);
+        // One read for both: the table shows the first rows, the chart
+        // plots every session of the period, whatever the row limit.
+        $sessions = $this->charts->sessions($scope, $period, ListController::DASHBOARD_ROWS);
 
         return [
             'totals' => $collected['totals'],
             'insights' => $insights,
             'heatmap' => $insights['heatmap'],
-            'sessions' => $this->charts->sessions($scope, $period, ListController::DASHBOARD_ROWS),
+            'sessions' => $sessions,
             'records' => $this->charts->records($scope),
             'spawns' => $this->charts->spawns($scope, ListController::DASHBOARD_ROWS),
             'spawnTotal' => $this->charts->spawnCount($scope),
@@ -174,7 +177,7 @@ class DashboardController extends Controller
                 'systems' => $this->charts->systems($scope, $period, 10),
                 'kills' => $this->charts->kills($scope, $period),
                 'characters' => $this->charts->byCharacter($scope, $period),
-                'sessions' => $this->charts->sessions($scope, $period)['points'],
+                'sessions' => $sessions['points'],
                 'weekdays' => $insights['weekdays'],
                 'hours' => $insights['hours'],
                 'efficiency' => array_slice($insights['systems'], 0, self::EFFICIENCY_SYSTEMS_PERSONAL),
