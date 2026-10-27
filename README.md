@@ -86,7 +86,7 @@ php artisan vendor:publish --tag=seat --force
    | Section | What it sets |
    |---|---|
    | **Income figures** | Whether pages lead with ISK ratted (the corporation's cut over its tax rate, as most corporations' ratting reports count it) or what pilots received. Also an alliance tax, shown beside the totals; 0 hides it. |
-   | **Display** | The look: EVE-RO's (black, Oxanium, blue and green) or standard SeAT. And whether the Monthly Report shows the Website export button (JSON in the layout EVE-RO's ratting page reads). |
+   | **Display** | The look: EVE-RO's (black, Oxanium, blue and green) or standard SeAT. And whether admins get the Monthly Report's JSON export button (the month in the layout EVE-RO's ratting page reads). |
    | **Access** | Whether directors see only their own corporation or every tracked one, and whether the pages need a character in a tracked corporation now. |
    | **Data** | Session gap, the Gone quiet lists and the members' leaderboard size. |
    | **Webhooks, Notifications** | Discord and Slack alerts and reports, below. |
@@ -164,7 +164,7 @@ Each tier includes the ones below it, so a director does not also need Member.
 | `ratting-manager.view` | Base | Help page |
 | `ratting-manager.member` | Member | My Ratting, and the leaderboard with rank and hours |
 | `ratting-manager.director` | Director | The Corporation tab, the full leaderboard with every player's ISK and ISK per hour, and the Ratter Lookup |
-| `ratting-manager.admin` | Admin | Settings, notifications and Diagnostics |
+| `ratting-manager.admin` | Admin | Settings, notifications, Diagnostics and the Monthly Report's JSON export |
 
 **Which corporations a director sees** is set under **Settings > Access**: their own corporation (the tracked corporations their characters are in now, the default) or every tracked corporation. Admins always see all of them. A director with no character in a tracked corporation, while directors see only their own, gets the member pages.
 

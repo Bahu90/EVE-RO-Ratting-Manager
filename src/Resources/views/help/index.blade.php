@@ -587,7 +587,7 @@
                     <h3><i class="fas fa-sync-alt"></i> Recent changes</h3>
                     <ul>
                         <li><strong>ISK ratted</strong>, the way the corporation counts it: its cut of bounties and ESS over its tax rate. The dashboards, the leaderboard and the reports lead with it by default; <em>Settings, Income figures</em> switches back to what pilots received.</li>
-                        <li><strong>Monthly Report</strong> for directors: one calendar month as the corporation reports it, with a CSV download, and a JSON website export when an admin turns it on.</li>
+                        <li><strong>Monthly Report</strong> for directors: one calendar month as the corporation reports it, with a CSV download, and a JSON export for admins.</li>
                         <li><strong>Pick any month</strong> of the last 24 from the period picker.</li>
                         <li><strong>Tidier dashboards</strong>: four headline boxes, six insights, the Corporation tab in four sub-tabs, one period for both tabs, and charts drawn only when they come into view.</li>
                         <li><strong>ISK written as 57.38 B</strong>, 788.07 M, 660.60 K, and <strong>Wallet: Linked / Not linked</strong> in place of Coverage.</li>
@@ -710,7 +710,7 @@
                     <h4>Downloads</h4>
                     <ul>
                         <li><strong>Download CSV</strong>: the member table, for a spreadsheet.</li>
-                        <li><strong>Website export</strong> (shown when an admin turns it on under Settings &gt; Display): the month as <code>YYYY-MM.json</code>, in the layout EVE-RO's ratting page reads (month, overview, ratting_source, systems, history for every day, members). Every amount is the corporation's cut, or that cut over the tax rate for <code>isk_ratted</code>, in whole ISK.</li>
+                        <li><strong>JSON export</strong> (admins only, shown when it is turned on under Settings &gt; Display): the month as <code>YYYY-MM.json</code>, in the layout EVE-RO's ratting page reads (month, overview, ratting_source, systems, history for every day, members). Every amount is the corporation's cut, or that cut over the tax rate for <code>isk_ratted</code>, in whole ISK.</li>
                     </ul>
                 </div>
             </div>
@@ -804,7 +804,7 @@
                         <li><strong>Gone quiet after</strong> and <strong>Regular ratter window</strong>: who is listed under Gone quiet.</li>
                         <li><strong>Leaderboard size for members</strong>: how many places members see.</li>
                         <li><strong>Income figures</strong>: whether the pages lead with ISK ratted (the corporation's count, the default) or with what pilots received, and the <strong>alliance tax</strong> rate shown beside the corporation's totals (0 hides it). ISK ratted needs a corporation tax: when every tracked corporation is at 0%, the pages show what pilots received whatever is picked, and Settings says so.</li>
-                        <li><strong>Display</strong>: the EVE-RO look (black, Oxanium, blue and green) or standard SeAT's, and whether the Monthly Report shows the <strong>Website export</strong> button.</li>
+                        <li><strong>Display</strong>: the EVE-RO look (black, Oxanium, blue and green) or standard SeAT's, and whether admins get the Monthly Report's <strong>JSON export</strong> button.</li>
                         <li><strong>Access</strong>: whether directors see only their own corporation (the tracked corporations their characters are in now) or every tracked one, and whether the pages need a character in a tracked corporation now, so players who leave lose them at once. Admins always see everything.</li>
                         <li><strong>Extra NPC type IDs</strong>: rats to list as special spawns on top of officers, commanders, clone soldiers and capital rats.</li>
                         <li><strong>Home space</strong>, on the Outsiders alert under Notifications: the regions, constellations and systems the alert watches, by name or ID. Until one is set the alert sends nothing and carries a warning badge.</li>
@@ -842,8 +842,8 @@
                         <tbody>
                             <tr><td><code>ratting-manager.view</code></td><td>This Help page.</td></tr>
                             <tr><td><code>ratting-manager.member</code></td><td>My Ratting, and the leaderboard with rank and hours.</td></tr>
-                            <tr><td><code>ratting-manager.director</code></td><td>The Corporation view, the full leaderboard with everyone's ISK and its CSV, the Monthly Report with its CSV (and the website export when it is on), and the Ratter Lookup, for the corporations <em>Settings, Access</em> lets directors see.</td></tr>
-                            <tr><td><code>ratting-manager.admin</code></td><td>Settings and Diagnostics, and every tracked corporation.</td></tr>
+                            <tr><td><code>ratting-manager.director</code></td><td>The Corporation view, the full leaderboard with everyone's ISK and its CSV, the Monthly Report with its CSV, and the Ratter Lookup, for the corporations <em>Settings, Access</em> lets directors see.</td></tr>
+                            <tr><td><code>ratting-manager.admin</code></td><td>Settings and Diagnostics, the Monthly Report's JSON export, and every tracked corporation.</td></tr>
                         </tbody>
                     </table>
                     <p>By default a director sees the tracked corporations their own characters are in now; a director with none sees their own ratting only. With <em>Only players in a tracked corporation</em> ticked under Settings, Access, every page but this one also needs a character in a tracked corporation now.</p>

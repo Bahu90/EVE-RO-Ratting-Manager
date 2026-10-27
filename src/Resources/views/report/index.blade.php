@@ -32,7 +32,7 @@
                             @endforeach
                         </select>
                         <noscript><button type="submit" class="btn btn-sm btn-rm-primary">{{ trans('ratting-manager::common.apply') }}</button></noscript>
-                        @if($websiteExport ?? false)
+                        @if($jsonExport ?? false)
                         <a class="btn btn-sm btn-outline-secondary" href="{{ route('ratting-manager.report.json', array_filter(['month' => $period->key, 'corporation' => count($corporations) > 1 ? $pickedCorporation : null])) }}" title="{{ trans('ratting-manager::report.download_json_title') }}">
                             <i class="fas fa-file-code"></i> {{ trans('ratting-manager::report.download_json') }}
                         </a>

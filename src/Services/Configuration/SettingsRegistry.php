@@ -54,8 +54,8 @@ final class SettingsRegistry
         // as EVE-RO's ratting page) or "seat" (AdminLTE's dark cards and
         // SeAT's font).
         'display.theme' => [self::INSTALL, 'string', 'eve-ro'],
-        // The Monthly Report's "Website export" button: the month as JSON in
-        // the layout EVE-RO's ratting page reads. Off hides it.
+        // The Monthly Report's "JSON export" button, for admins: the month as
+        // JSON in the layout EVE-RO's ratting page reads. Off hides it.
         'display.website_export' => [self::INSTALL, 'bool', false],
 
         // Special spawns: this rank and above, capitals, and the watch list.

@@ -38,7 +38,7 @@ All notable changes to Ratting Manager will be documented in this file.
 
 - Published as `bahu90/ratting-manager`, Bahu90's edition of Matt Falahe's Ratting Manager.
 - **Settings > Access**: directors see their own corporation (the tracked corporations their characters are in now) or every tracked corporation; admins always see all. Optionally, the pages need a character in a tracked corporation now, so players who leave lose them at once.
-- **Settings > Display**: EVE-RO's look or standard SeAT's, and the Monthly Report's Website export button on or off.
+- **Settings > Display**: EVE-RO's look or standard SeAT's, and the Monthly Report's JSON export button (admins only) on or off.
 - Pages name the corporation (its ticker) when they cover one, show its tax rate, and drop the corporation pickers and wording that only matter with several.
 - Players who have left are tagged *Left corp* on the leaderboards, the Ratter Lookup and their ratter page.
 - The Oxanium font ships with the plugin; no page calls Google Fonts.

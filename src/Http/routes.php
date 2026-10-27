@@ -65,11 +65,6 @@ Route::group([
             'uses' => 'ReportController@index',
         ]);
 
-        Route::get('/report/json', [
-            'as' => 'ratting-manager.report.json',
-            'uses' => 'ReportController@json',
-        ]);
-
         Route::get('/report/csv', [
             'as' => 'ratting-manager.report.csv',
             'uses' => 'ReportController@csv',
@@ -92,6 +87,12 @@ Route::group([
     });
 
     Route::group(['middleware' => 'ratting-manager.tier:admin'], function () {
+        // The Monthly Report's JSON export, for admins only.
+        Route::get('/report/json', [
+            'as' => 'ratting-manager.report.json',
+            'uses' => 'ReportController@json',
+        ]);
+
         Route::get('/settings', [
             'as' => 'ratting-manager.settings.index',
             'uses' => 'SettingsController@index',

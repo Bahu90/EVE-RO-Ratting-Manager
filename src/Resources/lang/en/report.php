@@ -17,7 +17,7 @@ return [
     'members' => 'Members (:count)',
     'member' => 'Member',
     'download_csv' => 'Download CSV',
-    'download_json' => 'Website export',
+    'download_json' => 'JSON export',
     'download_json_title' => 'The month as YYYY-MM.json in the EVE-RO ratting page layout (generate-ratting-report.mjs), for a website that reads it.',
     'csv_hours' => 'Hours',
     'csv_characters' => 'Characters',
