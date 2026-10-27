@@ -107,6 +107,21 @@ final class Period
     }
 
     /**
+     * The period as a page title, the way the corporation's ratting page
+     * writes a month: "SEP. 2026". A period that is one calendar month (a
+     * picked month, this month or last month) gets the month; a rolling one
+     * its name ("LAST 30 DAYS").
+     */
+    public function headline(): string
+    {
+        if (str_starts_with($this->key, 'm-') || in_array($this->key, ['this_month', 'last_month'], true)) {
+            return strtoupper($this->start->format('M')) . '. ' . $this->start->format('Y');
+        }
+
+        return mb_strtoupper($this->label());
+    }
+
+    /**
      * The calendar months the picker offers, newest first.
      *
      * @return array<string, string> key (m-YYYY-MM) => label (September 2026)

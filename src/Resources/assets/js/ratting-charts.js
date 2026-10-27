@@ -18,14 +18,14 @@
     }
 
     var COLORS = {
-        s1: token('--rm-series-1', '#3987e5'),
-        s2: token('--rm-series-2', '#d95926'),
-        s3: token('--rm-series-3', '#199e70'),
-        s4: token('--rm-series-4', '#c98500'),
-        text: '#c2c7d0',
-        grid: 'rgba(255, 255, 255, 0.08)',
-        surface: '#161922',
-        muted: '#6c757d'
+        s1: token('--rm-series-1', '#00aeff'),
+        s2: token('--rm-series-2', '#0a6fae'),
+        s3: token('--rm-series-3', '#3ddc84'),
+        s4: token('--rm-series-4', '#f5a524'),
+        text: '#a7b0be',
+        grid: '#1b2029',
+        surface: '#0d1016',
+        muted: '#8b95a5'
     };
 
     /** Same as Format::isk() on the server: 57.38 B, 788.07 M, 660.60 K. */
@@ -356,7 +356,7 @@
     if (typeof Chart !== 'undefined') {
         Chart.defaults.color = COLORS.text;
         Chart.defaults.borderColor = COLORS.grid;
-        Chart.defaults.font.family = "'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        Chart.defaults.font.family = "'Oxanium', 'Source Sans Pro', system-ui, -apple-system, 'Segoe UI', sans-serif";
     }
 
     window.RattingCharts = R;

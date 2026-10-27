@@ -1,0 +1,623 @@
+/* ============================================
+   Ratting Manager - EVE-RO theme
+
+   The look of the corporation's own ratting page (eve-ro.com/tools/ratting):
+   a black ground, flat dark tiles, the Oxanium typeface, electric blue for
+   ISK ratted and green for ratting tax, small spaced capitals over large
+   numbers. Loaded after ratting-manager.css and scoped to the plugin's two
+   wrappers, so it restyles only Ratting Manager pages and never SeAT's own.
+   ============================================ */
+
+:root {
+    --rm-ground: #050608;
+    --rm-surface: #0d1016;
+    --rm-surface-2: #12161d;
+    --rm-line: #1b2029;
+    --rm-line-soft: #161a22;
+    --rm-text: #eef2f7;
+    --rm-text-2: #c3cad5;
+    --rm-label: #a7b0be;
+    --rm-muted: #8b95a5;
+    --rm-blue: #00aeff;
+    --rm-blue-hover: #5cc9ff;
+    --rm-blue-deep: #0a6fae;
+    --rm-green: #3ddc84;
+    --rm-amber: #f5a524;
+    --rm-font: 'Oxanium', 'Source Sans Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    /* Chart series, read by ratting-charts.js: bounties, ESS, ratting tax, extra. */
+    --rm-series-1: #00aeff;
+    --rm-series-2: #0a6fae;
+    --rm-series-3: #3ddc84;
+    --rm-series-4: #f5a524;
+    --rm-heat-0: #12161d;
+}
+
+/* ---------- Ground and type ---------- */
+.ratting-manager-dashboard,
+.ratting-manager-wrapper {
+    background: var(--rm-ground);
+    color: var(--rm-text);
+    font-family: var(--rm-font);
+    font-weight: 300;
+    padding: 24px 28px 48px;
+    margin: -15px -15px 0;
+    min-height: calc(100vh - 57px);
+}
+
+.ratting-manager-dashboard a,
+.ratting-manager-wrapper a {
+    color: var(--rm-blue);
+}
+
+.ratting-manager-dashboard a:hover,
+.ratting-manager-wrapper a:hover {
+    color: var(--rm-blue-hover);
+    text-decoration: none;
+}
+
+.ratting-manager-dashboard h1, .ratting-manager-dashboard h2, .ratting-manager-dashboard h3,
+.ratting-manager-dashboard h4, .ratting-manager-dashboard h5, .ratting-manager-dashboard h6,
+.ratting-manager-wrapper h1, .ratting-manager-wrapper h2, .ratting-manager-wrapper h3,
+.ratting-manager-wrapper h4, .ratting-manager-wrapper h5, .ratting-manager-wrapper h6 {
+    font-family: var(--rm-font);
+    color: var(--rm-text);
+}
+
+.ratting-manager-dashboard .text-muted,
+.ratting-manager-wrapper .text-muted {
+    color: var(--rm-muted) !important;
+}
+
+/* ---------- Page header: eyebrow, big title, subtitle, actions ---------- */
+.rm-page-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.rm-page-head .rm-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--rm-muted);
+    text-transform: uppercase;
+}
+
+.rm-page-head .rm-title {
+    margin: 6px 0 0;
+    font-size: 52px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.rm-page-head .rm-subtitle {
+    margin: 10px 0 0;
+    font-size: 15px;
+    color: var(--rm-label);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.rm-page-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+@media (max-width: 575px) {
+    .rm-page-head .rm-title { font-size: 36px; }
+}
+
+/* ---------- Section headings ---------- */
+.rm-section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 8px 0 14px;
+}
+
+.rm-section-head .rm-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--rm-muted);
+    text-transform: uppercase;
+}
+
+.rm-section-head h2 {
+    margin: 2px 0 0;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--rm-blue);
+    text-transform: uppercase;
+}
+
+/* ---------- Cards ---------- */
+.ratting-manager-dashboard .card,
+.ratting-manager-wrapper .card {
+    background: var(--rm-surface) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin-bottom: 20px;
+}
+
+.ratting-manager-dashboard .card:hover,
+.ratting-manager-wrapper .card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.ratting-manager-dashboard .card .card-header,
+.ratting-manager-wrapper .card .card-header {
+    background: transparent !important;
+    border-bottom: 1px solid var(--rm-line) !important;
+    padding: 16px 22px;
+}
+
+.ratting-manager-dashboard .card .card-title,
+.ratting-manager-wrapper .card .card-title {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--rm-text) !important;
+}
+
+.ratting-manager-dashboard .card .card-title i,
+.ratting-manager-wrapper .card .card-title i {
+    color: var(--rm-blue);
+    margin-right: 6px;
+}
+
+.ratting-manager-dashboard .card .card-body,
+.ratting-manager-wrapper .card .card-body,
+.ratting-manager-dashboard .card .card-footer,
+.ratting-manager-wrapper .card .card-footer {
+    background: var(--rm-surface) !important;
+    color: var(--rm-text) !important;
+    border-color: var(--rm-line) !important;
+}
+
+/* The page shell's outer card and tab body stay on the black ground. */
+.ratting-manager-dashboard .card.rm-shell,
+.ratting-manager-dashboard .card.rm-shell > .card-body,
+.ratting-manager-dashboard .rm-page,
+.ratting-manager-dashboard .rm-page > .card-body,
+.ratting-manager-dashboard .tab-content {
+    background: transparent !important;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.ratting-manager-dashboard .rm-page > .card-header {
+    display: none;
+}
+
+/* ---------- Tiles (info-box) ---------- */
+.ratting-manager-dashboard .info-box,
+.ratting-manager-wrapper .info-box {
+    background: var(--rm-surface) !important;
+    color: var(--rm-text) !important;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: 0;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+}
+
+.ratting-manager-dashboard .info-box .info-box-icon,
+.ratting-manager-wrapper .info-box .info-box-icon {
+    display: none;
+}
+
+.ratting-manager-dashboard .info-box .info-box-content,
+.ratting-manager-wrapper .info-box .info-box-content {
+    padding: 0;
+    gap: 4px;
+}
+
+.ratting-manager-dashboard .info-box .info-box-text,
+.ratting-manager-wrapper .info-box .info-box-text {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--rm-label);
+}
+
+.ratting-manager-dashboard .info-box .info-box-number,
+.ratting-manager-wrapper .info-box .info-box-number {
+    font-size: 30px;
+    font-weight: 600;
+    color: var(--rm-blue);
+    margin: 2px 0;
+    white-space: nowrap;
+}
+
+.ratting-manager-dashboard .info-box.rm-tile-tax .info-box-number,
+.ratting-manager-wrapper .info-box.rm-tile-tax .info-box-number {
+    color: var(--rm-green);
+}
+
+.ratting-manager-dashboard .info-box.rm-tile-warn .info-box-number,
+.ratting-manager-wrapper .info-box.rm-tile-warn .info-box-number {
+    color: var(--rm-amber);
+}
+
+.ratting-manager-dashboard .info-box small,
+.ratting-manager-wrapper .info-box small {
+    font-size: 12px;
+    color: var(--rm-muted);
+    display: block;
+}
+
+/* ---------- Small stat (systems / const. / regions) ---------- */
+.rm-mini-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.rm-mini-stat {
+    background: var(--rm-surface);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rm-mini-stat span:first-child {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--rm-label);
+    text-transform: uppercase;
+}
+
+.rm-mini-stat span:last-child {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--rm-blue);
+}
+
+/* ---------- Top systems list ---------- */
+.rm-top-systems {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 24px;
+    row-gap: 8px;
+    font-size: 14px;
+}
+
+.rm-top-systems div {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.rm-top-systems span:first-child { color: var(--rm-text-2); }
+.rm-top-systems span:last-child { color: var(--rm-blue); font-weight: 600; }
+
+/* ---------- Donut ---------- */
+.rm-donut {
+    position: relative;
+    height: 230px;
+}
+
+.rm-donut-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.rm-donut-center strong {
+    font-size: 26px;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.rm-donut-center span {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--rm-muted);
+    text-transform: uppercase;
+}
+
+.rm-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--rm-text-2);
+}
+
+.rm-legend span { display: inline-flex; align-items: center; gap: 8px; }
+.rm-legend i { width: 12px; height: 12px; display: inline-block; }
+
+/* ---------- Tables ---------- */
+.ratting-manager-dashboard .table,
+.ratting-manager-wrapper .table {
+    color: var(--rm-text) !important;
+    background: transparent !important;
+    font-size: 14px;
+}
+
+.ratting-manager-dashboard .table thead th,
+.ratting-manager-wrapper .table thead th {
+    background: transparent !important;
+    color: var(--rm-label) !important;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-top: 0 !important;
+    border-bottom: 1px solid var(--rm-line) !important;
+}
+
+.ratting-manager-dashboard .table td,
+.ratting-manager-wrapper .table td {
+    border-top: 1px solid var(--rm-line-soft) !important;
+    vertical-align: middle;
+}
+
+.ratting-manager-dashboard .table-hover tbody tr:hover,
+.ratting-manager-wrapper .table-hover tbody tr:hover {
+    background: var(--rm-surface-2) !important;
+}
+
+.rm-isk { color: var(--rm-blue); font-weight: 600; }
+.rm-tax { color: var(--rm-green); }
+
+/* ---------- Buttons, pills, form controls ---------- */
+.ratting-manager-dashboard .btn-rm-primary,
+.ratting-manager-wrapper .btn-rm-primary {
+    background: var(--rm-blue) !important;
+    border: 1px solid var(--rm-blue) !important;
+    color: #031018 !important;
+    font-weight: 600;
+    border-radius: 0;
+    letter-spacing: 0.06em;
+}
+
+.ratting-manager-dashboard .btn-outline-secondary,
+.ratting-manager-wrapper .btn-outline-secondary,
+.rm-btn-outline {
+    background: transparent !important;
+    border: 1px solid var(--rm-blue) !important;
+    color: var(--rm-blue) !important;
+    border-radius: 0;
+    letter-spacing: 0.06em;
+}
+
+.ratting-manager-dashboard .form-control,
+.ratting-manager-wrapper .form-control {
+    background: var(--rm-surface) !important;
+    color: var(--rm-text) !important;
+    border: 1px solid var(--rm-line) !important;
+    border-radius: 0;
+    font-family: var(--rm-font);
+}
+
+.rm-segmented {
+    display: inline-flex;
+    border: 1px solid var(--rm-line);
+    background: var(--rm-surface);
+}
+
+.rm-segmented a,
+.rm-segmented button {
+    min-height: 40px;
+    padding: 0 18px;
+    display: inline-flex;
+    align-items: center;
+    border: 0;
+    background: transparent;
+    color: var(--rm-text-2) !important;
+    font-family: var(--rm-font);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+}
+
+.rm-segmented .active,
+.rm-segmented [aria-pressed="true"],
+.rm-segmented [aria-selected="true"] {
+    background: var(--rm-blue);
+    color: #031018 !important;
+    font-weight: 600;
+}
+
+.ratting-manager-dashboard .nav-pills.rm-subtabs,
+.ratting-manager-dashboard .nav.rm-subtabs {
+    gap: 8px;
+    border-bottom: 1px solid var(--rm-line);
+    padding-bottom: 12px;
+}
+
+.ratting-manager-dashboard .rm-subtabs .nav-link {
+    border: 1px solid var(--rm-line);
+    border-radius: 0;
+    color: var(--rm-label) !important;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: transparent;
+}
+
+.ratting-manager-dashboard .rm-subtabs .nav-link.active {
+    border-color: var(--rm-blue);
+    color: var(--rm-blue) !important;
+    background: var(--rm-surface-2);
+}
+
+/* ---------- Insights ---------- */
+.ratting-manager-dashboard .rm-insight,
+.ratting-manager-wrapper .rm-insight {
+    background: var(--rm-ground) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+
+.ratting-manager-dashboard .rm-insight-label,
+.ratting-manager-wrapper .rm-insight-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--rm-label) !important;
+}
+
+.ratting-manager-dashboard .rm-insight-label i { display: none; }
+
+.ratting-manager-dashboard .rm-insight-value { color: var(--rm-text) !important; font-weight: 600; }
+
+/* ---------- Portraits ---------- */
+.rm-portrait {
+    width: 44px;
+    height: 44px;
+    flex: none;
+    background: var(--rm-surface-2);
+    border: 1px solid #263040;
+    object-fit: cover;
+}
+
+.rm-portrait-lg { width: 56px; height: 56px; }
+.rm-portrait-sm { width: 32px; height: 32px; }
+
+/* ---------- Podium ---------- */
+.rm-podium {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.rm-podium-card {
+    background: var(--rm-surface);
+    border-top: 3px solid var(--rm-medal, var(--rm-blue));
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.rm-podium-card .rm-who { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.rm-podium-card .rm-place { font-size: 44px; font-weight: 700; line-height: 1; color: var(--rm-medal, var(--rm-blue)); }
+.rm-podium-card .rm-name { font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--rm-text); }
+.rm-podium-card .rm-sub { font-size: 12px; color: var(--rm-muted); }
+.rm-podium-card .rm-money { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.rm-podium-card .rm-money strong { font-size: 32px; font-weight: 600; color: var(--rm-blue); }
+.rm-podium-card .rm-money span { font-size: 15px; color: var(--rm-green); }
+.rm-podium-card .rm-meta { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--rm-label); }
+
+.rm-medal-1 { --rm-medal: #f5c542; }
+.rm-medal-2 { --rm-medal: #c8d1dc; }
+.rm-medal-3 { --rm-medal: #d48a4f; }
+
+/* ---------- Your place ---------- */
+.rm-your-place {
+    background: rgba(0, 174, 255, 0.08);
+    border: 1px solid rgba(0, 174, 255, 0.4);
+    padding: 14px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    color: var(--rm-text) !important;
+}
+
+.rm-your-place .rm-tag { font-size: 11px; letter-spacing: 0.14em; color: var(--rm-blue); font-weight: 600; }
+.rm-your-place .rm-rank { font-size: 20px; font-weight: 600; }
+.rm-your-place .rm-name { font-size: 15px; text-transform: uppercase; letter-spacing: 0.04em; }
+.rm-your-place .rm-go { margin-left: auto; font-size: 13px; color: var(--rm-label); }
+
+/* ---------- Member cards ---------- */
+.rm-member-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+}
+
+.rm-member-card {
+    background: var(--rm-surface);
+    border: 1px solid var(--rm-surface);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--rm-text) !important;
+}
+
+.rm-member-card:hover { border-color: var(--rm-line); }
+.rm-member-card.rm-you { border-color: var(--rm-blue); }
+.rm-member-card .rm-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.rm-member-card .rm-name { font-size: 11px; color: var(--rm-label); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rm-member-card .rm-money { font-size: 22px; font-weight: 600; color: var(--rm-blue); }
+.rm-member-card .rm-cut { font-size: 12px; color: var(--rm-green); align-self: flex-end; }
+
+.rm-you-tag {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--rm-blue);
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+/* ---------- Wallet badges ---------- */
+.rm-wallet {
+    font-size: 12px;
+    padding: 4px 10px;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+}
+
+.rm-wallet-linked { color: var(--rm-green); }
+.rm-wallet-not { color: var(--rm-amber); }
+
+/* ---------- Charts ---------- */
+.ratting-manager-dashboard canvas,
+.ratting-manager-wrapper canvas {
+    background: transparent !important;
+}
+
+/* ---------- DataTables on the dark ground ---------- */
+.ratting-manager-dashboard .dataTables_wrapper,
+.ratting-manager-wrapper .dataTables_wrapper {
+    color: var(--rm-label);
+    font-family: var(--rm-font);
+}
+
+.ratting-manager-dashboard .page-item .page-link,
+.ratting-manager-wrapper .page-item .page-link {
+    background: var(--rm-surface);
+    border-color: var(--rm-line);
+    color: var(--rm-text-2);
+    border-radius: 0 !important;
+}
+
+.ratting-manager-dashboard .page-item.active .page-link,
+.ratting-manager-wrapper .page-item.active .page-link {
+    background: var(--rm-blue);
+    border-color: var(--rm-blue);
+    color: #031018;
+}
+
+/* Visually hidden, still read out. */
+.rm-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
