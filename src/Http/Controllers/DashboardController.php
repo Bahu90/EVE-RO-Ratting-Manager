@@ -115,7 +115,7 @@ class DashboardController extends Controller
         $data = [
             'period' => $period,
             'totals' => $board['totals'],
-            'leaderboard' => $board['rows'],
+            'leaderboard' => Corporations::markLeft($board['rows'], $this->settings->configuredCorporations()),
             'incomeMode' => $board['mode'],
             'median' => $board['median_isk_per_hour'],
             'space' => $this->charts->spaceCounts($scope, $period),

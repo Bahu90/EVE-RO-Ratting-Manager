@@ -64,6 +64,9 @@
                         @if(count($row['characters']) > 1)
                             <small class="text-muted">(+{{ count($row['characters']) - 1 }})</small>
                         @endif
+                        @if($row['left'] ?? false)
+                            <span class="rm-left-tag" title="{{ trans('ratting-manager::common.left_title') }}">{{ mb_strtoupper(trans('ratting-manager::common.left')) }}</span>
+                        @endif
                         @if($i === $ownIndex)
                             <span class="rm-you-tag">{{ mb_strtoupper(trans('ratting-manager::leaderboard.you')) }}</span>
                         @endif

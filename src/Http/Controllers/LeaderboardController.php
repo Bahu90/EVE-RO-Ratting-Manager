@@ -82,7 +82,7 @@ class LeaderboardController extends Controller
                 'notConfigured' => false,
                 'isDirector' => true,
                 'isAdmin' => Access::isAdmin(),
-                'rows' => $board['rows'],
+                'rows' => \RattingManager\Support\Corporations::markLeft($board['rows'], $settings->configuredCorporations()),
                 'brand' => \RattingManager\Support\Corporations::brand($corporations),
                 'taxRate' => \RattingManager\Support\Corporations::taxRate($corporations),
                 'incomeMode' => $board['mode'],

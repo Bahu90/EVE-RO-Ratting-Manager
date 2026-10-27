@@ -55,4 +55,6 @@ return [
     'no_corporation_access' => 'None of your characters is in a corporation this plugin tracks, and directors here only see their own corporation.',
     'not_in_corporation' => 'The ratting pages are for players with a character in a corporation this plugin tracks.',
     'plugin_name' => 'Ratting Manager',
+    'left' => 'Left corp',
+    'left_title' => 'None of this player\'s characters is in a tracked corporation now. Their ratting still counts where they earned it.',
 ];

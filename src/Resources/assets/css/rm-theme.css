@@ -660,3 +660,15 @@
 .rm-podium-card a.rm-name:hover { color: var(--rm-blue); }
 .rm-member-card { text-decoration: none !important; }
 .rm-member-card[hidden] { display: none !important; }
+
+/* ---------- Left the corporation ---------- */
+.rm-left-tag {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--rm-amber);
+    border: 1px solid currentColor;
+    padding: 1px 6px;
+    margin-left: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+}

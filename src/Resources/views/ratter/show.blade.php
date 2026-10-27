@@ -14,6 +14,7 @@
             @include('ratting-manager::partials.page-title', [
                 'eyebrow' => trans('ratting-manager::ratter.eyebrow', ['brand' => $brand ?? trans('ratting-manager::common.plugin_name')]) . ' / ' . $period->label(),
                 'title' => $mainName,
+                'subtitle' => ($left ?? false) ? trans('ratting-manager::common.left_title') : null,
             ])
         </div>
         <div class="rm-page-actions">

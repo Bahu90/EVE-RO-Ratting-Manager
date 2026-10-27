@@ -47,6 +47,52 @@ final class Corporations
         return $rate === null ? null : (float) $rate;
     }
 
+    /**
+     * Mark the players who have left: SeAT knows where their characters are
+     * now, and none of them is in a tracked corporation. Their ratting still
+     * counts where they earned it; the mark explains why they are listed.
+     * Players SeAT has no affiliation for are not marked.
+     *
+     * @param array<int, array> $rows player rows with a 'characters' list
+     * @param int[] $tracked
+     * @return array<int, array> the rows, each with 'left' => bool
+     */
+    public static function markLeft(array $rows, array $tracked): array
+    {
+        // The characters that ratted, and the main, which may be in the
+        // corporation while its ratting alts are not.
+        $of = fn (array $row) => array_merge($row['characters'] ?? [], isset($row['main_id']) ? [$row['main_id']] : []);
+
+        $characters = [];
+        foreach ($rows as $row) {
+            foreach ($of($row) as $id) {
+                $characters[] = (int) $id;
+            }
+        }
+
+        $now = [];
+        foreach (array_chunk(array_values(array_unique($characters)), 1000) as $chunk) {
+            foreach (DB::table('character_affiliations')->whereIn('character_id', $chunk)->get(['character_id', 'corporation_id']) as $a) {
+                $now[(int) $a->character_id] = (int) $a->corporation_id;
+            }
+        }
+
+        foreach ($rows as &$row) {
+            $known = false;
+            $inside = false;
+            foreach ($of($row) as $id) {
+                if (isset($now[(int) $id])) {
+                    $known = true;
+                    $inside = $inside || in_array($now[(int) $id], $tracked, true);
+                }
+            }
+            $row['left'] = $known && !$inside;
+        }
+        unset($row);
+
+        return $rows;
+    }
+
     /** "15%" or "12.5%" for 0.15 or 0.125. */
     public static function percent(float $rate): string
     {

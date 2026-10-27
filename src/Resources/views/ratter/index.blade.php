@@ -85,7 +85,7 @@
                                     <span class="d-inline-flex align-items-center" style="gap: 10px">
                                         <img class="rm-portrait rm-portrait-sm" src="https://images.evetech.net/characters/{{ $row['main_id'] }}/portrait?size=64" alt="" loading="lazy">
                                         <span class="d-flex flex-column">
-                                            <a href="{{ route('ratting-manager.ratters.show', $row['main_id']) }}">{{ $row['name'] }}</a>
+                                            <span><a href="{{ route('ratting-manager.ratters.show', $row['main_id']) }}">{{ $row['name'] }}</a>@if($row['left'] ?? false) <span class="rm-left-tag" title="{{ trans('ratting-manager::common.left_title') }}">{{ mb_strtoupper(trans('ratting-manager::common.left')) }}</span>@endif</span>
                                             <small class="text-muted">{{ trans_choice('ratting-manager::ratter.characters_count', count($row['characters']), ['count' => count($row['characters'])]) }}</small>
                                         </span>
                                     </span>

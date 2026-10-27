@@ -83,7 +83,7 @@
                             <img class="rm-portrait rm-portrait-lg" src="{{ $portrait($row['main_id'], 128) }}" alt="" loading="lazy">
                             <div class="d-flex flex-column" style="min-width: 0">
                                 <a class="rm-name" href="{{ route('ratting-manager.ratters.show', $row['main_id']) }}">{{ $row['name'] }}</a>
-                                <span class="rm-sub">{{ trans_choice('ratting-manager::leaderboard.characters', count($row['characters']), ['count' => count($row['characters'])]) }}</span>
+                                <span class="rm-sub">{{ trans_choice('ratting-manager::leaderboard.characters', count($row['characters']), ['count' => count($row['characters'])]) }}@if($row['left'] ?? false) · {{ trans('ratting-manager::common.left') }}@endif</span>
                             </div>
                         </div>
                         <div class="rm-money">
@@ -137,7 +137,7 @@
                        class="rm-member-card {{ $i === $ownIndex ? 'rm-you' : '' }}" data-rm-search="{{ mb_strtolower($row['name']) }}">
                         <img class="rm-portrait" src="{{ $portrait($row['main_id']) }}" alt="" loading="lazy">
                         <span class="rm-body">
-                            <span class="rm-name">{{ $i + 1 }}. {{ $row['name'] }}@if($i === $ownIndex)<span class="rm-you-tag">{{ mb_strtoupper(trans('ratting-manager::leaderboard.you')) }}</span>@endif</span>
+                            <span class="rm-name">{{ $i + 1 }}. {{ $row['name'] }}@if($row['left'] ?? false)<span class="rm-left-tag" title="{{ trans('ratting-manager::common.left_title') }}">{{ mb_strtoupper(trans('ratting-manager::common.left')) }}</span>@endif @if($i === $ownIndex)<span class="rm-you-tag">{{ mb_strtoupper(trans('ratting-manager::leaderboard.you')) }}</span>@endif</span>
                             <span class="rm-money">{{ $isk($value($row)) }}</span>
                         </span>
                         <span class="rm-cut">{{ $isk($row['corp_tax']) }}</span>

@@ -38,6 +38,7 @@ class RatterController extends Controller
         unset($row);
 
         usort($rows, fn ($a, $b) => $b['value'] <=> $a['value']);
+        $rows = \RattingManager\Support\Corporations::markLeft($rows, $configured);
 
         $linked = count(array_filter($rows, fn ($r) => $r['wallet_token']));
 
@@ -97,6 +98,7 @@ class RatterController extends Controller
         return view('ratting-manager::ratter.show', array_merge($personal, [
             'period' => $period,
             'brand' => \RattingManager\Support\Corporations::brand($configured),
+            'left' => \RattingManager\Support\Corporations::markLeft([['main_id' => $main, 'characters' => $characters]], $settings->configuredCorporations())[0]['left'],
             'mainId' => $main,
             'mainName' => $players->name($main),
             'sources' => $sources,
