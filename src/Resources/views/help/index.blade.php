@@ -519,6 +519,7 @@
                             'my-ratting' => ['fa-crosshairs', 'my_ratting'],
                             'corporation' => ['fa-building', 'corporation'],
                             'leaderboard' => ['fa-trophy', 'leaderboard'],
+                            'report' => ['fa-file-invoice', 'report'],
                             'figures' => ['fa-calculator', 'figures'],
                             'notifications' => ['fa-bell', 'notifications'],
                             'settings' => ['fa-cog', 'settings'],
@@ -581,6 +582,18 @@
                         <li><strong>Discord and Slack notifications</strong>: alerts for special spawns, ratting ships lost, outsiders in home space, stalled data, untracked ratters and players gone quiet, and weekly and monthly Director Reports and Rankings.</li>
                     </ul>
                 </div>
+
+                <div class="whats-new-box">
+                    <h3><i class="fas fa-sync-alt"></i> Recent changes</h3>
+                    <ul>
+                        <li><strong>ISK ratted</strong>, the way the corporation counts it: its cut of bounties and ESS over its tax rate. The dashboards, the leaderboard and the reports lead with it by default; <em>Settings, Income figures</em> switches back to what pilots received.</li>
+                        <li><strong>Monthly Report</strong> for directors: one calendar month as the corporation reports it, with CSV and JSON downloads.</li>
+                        <li><strong>Pick any month</strong> of the last 24 from the period picker.</li>
+                        <li><strong>Tidier dashboards</strong>: four headline boxes, six insights, the Corporation tab in four sub-tabs, one period for both tabs, and charts drawn only when they come into view.</li>
+                        <li><strong>ISK written as 57.38 B</strong>, 788.07 M, 660.60 K, and <strong>Wallet: Linked / Not linked</strong> in place of Coverage.</li>
+                        <li><strong>CSV download</strong> of the leaderboard, and your own row marked <em>You</em> and shown first when you are further down.</li>
+                    </ul>
+                </div>
             </div>
 
             {{-- Getting started --}}
@@ -607,27 +620,31 @@
             <div id="my-ratting" class="help-section">
                 <div class="help-card">
                     <h3><i class="fas fa-crosshairs"></i> My Ratting</h3>
-                    <p>Your own ratting across all your characters, or one of them with the character picker. The period picker covers this month, last month, the last 30 or 90 days and the last 12 months.</p>
+                    <p>Your own ratting across all your characters, or one of them with the character picker. The period picker covers this month, last month, the last 30 or 90 days, the last 12 months, and any of the last 24 calendar months.</p>
+                    <h4>The four boxes</h4>
                     <ul>
-                        <li><strong>Ratting income</strong> is what you received: bounties plus ESS payouts.</li>
-                        <li><strong>Corporation tax paid</strong> is the corporation's cut of your bounties and ESS payouts, from the corporation journal, with the share of the payout it took. The income chart shows it month by month, and Month by character shows it per character.</li>
-                        <li><strong>ISK per hour</strong> is that income over the time you spent ratting. Alts ratting together count their time once, so three characters for an hour is one hour.</li>
-                        <li><strong>Rats killed</strong> counts each tick's kill list once. In a fleet that shares bounties, every member's tick lists the fleet's rats, so a shared payout counts them once and not once per member.</li>
-                        <li><strong>Rank by hours</strong> is your place in your corporation by hours ratted.</li>
-                        <li><strong>When I rat</strong> shades each hour of the week, in EVE time, by how often you ratted in it. Hover a square for the count.</li>
-                        <li><strong>Sessions</strong> are runs of ticks with no gap longer than {{ $sessionGap }} minutes. A session's ISK per hour counts bounties only, because ESS pays out later and is not tied to one session.</li>
+                        <li><strong>ISK ratted</strong> (or <strong>Ratting income</strong>, when Settings is set to what pilots received): see <em>How the figures work</em>. Beneath it, what you received after tax, split into bounties and ESS.</li>
+                        <li><strong>Ratting tax</strong>: the corporation's cut of your bounties and ESS payouts, with the share of the payout it took.</li>
+                        <li><strong>Hours ratted</strong>, with ISK per hour and active days beneath. Alts ratting together count their time once, so three characters for an hour is one hour.</li>
+                        <li><strong>Rank by hours</strong>: your place in your corporation by hours ratted.</li>
                     </ul>
-                    <p>Long lists, such as sessions, systems and special spawns, show their first 10 rows. <strong>View all</strong> opens the whole list on its own page, where it can be searched and sorted.</p>
                     <h4>Insights</h4>
                     <ul>
                         <li><strong>Favourite system</strong> is where you spent the most time; <strong>best-paying system</strong> is where your ISK per hour was highest, among systems with at least an hour of ratting.</li>
-                        <li><strong>Most active day</strong> and <strong>most active time</strong> are the day of the week and the three hours of the day, in EVE time, with the most ratting. The best-paying ones are where your bounty ISK per hour was highest.</li>
-                        <li><strong>Streaks</strong> are days in a row with at least one tick. The current streak counts while you ratted today or yesterday.</li>
-                        <li><strong>By day of the week</strong> and <strong>by hour of the day</strong> show your hours; hover a bar for its bounties and bounty ISK per hour. ESS is left out of these, because it pays out hours after the ratting it is for.</li>
-                        <li><strong>ISK per hour by system</strong> and the <strong>Systems</strong> table count ESS, since each payout names the system its bank was in.</li>
+                        <li><strong>Most active time</strong> and <strong>best-paying time</strong> are the three hours of the day, in EVE time, with the most ratting and the highest bounty ISK per hour.</li>
+                        <li><strong>Sessions</strong> are runs of ticks with no gap longer than {{ $sessionGap }} minutes, with the typical and the longest one.</li>
+                        <li><strong>Per active day</strong> is income over the days you ratted, with your longest streak of days in a row.</li>
                     </ul>
-                    <h4>Month by character</h4>
-                    <p>What each of your characters earned in a month: bounties, ESS, corporation tax, hours, ISK per hour, ticks and rats, with the month's total across all of them. The total's hours count alts ratting together once, so they can be less than the characters' hours added up. Below it, each character's income month by month.</p>
+                    <h4>Charts and tables</h4>
+                    <ul>
+                        <li><strong>Income, last 12 months</strong> and <strong>income per day</strong>, in the figure Settings picks.</li>
+                        <li><strong>When I rat</strong> shades each hour of the week, in EVE time, by how often you ratted in it: the busiest days and hours at a glance.</li>
+                        <li><strong>Systems</strong>: hours, share, what you received, ISK per hour, rats and days for every system you ratted in. It counts ESS, since each payout names the system its bank was in.</li>
+                        <li><strong>Most killed</strong>: each NPC type with its faction, size and rank, and the period's rats in the header. A fleet's shared payout counts its rats once, not once per member.</li>
+                        <li><strong>Bounty ISK per hour by session</strong>, and income by character when you have alts.</li>
+                        <li><strong>Month by character</strong>: what each of your characters made in a month, with the total, and each character month by month below it.</li>
+                    </ul>
+                    <p>Long lists show their first 10 rows. <strong>View all</strong> opens the whole list on its own page, where it can be searched and sorted. Charts are drawn as they come into view, so the page opens quickly.</p>
                 </div>
             </div>
 
@@ -635,22 +652,27 @@
             <div id="corporation" class="help-section">
                 <div class="help-card">
                     <h3><i class="fas fa-building"></i> The Corporation tab</h3>
-                    <p>Directors get a second tab on the Dashboard. It loads when it is first opened, and has its own corporation and period pickers.</p>
+                    <p>Directors get a second tab on the Dashboard. It loads when it is first opened. The period picker above the two tabs sets the period for both; when more than one corporation is tracked, the tab has its own corporation picker.</p>
+                    <h4>The four boxes</h4>
                     <ul>
-                        <li><strong>Leaderboard</strong>: every player by income, with hours, ISK per hour, how that compares with the median player, rats, active days, the change on the period before, and coverage.</li>
-                        <li><strong>Efficiency by system</strong>: where the time pays best.</li>
-                        <li><strong>When the corporation rats</strong>: how many players rat in each hour of the week, useful for planning cover.</li>
-                        <li><strong>Ratters coming and going</strong>: new players, players back after a gap, players still ratting, and players who stopped since the month before.</li>
-                        <li><strong>Untracked ratters</strong>: characters the corporation journal pays bounties to who have no wallet token on SeAT.</li>
-                        <li><strong>Gone quiet</strong>: regular ratters who have stopped.</li>
-                        <li>Each long list shows its first 10 rows; <strong>View all</strong> opens the whole of it, searchable and sortable, for the same corporation and period. The leaderboard's View all opens the Leaderboard page.</li>
-                        <li><strong>Insights</strong>: the same as on My Ratting for the whole corporation, plus the most players ratting in one hour, players per active day and income per player. The Systems table adds how many players ratted in each system and who ratted there most.</li>
-                        <li><strong>Month by month</strong>: for the last 12 months, what the players earned, what landed in the corporation's wallet and the tax rate that makes, players, characters, hours, ISK per hour and income per player.</li>
+                        <li><strong>ISK ratted</strong> (or ratting income), with what the pilots received beneath it.</li>
+                        <li><strong>Ratting tax</strong>, with the <strong>alliance tax</strong> beneath it at the rate set under Settings.</li>
+                        <li><strong>Active players</strong>, with their characters. Counting ISK ratted, only players the corporation took a cut from count.</li>
+                        <li><strong>Hours ratted</strong>, with the median player's ISK per hour.</li>
                     </ul>
-                    <h4>Coverage</h4>
+                    <p>Under them: how many systems, constellations and regions were ratted in.</p>
+                    <h4>Sub-tabs</h4>
+                    <ul>
+                        <li><strong>Overview</strong>: the insights (favourite and best-paying system and time, the most players ratting in one hour, income per player) and the top of the leaderboard.</li>
+                        <li><strong>Activity</strong>: income over the last 12 months and how it is shared among players, the month-by-month table (with the tax rate the corporation's cut makes), income per day and when the corporation rats.</li>
+                        <li><strong>Space</strong>: the systems table, with how many players ratted in each and who ratted there most, and what was killed.</li>
+                        <li><strong>Members</strong>: ratters coming and going, players who have <strong>gone quiet</strong>, <strong>wallets not linked</strong> (characters the corporation taxes whose wallet is not on SeAT) and special spawns.</li>
+                    </ul>
+                    <p>Each long list shows its first 10 rows; <strong>View all</strong> opens the whole of it, searchable and sortable, for the same corporation and period. The leaderboard's View all opens the Leaderboard page.</p>
+                    <h4>Wallet</h4>
                     <p>
-                        <span class="badge badge-coverage-full"><i class="fas fa-check"></i> Tracked</span> means the ticks the corporation journal saw are also in the character's own journal.
-                        A percentage means some are. <span class="badge badge-coverage-none"><i class="fas fa-eye-slash"></i> Untracked</span> means none are, so the player's income is worked out from the corporation's cut.
+                        <span class="badge badge-coverage-full"><i class="fas fa-check"></i> Linked</span> means the ticks the corporation journal saw are also in the character's own journal.
+                        A percentage means some are. <span class="badge badge-coverage-none"><i class="fas fa-eye-slash"></i> Not linked</span> means none are, so the player's income is worked out from the corporation's cut.
                     </p>
                 </div>
             </div>
@@ -659,8 +681,28 @@
             <div id="leaderboard" class="help-section">
                 <div class="help-card">
                     <h3><i class="fas fa-trophy"></i> Leaderboard</h3>
-                    <p>Members see their corporation ranked by hours ratted, with active days, and their own row picked out. Nobody's ISK is shown to members, their own included; they find their own on My Ratting.</p>
-                    <p>Directors see the full board: income, hours, ISK per hour, the median comparison, rats, active days, change and coverage, for any tracked corporation or all of them.</p>
+                    <p>Members see their corporation ranked by hours ratted, with active days, and their own row marked <em>You</em>. Nobody's ISK is shown to members, their own included; they find their own on My Ratting.</p>
+                    <p>Directors see the full board, ranked by ISK ratted (or income received, by Settings): ratting tax, hours, ISK per hour, the median comparison, rats, active days, change on the period before and wallet, for any tracked corporation or all of them. Counting ISK ratted, players the corporation took no cut from are not listed. Your own row is marked <em>You</em> and, when it is below the top 10, also shown first.</p>
+                    <p><strong>Download CSV</strong> gives every player with both figures side by side, for a spreadsheet. On a phone the board shows rank, player, money and hours; the other columns appear on a wider screen.</p>
+                </div>
+            </div>
+
+            {{-- Monthly Report --}}
+            <div id="report" class="help-section">
+                <div class="help-card">
+                    <h3><i class="fas fa-file-invoice"></i> Monthly Report</h3>
+                    <p>For directors: one calendar month the way the corporation reports it, so it can be compared line by line with the corporation's own ratting page. It always counts ISK ratted, whatever the dashboards are set to.</p>
+                    <ul>
+                        <li><strong>ISK ratted</strong>, <strong>Ratting tax</strong>, <strong>Alliance tax</strong> and <strong>Active members</strong> (the players the corporation took a cut from).</li>
+                        <li>How many systems, constellations and regions were ratted in, and the <strong>top 10 systems</strong> by ISK ratted.</li>
+                        <li><strong>Members</strong> ranked by ISK ratted, with ratting tax and hours; each opens that player's page for the same month.</li>
+                    </ul>
+                    <p>It opens on the last full month; the picker offers the last 24.</p>
+                    <h4>Downloads</h4>
+                    <ul>
+                        <li><strong>Download CSV</strong>: the member table, for a spreadsheet.</li>
+                        <li><strong>Download JSON</strong>: the month as <code>YYYY-MM.json</code>, in the layout the corporation's website reads (month, overview, ratting_source, systems, history for every day, members). Every amount is the corporation's cut, or that cut over the tax rate for <code>isk_ratted</code>, in whole ISK.</li>
+                    </ul>
                 </div>
             </div>
 
@@ -674,6 +716,15 @@
                         The <strong>character journal</strong> records what the character received, if the character has a wallet token on SeAT.
                         Both carry the same time, the system and the list of rats killed, so the plugin pairs them.
                     </p>
+                    <h4>ISK ratted and income received</h4>
+                    <p>
+                        There are two ways to count ratting, and the plugin keeps both.
+                        <strong>ISK ratted</strong> is the corporation's count: its cut of each bounty and ESS payout over its tax rate that day,
+                        <code>cut / rate</code>. At 15%, a cut of 1.5M ISK is 10M ISK ratted. It only counts what the corporation took a cut of.
+                        <strong>Income received</strong> is what the pilots got after tax, from their own wallet journals.
+                        At 15%, ISK ratted is income received plus the ratting tax. <em>Settings, Income figures</em> picks which one the pages lead with.
+                    </p>
+                    <p>The Systems table, the insights and the session chart always use what was received, worked out tick by tick, because ISK ratted is only known per day and system.</p>
                     <h4>Worked-out income</h4>
                     <p>
                         When only the corporation journal has a tick, the character's income is worked out from the cut:
@@ -727,7 +778,7 @@
                     <p>Each alert remembers what it has sent and never sends the same thing twice. A post every bound webhook refused is tried again on the next run.</p>
                     <h4>Reports</h4>
                     <ul>
-                        <li><strong>Director Report</strong>, weekly on Monday and monthly on the 1st, per corporation: what the players earned, what landed in the corporation's wallet and the tax rate, the change on the period before, players, hours, median ISK per hour, rats, the top systems, and players ranked by income (tax paid beside it), hours, ISK per hour and corporation tax paid. For director channels.</li>
+                        <li><strong>Director Report</strong>, weekly on Monday and monthly on the 1st, per corporation: ISK ratted and the alliance tax (when Settings counts ISK ratted), what the players earned, what landed in the corporation's wallet and the tax rate, the change on the period before, players, hours, median ISK per hour, rats, the top systems, and players ranked by ISK ratted or income, as Settings picks (tax paid beside it), hours, ISK per hour and corporation tax paid. For director channels.</li>
                         <li><strong>Rankings</strong>, on the same days: players ranked by hours ratted, with no ISK figures, so it can go to a members' channel.</li>
                     </ul>
                     <p>Players are ranked as a main with all their alts. A report goes once per period; one that could not be sent, or that had no webhook yet, is sent on the next day's run.</p>
@@ -743,6 +794,7 @@
                         <li><strong>Session gap</strong>: how long a pause ends a session. The default of {{ $sessionGap }} minutes lets one missed tick pass.</li>
                         <li><strong>Gone quiet after</strong> and <strong>Regular ratter window</strong>: who is listed under Gone quiet.</li>
                         <li><strong>Leaderboard size for members</strong>: how many places members see.</li>
+                        <li><strong>Income figures</strong>: whether the pages lead with ISK ratted (the corporation's count, the default) or with what pilots received, and the <strong>alliance tax</strong> rate shown beside the corporation's totals (0 hides it).</li>
                         <li><strong>Extra NPC type IDs</strong>: rats to list as special spawns on top of officers, commanders, clone soldiers and capital rats.</li>
                         <li><strong>Home space</strong>, on the Outsiders alert under Notifications: the regions, constellations and systems the alert watches, by name or ID. Until one is set the alert sends nothing and carries a warning badge.</li>
                         <li><strong>Webhooks</strong>, <strong>Notifications</strong> and the <strong>Routing Map</strong>: see Notifications. Notifications also holds the alert thresholds: the lowest special spawn rank, how old a spawn may be, when a journal counts as stalled, how many NPC kills count as outsiders, how close a tick has to be to a loss, and how many players each ranking lists.</li>

@@ -8,6 +8,7 @@ return [
     'my_ratting' => 'My Ratting',
     'corporation' => 'Corporation tab',
     'leaderboard' => 'Leaderboard',
+    'report' => 'Monthly Report',
     'figures' => 'How the figures work',
     'notifications' => 'Notifications',
     'settings' => 'Settings',
