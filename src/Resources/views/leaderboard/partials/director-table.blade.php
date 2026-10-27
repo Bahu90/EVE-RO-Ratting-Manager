@@ -50,35 +50,32 @@
         </thead>
         <tbody>
             @forelse($lines as [$i, $row, $pinned])
-                <tr class="{{ $i === $ownIndex ? 'rm-own-row' : '' }} {{ $pinned ? 'rm-pinned-row' : '' }}">
+                <tr class="{{ $i === $ownIndex ? 'rm-own-row' : '' }} {{ $pinned ? 'rm-pinned-row' : '' }}" data-rm-search="{{ mb_strtolower($row['name']) }}">
                     <td>
-                        @if($i === 0)
-                            <span class="badge badge-gold">1</span>
-                        @elseif($i === 1)
-                            <span class="badge badge-silver">2</span>
-                        @elseif($i === 2)
-                            <span class="badge badge-bronze">3</span>
+                        @if($i < 3)
+                            <span class="rm-rank-medal rm-medal-{{ $i + 1 }}">{{ $i + 1 }}</span>
                         @else
                             {{ $i + 1 }}
                         @endif
                     </td>
                     <td>
+                        <img class="rm-portrait rm-portrait-sm mr-2" src="https://images.evetech.net/characters/{{ $row['main_id'] }}/portrait?size=64" alt="" loading="lazy">
                         <a href="{{ route('ratting-manager.ratters.show', $row['main_id']) }}">{{ $row['name'] }}</a>
                         @if(count($row['characters']) > 1)
                             <small class="text-muted">(+{{ count($row['characters']) - 1 }})</small>
                         @endif
                         @if($i === $ownIndex)
-                            <span class="badge badge-info ml-1">{{ trans('ratting-manager::leaderboard.you') }}</span>
+                            <span class="rm-you-tag">{{ mb_strtoupper(trans('ratting-manager::leaderboard.you')) }}</span>
                         @endif
                     </td>
-                    <td class="text-right">
+                    <td class="text-right rm-isk">
                         @if(!$ratted && $row['estimated'] > 0)
                             <span class="rm-estimated" title="{{ trans('ratting-manager::common.worked_out_title') }}">@rmisk($row['value'] ?? $row['income'])</span>
                         @else
                             @rmisk($row['value'] ?? $row['income'])
                         @endif
                     </td>
-                    <td class="text-right">@rmisk($row['corp_tax'])</td>
+                    <td class="text-right rm-tax">@rmisk($row['corp_tax'])</td>
                     <td class="text-right">{{ \RattingManager\Support\Format::hours($row['minutes']) }}</td>
                     <td class="text-right d-none d-md-table-cell">@rmisk($row['value_per_hour'] ?? $row['isk_per_hour'])</td>
                     <td class="text-right {{ $wide }}">

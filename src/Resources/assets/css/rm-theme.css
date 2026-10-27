@@ -627,3 +627,36 @@
 .ratting-manager-dashboard .rm-hero > [class*="col-"] > .card { height: calc(100% - 1rem); }
 .ratting-manager-dashboard .rm-chart.rm-chart-wide { height: 320px; }
 .ratting-manager-dashboard .card-tools.rm-legend { margin: 0; font-size: 12px; color: var(--rm-label); }
+
+/* ---------- Leaderboard ---------- */
+.rm-rank-medal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    font-weight: 700;
+    color: #050608;
+    background: var(--rm-medal, var(--rm-blue));
+}
+
+.ratting-manager-dashboard .rm-own-row > td { background: rgba(0, 174, 255, 0.08); }
+.ratting-manager-dashboard .rm-pinned-row > td { border-bottom: 2px solid var(--rm-line); }
+.rm-results { font-size: 13px; color: var(--rm-label); }
+.rm-results strong { color: var(--rm-text); font-weight: 600; }
+
+.ratting-manager-dashboard .form-control.rm-search {
+    height: 40px;
+    width: 240px;
+    max-width: 100%;
+    background: var(--rm-surface);
+    color: var(--rm-text);
+    border: 1px solid var(--rm-line);
+    border-radius: 0;
+}
+
+.rm-your-place .rm-isk { font-size: 15px; }
+.rm-your-place .rm-tax { font-size: 14px; }
+.rm-podium-card a.rm-name:hover { color: var(--rm-blue); }
+.rm-member-card { text-decoration: none !important; }
+.rm-member-card[hidden] { display: none !important; }
