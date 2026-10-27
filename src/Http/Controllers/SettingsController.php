@@ -31,6 +31,8 @@ class SettingsController extends Controller
                 'gone_quiet_days' => $settings->get('data.gone_quiet_days'),
                 'regular_ratter_days' => $settings->get('data.regular_ratter_days'),
                 'leaderboard_size' => $settings->get('leaderboard.size'),
+                'income' => $settings->get('display.income'),
+                'alliance_tax_percent' => $settings->get('display.alliance_tax_percent'),
                 'watch_type_ids' => implode(', ', $settings->get('spawns.watch_type_ids')),
             ],
             'lastProcessAt' => $settings->get('state.last_process_at'),
@@ -120,12 +122,16 @@ class SettingsController extends Controller
             'regular_ratter_days' => ['required', 'integer', 'min:7', 'max:730', 'gt:gone_quiet_days'],
             'leaderboard_size' => ['required', 'integer', 'min:5', 'max:500'],
             'watch_type_ids' => ['nullable', 'string', 'max:2000'],
+            'income' => ['required', 'in:ratted,received'],
+            'alliance_tax_percent' => ['required', 'numeric', 'min:0', 'max:99'],
         ]);
 
         $settings->set('data.session_gap_minutes', $data['session_gap_minutes']);
         $settings->set('data.gone_quiet_days', $data['gone_quiet_days']);
         $settings->set('data.regular_ratter_days', $data['regular_ratter_days']);
         $settings->set('leaderboard.size', $data['leaderboard_size']);
+        $settings->set('display.income', $data['income']);
+        $settings->set('display.alliance_tax_percent', (string) (float) $data['alliance_tax_percent']);
 
         preg_match_all('/\d+/', (string) ($data['watch_type_ids'] ?? ''), $ids);
         $settings->set('spawns.watch_type_ids', $ids[0]);

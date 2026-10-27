@@ -72,6 +72,31 @@
 
 <div class="card card-dark">
     <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-coins"></i> {{ trans('ratting-manager::settings.income') }}</h3>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">{{ trans('ratting-manager::settings.income_intro') }}</p>
+        <div class="row">
+            <div class="col-md-6 form-group">
+                @foreach(['ratted', 'received'] as $mode)
+                    <div class="custom-control custom-radio">
+                        <input type="radio" class="custom-control-input" id="rm-income-{{ $mode }}" name="income" value="{{ $mode }}" @checked(old('income', $values['income']) === $mode)>
+                        <label class="custom-control-label" for="rm-income-{{ $mode }}">{{ trans('ratting-manager::settings.income_' . $mode) }}</label>
+                        <small class="form-text text-muted">{{ trans('ratting-manager::settings.income_' . $mode . '_help') }}</small>
+                    </div>
+                @endforeach
+            </div>
+            <div class="col-md-6 form-group">
+                <label for="rm-alliance-tax">{{ trans('ratting-manager::settings.alliance_tax_percent') }}</label>
+                <input type="number" class="form-control" id="rm-alliance-tax" name="alliance_tax_percent" min="0" max="99" step="0.01" value="{{ old('alliance_tax_percent', $values['alliance_tax_percent']) }}" required>
+                <small class="form-text text-muted">{{ trans('ratting-manager::settings.alliance_tax_percent_help') }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card card-dark">
+    <div class="card-header">
         <h3 class="card-title"><i class="fas fa-star"></i> {{ trans('ratting-manager::settings.spawns') }}</h3>
     </div>
     <div class="card-body">

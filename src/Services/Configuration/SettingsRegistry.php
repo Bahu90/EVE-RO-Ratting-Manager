@@ -34,6 +34,15 @@ final class SettingsRegistry
 
         'leaderboard.size' => [self::INSTALL, 'int', 25],
 
+        // Which income the pages lead with. "ratted" is ISK ratted the way
+        // the corporation counts it: its cut of bounties and ESS over its
+        // tax rate, players it took no cut from left out. "received" is what
+        // pilots received, from their own wallet journals.
+        'display.income' => [self::INSTALL, 'string', 'ratted'],
+        // The alliance's share of ISK ratted, in percent, shown as Alliance
+        // tax beside the corporation's totals. 0 hides it.
+        'display.alliance_tax_percent' => [self::INSTALL, 'string', '7.5'],
+
         // Special spawns: this rank and above, capitals, and the watch list.
         // A spawn older than the age limit when it is first imported is not
         // sent, so a late import of old journal rows does not flood channels.
