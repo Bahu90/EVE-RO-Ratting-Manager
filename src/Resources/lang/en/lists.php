@@ -9,6 +9,6 @@ return [
     'title_sessions' => 'All sessions',
     'title_systems' => 'All systems',
     'title_spawns' => 'All special spawns',
-    'title_untracked' => 'All untracked ratters',
+    'title_untracked' => 'All wallets not linked',
     'title_gone_quiet' => 'All players gone quiet',
 ];

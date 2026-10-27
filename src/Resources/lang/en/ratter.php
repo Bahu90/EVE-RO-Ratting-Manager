@@ -6,7 +6,7 @@ return [
     'characters' => 'Characters',
     'income_90d' => 'Income, 90 days',
     'hours_90d' => 'Hours, 90 days',
-    'wallet' => 'Wallet token',
+    'wallet' => 'Token on SeAT',
     'open' => 'Open',
     'yes' => 'Yes',
     'no' => 'No',
