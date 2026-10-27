@@ -29,6 +29,13 @@ return [
                 'permission' => $member,
             ],
             [
+                'name'       => 'Monthly Report',
+                'label'      => 'ratting-manager::menu.report',
+                'icon'       => 'fas fa-file-invoice',
+                'route'      => 'ratting-manager.report',
+                'permission' => $director,
+            ],
+            [
                 'name'       => 'Ratter Lookup',
                 'label'      => 'ratting-manager::menu.ratter_lookup',
                 'icon'       => 'fas fa-search',

@@ -87,9 +87,9 @@ class ChartData
      *
      * @return array{systems: int, constellations: int, regions: int}
      */
-    public function spaceCounts(Scope $scope, Period $period): array
+    public function spaceCounts(Scope $scope, Period $period, ?string $mode = null): array
     {
-        $mode = $this->view->mode();
+        $mode ??= $this->view->mode();
         $column = $mode === IncomeView::RATTED ? 'd.bounty_gross + d.ess_gross' : 'd.bounty_net + d.ess_net';
 
         return FigureCache::remember(
@@ -141,9 +141,9 @@ class ChartData
      * Where the ISK was made, best systems first: by ISK ratted or by income
      * received, as set under Settings. 'value' is the figure ranked by.
      */
-    public function systems(Scope $scope, Period $period, int $limit = 15): array
+    public function systems(Scope $scope, Period $period, int $limit = 15, ?string $mode = null): array
     {
-        $mode = $this->view->mode();
+        $mode ??= $this->view->mode();
         $rows = $this->rows('systems', $scope, FigureCache::range($period->start, $period->end) . ':' . $limit . ':' . $mode, fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->whereBetween('date', [$period->start->toDateString(), $period->end->toDateString()])
             ->groupBy('solar_system_id')

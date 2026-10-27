@@ -60,6 +60,11 @@ Route::group([
             'uses' => 'ListController@ratter',
         ])->where(['characterId' => '[0-9]+', 'list' => '[a-z-]+']);
 
+        Route::get('/report', [
+            'as' => 'ratting-manager.report',
+            'uses' => 'ReportController@index',
+        ]);
+
         Route::get('/ratters', [
             'as' => 'ratting-manager.ratters.index',
             'uses' => 'RatterController@index',

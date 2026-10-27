@@ -53,11 +53,14 @@ class RattingMetrics
      * income, each with ISK per hour against the median of players who
      * ratted at least an hour.
      *
+     * @param string|null $mode IncomeView::RATTED or ::RECEIVED, or null for
+     *                          the one set under Settings
      * @return array{rows: array<int, array>, median_isk_per_hour: float, totals: array}
      */
-    public function leaderboard(Scope $scope, Period $period): array
+    public function leaderboard(Scope $scope, Period $period, ?string $mode = null): array
     {
-        $ratted = $this->view->isRatted();
+        $mode ??= $this->view->mode();
+        $ratted = $mode === IncomeView::RATTED;
         $current = $this->collect($scope, $period->start, $period->end);
         $previous = $this->income($scope, $period->previousStart, $period->previousEnd, $ratted);
 
@@ -101,7 +104,7 @@ class RattingMetrics
         $totals['alliance_rate'] = $this->view->allianceRate();
         $totals['alliance_tax'] = round(($totals['gross'] ?? 0) * $totals['alliance_rate'], 2);
 
-        return ['rows' => $rows, 'median_isk_per_hour' => $median, 'totals' => $totals, 'mode' => $this->view->mode()];
+        return ['rows' => $rows, 'median_isk_per_hour' => $median, 'totals' => $totals, 'mode' => $mode];
     }
 
     /**
