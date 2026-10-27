@@ -12,12 +12,18 @@
                         <div class="info-box bg-gradient-success">
                             <span class="info-box-icon"><i class="fas fa-coins"></i></span>
                             <div class="info-box-content">
+                                @if(($incomeMode ?? 'received') === 'ratted')
+                                <span class="info-box-text" title="{{ trans('ratting-manager::dashboard.isk_ratted_title') }}">{{ trans('ratting-manager::dashboard.isk_ratted') }}</span>
+                                <span class="info-box-number">@rmisk($totals['gross'])</span>
+                                <small>{{ trans('ratting-manager::dashboard.received_by_pilots', ['amount' => \RattingManager\Support\Format::isk($totals['income'])]) }}</small>
+                                @else
                                 <span class="info-box-text">{{ trans('ratting-manager::dashboard.ratting_income') }}</span>
                                 <span class="info-box-number">@rmisk($totals['income'])</span>
                                 @if($totals['estimated'] > 0)
                                     <small class="rm-estimated" title="{{ trans('ratting-manager::common.worked_out_title') }}">{{ trans('ratting-manager::dashboard.worked_out_share', ['amount' => \RattingManager\Support\Format::isk($totals['estimated'])]) }}</small>
                                 @else
                                     <small>{{ trans('ratting-manager::dashboard.ratting_income_hint') }}</small>
+                                @endif
                                 @endif
                             </div>
                         </div>
@@ -28,7 +34,11 @@
                             <div class="info-box-content">
                                 <span class="info-box-text">{{ trans('ratting-manager::dashboard.corp_tax') }}</span>
                                 <span class="info-box-number">@rmisk($totals['corp_tax'])</span>
-                                <small>{{ trans('ratting-manager::dashboard.corp_tax_hint') }}</small>
+                                @if(($totals['alliance_rate'] ?? 0) > 0)
+                                    <small title="{{ trans('ratting-manager::dashboard.alliance_tax_title') }}">{{ trans('ratting-manager::dashboard.alliance_tax_line', ['amount' => \RattingManager\Support\Format::isk($totals['alliance_tax']), 'rate' => rtrim(rtrim(number_format($totals['alliance_rate'] * 100, 2), '0'), '.')]) }}</small>
+                                @else
+                                    <small>{{ trans('ratting-manager::dashboard.corp_tax_hint') }}</small>
+                                @endif
                             </div>
                         </div>
                     </div>

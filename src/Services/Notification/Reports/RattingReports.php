@@ -8,6 +8,7 @@ use RattingManager\Services\Configuration\Settings;
 use RattingManager\Services\Notification\AlertState;
 use RattingManager\Services\Notification\Message;
 use RattingManager\Services\Notification\Notifier;
+use RattingManager\Services\Ratting\IncomeView;
 use RattingManager\Services\Ratting\Insights;
 use RattingManager\Services\Ratting\Period;
 use RattingManager\Services\Ratting\RattingMetrics;
@@ -37,9 +38,11 @@ class RattingReports
     private Settings $settings;
     private RattingMetrics $metrics;
     private Insights $insights;
+    private IncomeView $view;
 
-    public function __construct(Notifier $notifier, AlertState $state, Settings $settings, RattingMetrics $metrics, Insights $insights)
+    public function __construct(Notifier $notifier, AlertState $state, Settings $settings, RattingMetrics $metrics, Insights $insights, IncomeView $view)
     {
+        $this->view = $view;
         $this->notifier = $notifier;
         $this->state = $state;
         $this->settings = $settings;
@@ -134,16 +137,16 @@ class RattingReports
         $cadence = str_ends_with($type, self::MONTHLY) ? self::MONTHLY : self::WEEKLY;
         $label = self::periodLabel($cadence, self::lastPeriod($cadence));
         $rows = [
-            ['name' => 'Purpleshadez', 'income' => 2_171_400_000.0, 'corp_tax' => 383_200_000.0, 'minutes' => 1000, 'isk_per_hour' => 130_280_000.0],
-            ['name' => 'Solo Ratter', 'income' => 1_925_900_000.0, 'corp_tax' => 339_900_000.0, 'minutes' => 800, 'isk_per_hour' => 144_440_000.0],
-            ['name' => 'Rykel Fairchilde', 'income' => 190_000_000.0, 'corp_tax' => 33_500_000.0, 'minutes' => 1240, 'isk_per_hour' => 9_190_000.0],
+            ['name' => 'Purpleshadez', 'income' => 2_171_400_000.0, 'value' => 2_554_600_000.0, 'corp_tax' => 383_200_000.0, 'minutes' => 1000, 'isk_per_hour' => 130_280_000.0],
+            ['name' => 'Solo Ratter', 'income' => 1_925_900_000.0, 'value' => 2_265_800_000.0, 'corp_tax' => 339_900_000.0, 'minutes' => 800, 'isk_per_hour' => 144_440_000.0],
+            ['name' => 'Rykel Fairchilde', 'income' => 190_000_000.0, 'value' => 223_500_000.0, 'corp_tax' => 33_500_000.0, 'minutes' => 1240, 'isk_per_hour' => 9_190_000.0],
         ];
 
         if (str_starts_with($type, 'rankings')) {
             return $this->buildRankings('Test Corp', $label, $rows, $cadence);
         }
 
-        $totals = ['income' => 4_287_300_000.0, 'bounty' => 2_489_700_000.0, 'ess' => 1_797_600_000.0, 'estimated' => 2_222_100_000.0, 'corp_tax' => 756_600_000.0, 'players' => 3, 'characters' => 4, 'minutes' => 3040, 'rats' => 1140];
+        $totals = ['income' => 4_287_300_000.0, 'bounty' => 2_489_700_000.0, 'ess' => 1_797_600_000.0, 'estimated' => 2_222_100_000.0, 'corp_tax' => 756_600_000.0, 'gross' => 5_043_900_000.0, 'alliance_tax' => 378_290_000.0, 'players' => 3, 'characters' => 4, 'minutes' => 3040, 'rats' => 1140];
         $previous = ['income' => 3_900_000_000.0, 'corp_tax' => 690_000_000.0];
         $systems = [['name' => '0-VG7A', 'minutes' => 1000], ['name' => '3AE-CP', 'minutes' => 800], ['name' => 'Q-3HS5', 'minutes' => 800]];
 
@@ -159,6 +162,14 @@ class RattingReports
 
         if (($totals['players'] ?? 0) === 0) {
             return $message->description($t('report_empty'));
+        }
+
+        if (($totals['gross'] ?? 0) > 0 && $this->view->isRatted()) {
+            $ratted = $t('ratted_value', ['amount' => Format::isk($totals['gross'])]);
+            if (($totals['alliance_tax'] ?? 0) > 0) {
+                $ratted .= "\n" . $t('alliance_tax_value', ['amount' => Format::isk($totals['alliance_tax'])]);
+            }
+            $message->field($t('ratted'), $ratted);
         }
 
         $earned = $t('earned_value', ['income' => Format::isk($totals['income']), 'bounty' => Format::isk($totals['bounty']), 'ess' => Format::isk($totals['ess'])]);

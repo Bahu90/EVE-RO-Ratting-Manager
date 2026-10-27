@@ -91,7 +91,17 @@ class RattingMetrics
 
         usort($rows, fn ($a, $b) => $b['value'] <=> $a['value']);
 
-        return ['rows' => $rows, 'median_isk_per_hour' => $median, 'totals' => $current['totals'], 'mode' => $this->view->mode()];
+        $totals = $current['totals'];
+        if ($ratted) {
+            // Active players as the corporation counts them: the ones it took
+            // a cut from.
+            $totals['players'] = count($rows);
+            $totals['characters'] = array_sum(array_map(fn ($r) => count($r['characters']), $rows));
+        }
+        $totals['alliance_rate'] = $this->view->allianceRate();
+        $totals['alliance_tax'] = round(($totals['gross'] ?? 0) * $totals['alliance_rate'], 2);
+
+        return ['rows' => $rows, 'median_isk_per_hour' => $median, 'totals' => $totals, 'mode' => $this->view->mode()];
     }
 
     /**

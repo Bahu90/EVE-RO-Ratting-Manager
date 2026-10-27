@@ -134,4 +134,7 @@ return [
     'income_title' => 'Bounties and ESS payouts received, after corporation tax.',
     'ratting_tax' => 'Ratting tax',
     'ratting_tax_title' => "The corporation's cut of bounties and ESS payouts.",
+    'received_by_pilots' => ':amount received by the pilots, after tax',
+    'alliance_tax_line' => 'Alliance tax :amount (:rate% of ISK ratted)',
+    'alliance_tax_title' => "The alliance's share of ISK ratted, at the rate set under Settings.",
 ];
