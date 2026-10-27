@@ -110,7 +110,7 @@ class RattingManagerServiceProvider extends AbstractSeatPlugin
 
     public function getPackageRepositoryUrl(): string
     {
-        return 'https://github.com/Bahu90/EVE-RO-Ratting-Manager';
+        return 'https://github.com/Bahu90/EVE-Ratting-Manager';
     }
 
     public function getPackagistPackageName(): string

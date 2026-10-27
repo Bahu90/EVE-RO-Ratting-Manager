@@ -553,13 +553,13 @@
                         <div>This is Bahu90's edition of Ratting Manager (<code>bahu90/ratting-manager</code>), maintained for EVE-RO and open to any corporation. It is built on Matt Falahe's original.</div>
                     </div>
                     <div class="quick-links" style="margin-top: 15px;">
-                        <a href="https://github.com/Bahu90/EVE-RO-Ratting-Manager" class="quick-link" target="_blank" rel="noopener" style="padding: 10px;">
+                        <a href="https://github.com/Bahu90/EVE-Ratting-Manager" class="quick-link" target="_blank" rel="noopener" style="padding: 10px;">
                             <i class="fas fa-code-branch" style="font-size: 1rem; margin-bottom: 4px;"></i> GitHub
                         </a>
-                        <a href="https://github.com/Bahu90/EVE-RO-Ratting-Manager/blob/main/CHANGELOG.md" class="quick-link" target="_blank" rel="noopener" style="padding: 10px;">
+                        <a href="https://github.com/Bahu90/EVE-Ratting-Manager/blob/main/CHANGELOG.md" class="quick-link" target="_blank" rel="noopener" style="padding: 10px;">
                             <i class="fas fa-list" style="font-size: 1rem; margin-bottom: 4px;"></i> Changelog
                         </a>
-                        <a href="https://github.com/Bahu90/EVE-RO-Ratting-Manager/issues" class="quick-link" target="_blank" rel="noopener" style="padding: 10px;">
+                        <a href="https://github.com/Bahu90/EVE-Ratting-Manager/issues" class="quick-link" target="_blank" rel="noopener" style="padding: 10px;">
                             <i class="fas fa-bug" style="font-size: 1rem; margin-bottom: 4px;"></i> Report an issue
                         </a>
                     </div>

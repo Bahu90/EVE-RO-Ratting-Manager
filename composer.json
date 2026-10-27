@@ -26,10 +26,10 @@
       "role": "Original author"
     }
   ],
-  "homepage": "https://github.com/Bahu90/EVE-RO-Ratting-Manager",
+  "homepage": "https://github.com/Bahu90/EVE-Ratting-Manager",
   "support": {
-    "issues": "https://github.com/Bahu90/EVE-RO-Ratting-Manager/issues",
-    "source": "https://github.com/Bahu90/EVE-RO-Ratting-Manager"
+    "issues": "https://github.com/Bahu90/EVE-Ratting-Manager/issues",
+    "source": "https://github.com/Bahu90/EVE-Ratting-Manager"
   },
   "require": {
     "php": "^8.1",
