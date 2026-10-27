@@ -17,6 +17,9 @@ use RattingManager\Support\Access;
 
 class DashboardController extends Controller
 {
+    /** Systems listed in the dashboard hero. */
+    private const HERO_SYSTEMS = 10;
+
     use ResolvesViewer;
 
     /** How many of the most-ratted systems the ISK per hour charts compare. */
@@ -113,6 +116,7 @@ class DashboardController extends Controller
             'incomeMode' => $board['mode'],
             'median' => $board['median_isk_per_hour'],
             'space' => $this->charts->spaceCounts($scope, $period),
+            'topSystems' => $this->charts->systems($scope, $period, self::HERO_SYSTEMS),
             'goneQuiet' => $this->metrics->goneQuiet($corporations),
             'untracked' => $this->metrics->untracked($corporations),
             'spawns' => $this->charts->spawns($scope, ListController::DASHBOARD_ROWS),
@@ -134,6 +138,10 @@ class DashboardController extends Controller
                 'daily' => $this->charts->daily($scope, $period),
                 'movement' => $this->charts->ratterMovement($scope),
                 'concentration' => $this->charts->concentration($board['rows']),
+                'taxSplit' => [
+                    'labels' => [trans('ratting-manager::insights.bounties'), trans('ratting-manager::insights.ess')],
+                    'values' => [(float) ($board['totals']['bounty_tax'] ?? 0), (float) ($board['totals']['ess_tax'] ?? 0)],
+                ],
             ],
         ]);
     }

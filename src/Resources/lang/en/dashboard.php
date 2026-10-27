@@ -147,4 +147,20 @@ return [
     'sub_activity' => 'Activity',
     'sub_space' => 'Space',
     'sub_members' => 'Members',
+
+    // Redesigned header and hero.
+    'eyebrow' => 'Ratting Manager / Dashboard',
+    'subtitle' => 'What the corporation ratted, what it kept, and where.',
+    'subtitle_member' => 'What you ratted and where.',
+    'view_mine' => 'Mine',
+    'view_corporation' => 'Corporation',
+    'tax_split' => 'Ratting tax by source',
+    'tax_split_empty' => 'No ratting tax in this period.',
+    'where_we_ratted' => 'Where we ratted',
+    'constellations_short' => 'Const.',
+    'regions' => 'Regions',
+    'top_systems' => 'Top systems',
+    'alliance_tax' => 'Alliance tax',
+    'alliance_tax_rate' => ':rate% of ISK ratted',
+    'daily_income_and_tax' => 'Daily ratting and tax',
 ];

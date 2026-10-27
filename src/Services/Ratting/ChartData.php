@@ -111,26 +111,33 @@ class ChartData
         );
     }
 
-    /** Income per day across the period, with a trailing seven-day average. */
+    /**
+     * Income per day across the period (ISK ratted or received, by the
+     * setting), with the corporation's cut each day and a trailing
+     * seven-day average.
+     */
     public function daily(Scope $scope, Period $period): array
     {
         $column = $this->view->isRatted() ? 'bounty_gross + ess_gross' : 'bounty_net + ess_net';
-        $rows = $this->rows('daily', $scope, FigureCache::range($period->start, $period->end) . ':' . $this->view->mode(), fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
+        $rows = $this->rows('daily2', $scope, FigureCache::range($period->start, $period->end) . ':' . $this->view->mode(), fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->whereBetween('date', [$period->start->toDateString(), $period->end->toDateString()])
             ->groupBy('date')
-            ->selectRaw("date, SUM({$column}) as income")
-            ->pluck('income', 'date'));
+            ->selectRaw("date, SUM({$column}) as income, SUM(bounty_corp_tax + ess_corp_tax) as tax")
+            ->get()
+            ->keyBy(fn ($r) => substr((string) $r->date, 0, 10)));
 
-        $data = ['labels' => [], 'income' => [], 'average' => []];
+        $data = ['labels' => [], 'income' => [], 'tax' => [], 'average' => []];
         $window = [];
         for ($d = $period->start->copy()->startOfDay(); $d->lte($period->end); $d->addDay()) {
-            $value = round((float) ($rows[$d->toDateString()] ?? 0), 2);
+            $r = $rows->get($d->toDateString());
+            $value = round((float) ($r->income ?? 0), 2);
             $window[] = $value;
             if (count($window) > 7) {
                 array_shift($window);
             }
             $data['labels'][] = $d->format('M j');
             $data['income'][] = $value;
+            $data['tax'][] = round((float) ($r->tax ?? 0), 2);
             $data['average'][] = round(array_sum($window) / count($window), 2);
         }
 

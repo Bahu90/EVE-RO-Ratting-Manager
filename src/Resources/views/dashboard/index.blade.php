@@ -12,73 +12,72 @@
     @if($notConfigured)
         @include('ratting-manager::partials.not-configured')
     @elseif($isDirector)
-        <div class="row">
-            <div class="col-12">
-                <div class="card card-dark card-tabs">
-                    <div class="card-header p-0 pt-1 d-flex flex-wrap align-items-center">
-                        <ul class="nav nav-tabs flex-grow-1" id="rm-dashboard-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="rm-personal-tab" data-toggle="pill" href="#rm-personal" role="tab" aria-controls="rm-personal" aria-selected="true">
-                                    <i class="fas fa-user"></i> {{ trans('ratting-manager::dashboard.my_ratting') }}
-                                    <span class="badge personal-badge ml-2">{{ trans('ratting-manager::dashboard.personal_badge') }}</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="rm-corporation-tab" data-toggle="pill" href="#rm-corporation" role="tab" aria-controls="rm-corporation" aria-selected="false">
-                                    <i class="fas fa-building"></i> {{ trans('ratting-manager::dashboard.corporation_ratting') }}
-                                    <span class="badge corporation-badge ml-2">{{ trans('ratting-manager::dashboard.corporation_badge') }}</span>
-                                </a>
-                            </li>
-                        </ul>
-                        {{-- One period for both tabs. The character picker only narrows My Ratting. --}}
-                        <div class="px-2 py-1 rm-shared-period">
-                            @include('ratting-manager::partials.period-picker', [
-                                'formId' => 'rm-period-form',
-                                'characterOptions' => $characterOptions ?? [],
-                                'pickedCharacter' => $pickedCharacter ?? null,
-                                'tabInput' => request('tab') === 'corporation' ? 'corporation' : 'personal',
-                            ])
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="tab-content" id="rm-dashboard-content">
-                            <div class="tab-pane fade show active" id="rm-personal" role="tabpanel" aria-labelledby="rm-personal-tab">
-                                @include('ratting-manager::dashboard.partials.personal', ['showPicker' => false])
-                            </div>
-                            <div class="tab-pane fade" id="rm-corporation" role="tabpanel" aria-labelledby="rm-corporation-tab">
-                                <div class="card card-dark">
-                                    <div class="card-header">
-                                        <h3 class="card-title"><i class="fas fa-building"></i> {{ trans('ratting-manager::dashboard.corporation_ratting') }}</h3>
-                                        <div class="card-tools">
-                                            {{-- The period comes from the shared picker above the tabs; this only picks the corporation,
-                                                 and with one corporation tracked there is nothing to pick, so the form only carries the period. --}}
-                                            @if(count($corporations) > 1)
-                                                @include('ratting-manager::partials.period-picker', [
-                                                    'formId' => 'rm-corp-filters',
-                                                    'corporations' => $corporations,
-                                                    'pickedCorporation' => null,
-                                                    'characterOptions' => [],
-                                                    'showPeriod' => false,
-                                                ])
-                                            @else
-                                                <form id="rm-corp-filters" hidden><input type="hidden" name="period" value="{{ $period->key }}"></form>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="rm-corp-loading" class="text-center py-5 text-muted">
-                                    <i class="fas fa-spinner fa-spin fa-2x"></i>
-                                    <p class="mt-2">{{ trans('ratting-manager::dashboard.loading') }}</p>
-                                </div>
-                                <div id="rm-corp-content"></div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="rm-page-head">
+            @include('ratting-manager::partials.page-title', [
+                'eyebrow' => trans('ratting-manager::dashboard.eyebrow'),
+                'title' => $period->headline(),
+                'subtitle' => trans('ratting-manager::dashboard.subtitle'),
+            ])
+            <div class="rm-page-actions">
+                {{-- Mine / Corporation. A .nav so Bootstrap switches the panes. --}}
+                <div class="nav rm-segmented" id="rm-dashboard-tabs" role="tablist">
+                    <a class="nav-link active" id="rm-personal-tab" data-toggle="pill" href="#rm-personal" role="tab" aria-controls="rm-personal" aria-selected="true">{{ trans('ratting-manager::dashboard.view_mine') }}</a>
+                    <a class="nav-link" id="rm-corporation-tab" data-toggle="pill" href="#rm-corporation" role="tab" aria-controls="rm-corporation" aria-selected="false">{{ trans('ratting-manager::dashboard.view_corporation') }}</a>
+                </div>
+                {{-- One period for both views. The character picker only narrows Mine. --}}
+                <div class="rm-shared-period">
+                    @include('ratting-manager::partials.period-picker', [
+                        'formId' => 'rm-period-form',
+                        'characterOptions' => $characterOptions ?? [],
+                        'pickedCharacter' => $pickedCharacter ?? null,
+                        'tabInput' => request('tab') === 'corporation' ? 'corporation' : 'personal',
+                    ])
                 </div>
             </div>
         </div>
+
+        <div class="tab-content" id="rm-dashboard-content">
+            <div class="tab-pane fade show active" id="rm-personal" role="tabpanel" aria-labelledby="rm-personal-tab">
+                @include('ratting-manager::dashboard.partials.personal', ['showPicker' => false, 'headed' => true])
+            </div>
+            <div class="tab-pane fade" id="rm-corporation" role="tabpanel" aria-labelledby="rm-corporation-tab">
+                {{-- The period comes from the shared picker; this only picks the corporation,
+                     and with one corporation tracked the form only carries the period. --}}
+                @if(count($corporations) > 1)
+                    <div class="d-flex justify-content-end mb-3">
+                        @include('ratting-manager::partials.period-picker', [
+                            'formId' => 'rm-corp-filters',
+                            'corporations' => $corporations,
+                            'pickedCorporation' => null,
+                            'characterOptions' => [],
+                            'showPeriod' => false,
+                        ])
+                    </div>
+                @else
+                    <form id="rm-corp-filters" hidden><input type="hidden" name="period" value="{{ $period->key }}"></form>
+                @endif
+                <div id="rm-corp-loading" class="text-center py-5 text-muted">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p class="mt-2">{{ trans('ratting-manager::dashboard.loading') }}</p>
+                </div>
+                <div id="rm-corp-content"></div>
+            </div>
+        </div>
     @else
-        @include('ratting-manager::dashboard.partials.personal')
+        <div class="rm-page-head">
+            @include('ratting-manager::partials.page-title', [
+                'eyebrow' => trans('ratting-manager::dashboard.eyebrow'),
+                'title' => $period->headline(),
+                'subtitle' => trans('ratting-manager::dashboard.subtitle_member'),
+            ])
+            <div class="rm-page-actions">
+                @include('ratting-manager::partials.period-picker', [
+                    'characterOptions' => $characterOptions ?? [],
+                    'pickedCharacter' => $pickedCharacter ?? null,
+                ])
+            </div>
+        </div>
+        @include('ratting-manager::dashboard.partials.personal', ['headed' => true])
     @endif
 </div>
     @include('ratting-manager::partials.character-lookup')

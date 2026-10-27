@@ -176,15 +176,22 @@
             });
         },
 
-        /** Income per day with its seven-day average. */
+        /**
+         * Income per day as a blue area, and the corporation's cut each day as
+         * a green line, as the corporation's ratting page draws it. Data
+         * without the cut falls back to the seven-day average.
+         */
         dailyIncome: function (id, d, t) {
+            var second = d.tax
+                ? { label: t.series_corp_tax, data: floats(d.tax), borderColor: COLORS.s3, backgroundColor: COLORS.s3 + '22', fill: true, borderWidth: 2, pointRadius: 2, pointHoverRadius: 4, tension: 0.3 }
+                : { label: t.seven_day_average, data: floats(d.average), borderColor: COLORS.muted, borderDash: [5, 4], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, fill: false, tension: 0.2 };
             return make(id, {
                 type: 'line',
                 data: {
                     labels: d.labels,
                     datasets: [
-                        { label: t.series_income, data: floats(d.income), borderColor: COLORS.s1, backgroundColor: COLORS.s1 + '33', fill: true, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.2 },
-                        { label: t.seven_day_average, data: floats(d.average), borderColor: COLORS.muted, borderDash: [5, 4], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, fill: false, tension: 0.2 }
+                        { label: t.series_income, data: floats(d.income), borderColor: COLORS.s1, backgroundColor: COLORS.s1 + '26', fill: true, borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 4, tension: 0.3 },
+                        second
                     ]
                 },
                 options: {
@@ -306,6 +313,28 @@
             });
         },
 
+        /**
+         * The corporation's cut split by where it came from, bounties and
+         * ESS, as a thin ring; the page draws the total in its middle and
+         * its own legend beside it.
+         */
+        taxSplit: function (id, labels, values) {
+            return make(id, {
+                type: 'doughnut',
+                data: { labels: labels, datasets: [{ data: floats(values), backgroundColor: [COLORS.s1, COLORS.s2], borderColor: COLORS.surface, borderWidth: 3 }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '72%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: function (ctx) {
+                            var total = ctx.dataset.data.reduce(function (a, b) { return a + b; }, 0) || 1;
+                            return ' ' + ctx.label + ': ' + formatISK(ctx.parsed) + ' ISK (' + Math.round(ctx.parsed / total * 100) + '%)';
+                        } } }
+                    }
+                }
+            });
+        },
+
         /** New, returning and continuing players above the line, those who stopped below it. */
         movement: function (id, d, t) {
             return make(id, {
@@ -350,6 +379,9 @@
             R.dailyIncome('rm-corp-daily', d.daily, t);
             R.movement('rm-corp-movement', d.movement, t);
             R.doughnut('rm-corp-concentration', d.concentration.labels, d.concentration.values);
+            if (d.taxSplit) {
+                R.taxSplit('rm-corp-taxsplit', d.taxSplit.labels, d.taxSplit.values);
+            }
         }
     };
 

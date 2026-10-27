@@ -621,3 +621,9 @@
     clip: rect(0 0 0 0);
     white-space: nowrap;
 }
+
+/* ---------- Dashboard hero ---------- */
+.ratting-manager-dashboard .rm-hero .info-box { min-height: 118px; }
+.ratting-manager-dashboard .rm-hero > [class*="col-"] > .card { height: calc(100% - 1rem); }
+.ratting-manager-dashboard .rm-chart.rm-chart-wide { height: 320px; }
+.ratting-manager-dashboard .card-tools.rm-legend { margin: 0; font-size: 12px; color: var(--rm-label); }

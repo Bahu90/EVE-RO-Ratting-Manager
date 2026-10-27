@@ -33,7 +33,8 @@ class RattingMetrics
      */
     public function collect(Scope $scope, Carbon $from, Carbon $to): array
     {
-        $key = 'collect:' . $scope->cacheKey() . ':' . FigureCache::range($from, $to);
+        // collect2: totals carry the corporation's cut by source (bounty_tax, ess_tax).
+        $key = 'collect2:' . $scope->cacheKey() . ':' . FigureCache::range($from, $to);
 
         $collected = FigureCache::remember($key, fn () => $this->compute($scope, $from, $to));
 
@@ -259,7 +260,7 @@ class RattingMetrics
         $money = $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->whereBetween('date', [$from->toDateString(), $to->toDateString()])
             ->groupBy('character_id')
-            ->selectRaw('character_id, SUM(bounty_net) as bounty, SUM(bounty_estimated) as bounty_estimated, SUM(ess_net) as ess, SUM(ess_estimated) as ess_estimated, SUM(bounty_corp_tax + ess_corp_tax) as corp_tax, SUM(bounty_gross + ess_gross) as gross')
+            ->selectRaw('character_id, SUM(bounty_net) as bounty, SUM(bounty_estimated) as bounty_estimated, SUM(ess_net) as ess, SUM(ess_estimated) as ess_estimated, SUM(bounty_corp_tax + ess_corp_tax) as corp_tax, SUM(bounty_corp_tax) as bounty_tax, SUM(ess_corp_tax) as ess_tax, SUM(bounty_gross + ess_gross) as gross')
             ->get()
             ->keyBy('character_id');
 
@@ -274,6 +275,7 @@ class RattingMetrics
             'name' => '',
             'characters' => [],
             'income' => 0.0, 'bounty' => 0.0, 'ess' => 0.0, 'estimated' => 0.0, 'corp_tax' => 0.0, 'gross' => 0.0,
+            'bounty_tax' => 0.0, 'ess_tax' => 0.0,
             'ticks' => 0, 'minutes' => 0, 'isk_per_hour' => 0.0, 'gross_per_hour' => 0.0, 'rats' => 0, 'active_days' => 0,
             'coverage' => null, 'wallet_token' => false, 'last_tick' => null,
         ];
@@ -288,6 +290,8 @@ class RattingMetrics
             $p['estimated'] += (float) $m->bounty_estimated + (float) $m->ess_estimated;
             $p['corp_tax'] += (float) $m->corp_tax;
             $p['gross'] += (float) $m->gross;
+            $p['bounty_tax'] += (float) $m->bounty_tax;
+            $p['ess_tax'] += (float) $m->ess_tax;
             unset($p);
         }
 
@@ -346,6 +350,7 @@ class RattingMetrics
 
         $totals = [
             'income' => 0.0, 'bounty' => 0.0, 'ess' => 0.0, 'estimated' => 0.0, 'corp_tax' => 0.0, 'gross' => 0.0,
+            'bounty_tax' => 0.0, 'ess_tax' => 0.0,
             'ticks' => 0, 'minutes' => 0, 'rats' => $allRats, 'players' => 0, 'characters' => 0,
             'seen_by_corp' => array_sum($seenByCorp), 'paired' => array_sum($paired),
         ];
@@ -363,7 +368,7 @@ class RattingMetrics
             $p['last_tick'] = isset($last[$main]) ? gmdate('Y-m-d H:i:s', $last[$main]) : null;
             $p['wallet_token'] = (bool) array_filter($p['characters'], fn ($id) => $this->players->hasWalletToken($id));
 
-            foreach (['income', 'bounty', 'ess', 'estimated', 'corp_tax', 'gross', 'ticks', 'minutes'] as $f) {
+            foreach (['income', 'bounty', 'ess', 'estimated', 'corp_tax', 'gross', 'bounty_tax', 'ess_tax', 'ticks', 'minutes'] as $f) {
                 $totals[$f] += $p[$f];
             }
             $totals['characters'] += count($p['characters']);

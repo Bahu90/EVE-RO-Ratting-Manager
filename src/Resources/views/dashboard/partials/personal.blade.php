@@ -14,6 +14,9 @@
     $taxShare = $totals['corp_tax'] > 0 && $paidOut > 0 ? number_format($totals['corp_tax'] / $paidOut * 100, 1) : null;
 @endphp
 
+{{-- With a page head above ($headed), the head carries the title and the
+     period picker, so the tiles stand on their own. --}}
+@if(!($headed ?? false))
 <div class="row">
     <div class="col-12">
         <div class="card card-dark">
@@ -22,7 +25,6 @@
                     <i class="fas fa-crosshairs"></i>
                     {{ $heading ?? trans('ratting-manager::dashboard.my_ratting') }} - {{ $period->label() }}
                 </h3>
-                {{-- On the directors' dashboard one picker above both tabs sets the period. --}}
                 @if($showPicker ?? true)
                     <div class="card-tools">
                         @include('ratting-manager::partials.period-picker', [
@@ -33,11 +35,11 @@
                 @endif
             </div>
             <div class="card-body">
+@endif
                 {{-- Four boxes: what was made, what the corporation took, how long, and where that ranks. --}}
                 <div class="row">
                     <div class="col-lg-3 col-md-6">
-                        <div class="info-box bg-gradient-success">
-                            <span class="info-box-icon"><i class="fas fa-coins"></i></span>
+                        <div class="info-box">
                             <div class="info-box-content">
                                 @if($ratted)
                                     <span class="info-box-text" title="{{ trans('ratting-manager::dashboard.isk_ratted_title') }}">{{ trans('ratting-manager::dashboard.isk_ratted') }}</span>
@@ -55,8 +57,7 @@
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
-                        <div class="info-box bg-gradient-danger">
-                            <span class="info-box-icon"><i class="fas fa-landmark"></i></span>
+                        <div class="info-box rm-tile-tax">
                             <div class="info-box-content">
                                 <span class="info-box-text">{{ trans('ratting-manager::dashboard.ratting_tax') }}</span>
                                 <span class="info-box-number">@rmisk($totals['corp_tax'])</span>
@@ -67,8 +68,7 @@
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
-                        <div class="info-box bg-gradient-info">
-                            <span class="info-box-icon"><i class="fas fa-clock"></i></span>
+                        <div class="info-box">
                             <div class="info-box-content">
                                 <span class="info-box-text">{{ trans('ratting-manager::dashboard.hours_ratted') }}</span>
                                 <span class="info-box-number">{{ \RattingManager\Support\Format::hours((int) $totals['minutes']) }}</span>
@@ -77,8 +77,7 @@
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
-                        <div class="info-box bg-gradient-primary">
-                            <span class="info-box-icon"><i class="fas fa-trophy"></i></span>
+                        <div class="info-box">
                             <div class="info-box-content">
                                 <span class="info-box-text">{{ trans('ratting-manager::dashboard.corp_rank') }}</span>
                                 @if(isset($ownRank) && $ownRank)
@@ -92,10 +91,12 @@
                         </div>
                     </div>
                 </div>
+@if(!($headed ?? false))
             </div>
         </div>
     </div>
 </div>
+@endif
 
 <div class="row">
     <div class="col-12">
