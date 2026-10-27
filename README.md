@@ -127,6 +127,8 @@ Each tier includes the ones below it, so a director does not also need Member.
 | `ratting-manager.director` | Director | The Corporation tab, the full leaderboard with every player's ISK and ISK per hour, and the Ratter Lookup |
 | `ratting-manager.admin` | Admin | Settings, notifications and Diagnostics |
 
+**Which corporations a director sees** is set under **Settings > Access**: their own corporation (the tracked corporations their characters are in now, the default) or every tracked corporation. Admins always see all of them. A director with no character in a tracked corporation, while directors see only their own, gets the member pages.
+
 ## Artisan Commands
 
 | Command | Description |

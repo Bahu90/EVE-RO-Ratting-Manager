@@ -41,4 +41,27 @@ final class Access
     {
         return self::atLeast('admin', $user);
     }
+
+    /**
+     * Which of the tracked corporations these characters are in now, by
+     * SeAT's character affiliations.
+     *
+     * @param int[] $characters
+     * @param int[] $tracked
+     * @return int[]
+     */
+    public static function trackedCorporationsOf(array $characters, array $tracked): array
+    {
+        if ($characters === [] || $tracked === []) {
+            return [];
+        }
+
+        $now = \Illuminate\Support\Facades\DB::table('character_affiliations')
+            ->whereIn('character_id', $characters)
+            ->pluck('corporation_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        return array_values(array_intersect($tracked, $now));
+    }
 }

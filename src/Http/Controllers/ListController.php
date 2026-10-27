@@ -71,7 +71,8 @@ class ListController extends Controller
     {
         abort_unless(in_array($list, self::PERSONAL, true), 404);
 
-        $scope = new Scope($this->settings->configuredCorporations(), $this->players->charactersOfPlayer($characterId));
+        $characters = $this->players->charactersOfPlayer($characterId);
+        $scope = new Scope($this->ratterCorporations($characters, $this->settings), $characters);
         $main = $this->players->mainOf($characterId);
 
         return $this->page($request, $list, $scope, [

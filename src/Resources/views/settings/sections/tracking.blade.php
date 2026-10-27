@@ -97,6 +97,27 @@
 
 <div class="card card-dark">
     <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-user-shield"></i> {{ trans('ratting-manager::settings.access') }}</h3>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">{{ trans('ratting-manager::settings.access_intro') }}</p>
+        <div class="row">
+            <div class="col-md-6 form-group">
+                <label>{{ trans('ratting-manager::settings.director_scope') }}</label>
+                @foreach(['own', 'all'] as $scope)
+                    <div class="custom-control custom-radio">
+                        <input type="radio" class="custom-control-input" id="rm-director-scope-{{ $scope }}" name="director_scope" value="{{ $scope }}" @checked(old('director_scope', $values['director_scope']) === $scope)>
+                        <label class="custom-control-label" for="rm-director-scope-{{ $scope }}">{{ trans('ratting-manager::settings.director_scope_' . $scope) }}</label>
+                        <small class="form-text text-muted">{{ trans('ratting-manager::settings.director_scope_' . $scope . '_help') }}</small>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card card-dark">
+    <div class="card-header">
         <h3 class="card-title"><i class="fas fa-star"></i> {{ trans('ratting-manager::settings.spawns') }}</h3>
     </div>
     <div class="card-body">

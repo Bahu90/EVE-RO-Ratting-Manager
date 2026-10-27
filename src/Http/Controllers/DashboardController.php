@@ -82,7 +82,8 @@ class DashboardController extends Controller
         return view('ratting-manager::dashboard.index', array_merge($personal, [
             'period' => $period,
             'notConfigured' => false,
-            'isDirector' => Access::isDirector(),
+            // A director with no corporation to see gets the member dashboard.
+            'isDirector' => $this->seesCorporation($this->settings),
             'isAdmin' => Access::isAdmin(),
             'ownRank' => $board['own_rank'],
             'rankedPlayers' => $board['players'],

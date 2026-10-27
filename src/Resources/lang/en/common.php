@@ -52,4 +52,5 @@ return [
 
     'last_import' => 'Last import',
     'never' => 'never',
+    'no_corporation_access' => 'None of your characters is in a corporation this plugin tracks, and directors here only see their own corporation.',
 ];

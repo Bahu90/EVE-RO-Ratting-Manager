@@ -58,7 +58,8 @@ class LeaderboardController extends Controller
     public function index(Request $request, RattingMetrics $metrics, Players $players, Settings $settings)
     {
         $period = Period::from($request->query('period'));
-        $isDirector = Access::isDirector();
+        // A director with no corporation to see gets the members' board.
+        $isDirector = $this->seesCorporation($settings);
         $size = max(5, (int) $settings->get('leaderboard.size'));
 
         if ($settings->configuredCorporations() === []) {

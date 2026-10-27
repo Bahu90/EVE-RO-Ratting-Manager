@@ -34,6 +34,10 @@ final class SettingsRegistry
 
         'leaderboard.size' => [self::INSTALL, 'int', 25],
 
+        // Which tracked corporations a director sees: "own", the ones their
+        // characters are in now, or "all". Admins always see all of them.
+        'access.director_scope' => [self::INSTALL, 'string', 'own'],
+
         // Which income the pages lead with. "ratted" is ISK ratted the way
         // the corporation counts it: its cut of bounties and ESS over its
         // tax rate, players it took no cut from left out. "received" is what

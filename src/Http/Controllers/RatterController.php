@@ -27,7 +27,7 @@ class RatterController extends Controller
         $period = Period::from($request->query('period', '90d'));
         $rows = $configured === []
             ? []
-            : array_values($metrics->collect(new Scope($configured), $period->start, $period->end)['players']);
+            : array_values($metrics->collect(new Scope($this->pickedCorporations($request, $settings)), $period->start, $period->end)['players']);
 
         $ratted = app(\RattingManager\Services\Ratting\IncomeView::class)->isRatted();
         foreach ($rows as &$row) {
@@ -57,9 +57,9 @@ class RatterController extends Controller
     /** One player's ratting, as they see it on My Ratting, plus where each character's figures come from. */
     public function show(Request $request, int $characterId, Players $players, Settings $settings, DashboardController $dashboard)
     {
-        $configured = $settings->configuredCorporations();
         $period = Period::from($request->query('period'));
         $characters = $players->charactersOfPlayer($characterId);
+        $configured = $this->ratterCorporations($characters, $settings);
         $main = $players->mainOf($characterId);
 
         $personal = $dashboard->personal(new Scope($configured, $characters), $period, $request->query('month'));

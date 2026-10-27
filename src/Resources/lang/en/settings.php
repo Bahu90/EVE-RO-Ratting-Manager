@@ -75,4 +75,13 @@ return [
     'last_report' => 'Last run',
     'report_line' => ':read rows read, :created new, :paired paired',
     'open_diagnostics' => 'Open Diagnostics',
+
+    // Access.
+    'access' => 'Access',
+    'access_intro' => 'Who sees which corporation. Admins always see every tracked corporation and every page.',
+    'director_scope' => 'Directors see',
+    'director_scope_own' => 'Their own corporation',
+    'director_scope_own_help' => 'The tracked corporations their characters are in now. A director with no character in one sees only their own ratting. Best when several corporations share this SeAT.',
+    'director_scope_all' => 'Every tracked corporation',
+    'director_scope_all_help' => 'All tracked corporations, with a picker to look at one. For one corporation, or an alliance whose directors share figures.',
 ];
