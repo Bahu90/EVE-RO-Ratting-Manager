@@ -550,7 +550,7 @@
                     </p>
                     <div class="info-box">
                         <i class="fas fa-box-open"></i>
-                        <div>Ratting Manager 1.0 is in preparation: there is no release on Packagist yet.</div>
+                        <div>This is Bahu90's edition of Ratting Manager (<code>bahu90/ratting-manager</code>), maintained for EVE-RO and open to any corporation. It is built on Matt Falahe's original.</div>
                     </div>
                     <div class="quick-links" style="margin-top: 15px;">
                         <a href="https://github.com/Bahu90/EVE-RO-Ratting-Manager" class="quick-link" target="_blank" rel="noopener" style="padding: 10px;">
@@ -592,6 +592,12 @@
                         <li><strong>Tidier dashboards</strong>: four headline boxes, six insights, the Corporation tab in four sub-tabs, one period for both tabs, and charts drawn only when they come into view.</li>
                         <li><strong>ISK written as 57.38 B</strong>, 788.07 M, 660.60 K, and <strong>Wallet: Linked / Not linked</strong> in place of Coverage.</li>
                         <li><strong>CSV download</strong> of the leaderboard, and your own row marked <em>You</em> and shown first when you are further down.</li>
+                        <li><strong>A new look</strong> for the Dashboard, Leaderboard and Ratter Lookup: the period as a large title, the tax split by bounties and ESS, the top three on a podium, members as cards or a table, and EVE portraits. <em>Settings, Display</em> switches to the standard SeAT look.</li>
+                        <li><strong>Lists apply as soon as you pick</strong>: no Apply or Show button after choosing a period, month or corporation.</li>
+                        <li><strong>Left corp</strong> marks players with no character in a tracked corporation any more. Their ratting still counts where they earned it.</li>
+                        <li><strong>Settings, Access</strong>: directors see their own corporation or every tracked one, and the pages can be limited to players in a tracked corporation now.</li>
+                        <li><strong>Corporations with no ratting tax</strong> show what pilots received instead of zeros.</li>
+                        <li><strong>Webhook URLs are stored encrypted</strong> and never shown again once saved.</li>
                     </ul>
                 </div>
             </div>
@@ -652,15 +658,17 @@
             <div id="corporation" class="help-section">
                 <div class="help-card">
                     <h3><i class="fas fa-building"></i> The Corporation tab</h3>
-                    <p>Directors get a second tab on the Dashboard. It loads when it is first opened. The period picker above the two tabs sets the period for both; when more than one corporation is tracked, the tab has its own corporation picker.</p>
-                    <h4>The four boxes</h4>
+                    <p>Directors switch between <strong>Mine</strong> and <strong>Corporation</strong> at the top of the Dashboard. The Corporation view loads when it is first opened. The period picker beside the switch sets the period for both; when more than one corporation can be seen, the view has its own corporation picker.</p>
+                    <h4>The top of the view</h4>
                     <ul>
                         <li><strong>ISK ratted</strong> (or ratting income), with what the pilots received beneath it.</li>
-                        <li><strong>Ratting tax</strong>, with the <strong>alliance tax</strong> beneath it at the rate set under Settings.</li>
+                        <li><strong>Ratting tax</strong>, with the corporation's tax rate now when one corporation is in view.</li>
                         <li><strong>Active players</strong>, with their characters. Counting ISK ratted, only players the corporation took a cut from count.</li>
-                        <li><strong>Hours ratted</strong>, with the median player's ISK per hour.</li>
+                        <li><strong>Alliance tax</strong> at the rate set under Settings, or <strong>hours ratted</strong> with the median player's ISK per hour when no alliance tax is set.</li>
+                        <li><strong>Ratting tax by source</strong>: how much of the corporation's cut came from bounties and how much from the ESS.</li>
+                        <li><strong>Where we ratted</strong>: how many systems, constellations and regions, and the top 10 systems.</li>
                     </ul>
-                    <p>Under them: how many systems, constellations and regions were ratted in.</p>
+                    <p>The Overview sub-tab opens on a chart of ISK ratted each day with the ratting tax as a green line.</p>
                     <h4>Sub-tabs</h4>
                     <ul>
                         <li><strong>Overview</strong>: the insights (favourite and best-paying system and time, the most players ratting in one hour, income per player) and the top of the leaderboard.</li>
@@ -683,6 +691,7 @@
                     <h3><i class="fas fa-trophy"></i> Leaderboard</h3>
                     <p>Members see their corporation ranked by hours ratted, with active days, and their own row marked <em>You</em>. Nobody's ISK is shown to members, their own included; they find their own on My Ratting.</p>
                     <p>Directors see the full board, ranked by ISK ratted (or income received, by Settings): ratting tax, hours, ISK per hour, the median comparison, rats, active days, change on the period before and wallet, for any tracked corporation or all of them. Counting ISK ratted, players the corporation took no cut from are not listed. Your own row is marked <em>You</em> and, when it is below the top 10, also shown first.</p>
+                    <p>The top three stand on a podium, and <strong>Your place</strong> shows where you are, with <em>Show my row</em> to jump to it. Everyone else is listed as <strong>cards</strong> or as the full <strong>table</strong>; the search box filters both. Players who have left are marked <em>Left corp</em>.</p>
                     <p><strong>Download CSV</strong> gives every player with both figures side by side, for a spreadsheet. On a phone the board shows rank, player, money and hours; the other columns appear on a wider screen.</p>
                 </div>
             </div>
@@ -794,7 +803,9 @@
                         <li><strong>Session gap</strong>: how long a pause ends a session. The default of {{ $sessionGap }} minutes lets one missed tick pass.</li>
                         <li><strong>Gone quiet after</strong> and <strong>Regular ratter window</strong>: who is listed under Gone quiet.</li>
                         <li><strong>Leaderboard size for members</strong>: how many places members see.</li>
-                        <li><strong>Income figures</strong>: whether the pages lead with ISK ratted (the corporation's count, the default) or with what pilots received, and the <strong>alliance tax</strong> rate shown beside the corporation's totals (0 hides it).</li>
+                        <li><strong>Income figures</strong>: whether the pages lead with ISK ratted (the corporation's count, the default) or with what pilots received, and the <strong>alliance tax</strong> rate shown beside the corporation's totals (0 hides it). ISK ratted needs a corporation tax: when every tracked corporation is at 0%, the pages show what pilots received whatever is picked, and Settings says so.</li>
+                        <li><strong>Display</strong>: the EVE-RO look (black, Oxanium, blue and green) or standard SeAT's, and whether the Monthly Report shows the <strong>Website export</strong> button.</li>
+                        <li><strong>Access</strong>: whether directors see only their own corporation (the tracked corporations their characters are in now) or every tracked one, and whether the pages need a character in a tracked corporation now, so players who leave lose them at once. Admins always see everything.</li>
                         <li><strong>Extra NPC type IDs</strong>: rats to list as special spawns on top of officers, commanders, clone soldiers and capital rats.</li>
                         <li><strong>Home space</strong>, on the Outsiders alert under Notifications: the regions, constellations and systems the alert watches, by name or ID. Until one is set the alert sends nothing and carries a warning badge.</li>
                         <li><strong>Webhooks</strong>, <strong>Notifications</strong> and the <strong>Routing Map</strong>: see Notifications. Notifications also holds the alert thresholds: the lowest special spawn rank, how old a spawn may be, when a journal counts as stalled, how many NPC kills count as outsiders, how close a tick has to be to a loss, and how many players each ranking lists.</li>
@@ -831,10 +842,11 @@
                         <tbody>
                             <tr><td><code>ratting-manager.view</code></td><td>This Help page.</td></tr>
                             <tr><td><code>ratting-manager.member</code></td><td>My Ratting, and the leaderboard with rank and hours.</td></tr>
-                            <tr><td><code>ratting-manager.director</code></td><td>The Corporation tab, the full leaderboard with everyone's ISK and its CSV, the Monthly Report with its CSV and JSON, and the Ratter Lookup.</td></tr>
-                            <tr><td><code>ratting-manager.admin</code></td><td>Settings and Diagnostics.</td></tr>
+                            <tr><td><code>ratting-manager.director</code></td><td>The Corporation view, the full leaderboard with everyone's ISK and its CSV, the Monthly Report with its CSV (and the website export when it is on), and the Ratter Lookup, for the corporations <em>Settings, Access</em> lets directors see.</td></tr>
+                            <tr><td><code>ratting-manager.admin</code></td><td>Settings and Diagnostics, and every tracked corporation.</td></tr>
                         </tbody>
                     </table>
+                    <p>By default a director sees the tracked corporations their own characters are in now; a director with none sees their own ratting only. With <em>Only players in a tracked corporation</em> ticked under Settings, Access, every page but this one also needs a character in a tracked corporation now.</p>
                 </div>
             </div>
 
@@ -858,6 +870,10 @@
                     <p>Check the Routing Map: the notification has to be switched on and ticked for a webhook that is switched on and for that corporation, and the Outsiders alert also needs a home space. Diagnostics, Notification Testing shows every send with Discord's answer, and what each alert has already sent for.</p>
                     <h5>Why does the Outsiders alert arrive hours late?</h5>
                     <p>It compares ESI's count for an hour with what the tracked corporations killed in it, and their ticks take one to two hours to reach SeAT. An hour is looked at once it is three hours old, so members' own ratting is never mistaken for outsiders.</p>
+                    <h5>Why is someone marked Left corp?</h5>
+                    <p>SeAT knows where their characters are now, and none is in a tracked corporation. Their ratting still counts for the periods they ratted, since ticks count for the corporation the character was in at the time.</p>
+                    <h5>As a director, I only see my own ratting.</h5>
+                    <p>Directors see the tracked corporations their characters are in now. If none of yours is, ask an admin to check your characters on SeAT, or to let directors see every tracked corporation under Settings, Access.</p>
                     <h5>A rat shows as Other or Size not known.</h5>
                     <p>It is a type the plugin could not place. It still counts in every total. Diagnostics, Master Test lists it.</p>
                 </div>
