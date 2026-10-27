@@ -65,12 +65,44 @@
         return (arr || []).map(function (v) { return parseFloat(v) || 0; });
     }
 
+    /**
+     * Charts are drawn when their canvas first comes into view, not all at
+     * once on page load: the dashboards hold a dozen or more, and drawing
+     * every one up front kept the browser busy for seconds. A canvas in a
+     * tab that is not open has no size, so it is drawn when the tab opens.
+     * Browsers without IntersectionObserver draw everything straight away.
+     */
+    var observer = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            observer.unobserve(entry.target);
+            draw(entry.target);
+        });
+    }, { rootMargin: '200px 0px' });
+
+    function draw(el) {
+        var config = el._rmPending;
+        if (!config) return;
+        el._rmPending = null;
+        if (el._rmChart) el._rmChart.destroy();
+        el._rmChart = new Chart(el, config);
+    }
+
     function make(id, config) {
         var el = document.getElementById(id);
         if (!el || typeof Chart === 'undefined') return null;
-        if (el._rmChart) el._rmChart.destroy();
-        el._rmChart = new Chart(el, config);
-        return el._rmChart;
+        if (el._rmChart) {
+            el._rmChart.destroy();
+            el._rmChart = null;
+        }
+        el._rmPending = config;
+        if (observer) {
+            observer.unobserve(el);
+            observer.observe(el);
+        } else {
+            draw(el);
+        }
+        return el;
     }
 
     function iskScale(stacked) {
