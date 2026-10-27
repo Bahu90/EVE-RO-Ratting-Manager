@@ -20,7 +20,9 @@ final class FigureCache
     public static function remember(string $key, callable $work)
     {
         return Cache::remember(
-            'rm:' . self::version() . ':' . $key,
+            // rm2: the cached figures gained ISK ratted (gross); entries the
+            // older code cached under rm: lack it and are left to expire.
+            'rm2:' . self::version() . ':' . $key,
             (int) config('ratting-manager.cache_seconds', 3600),
             $work
         );

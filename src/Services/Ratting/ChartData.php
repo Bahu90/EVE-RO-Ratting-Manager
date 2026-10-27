@@ -326,7 +326,7 @@ class ChartData
     /** How the period's income is shared out: the top player, the next four, the next five, and everyone else. */
     public function concentration(array $leaderboardRows): array
     {
-        $incomes = array_map(fn ($r) => $r['income'], $leaderboardRows);
+        $incomes = array_map(fn ($r) => $r['value'] ?? $r['income'], $leaderboardRows);
         rsort($incomes);
 
         return [

@@ -1,12 +1,17 @@
 {{-- Every column, for directors: the Corporation tab shows the top of it, the Leaderboard page all of it. --}}
-@php $shown = isset($limit) ? array_slice($rows, 0, $limit) : $rows; @endphp
+@php
+    $shown = isset($limit) ? array_slice($rows, 0, $limit) : $rows;
+    // ISK ratted (the corporation's count) or income received, as set under Settings.
+    $ratted = ($incomeMode ?? 'received') === 'ratted';
+@endphp
 <div class="table-responsive">
     <table class="table table-sm table-hover mb-0 rm-leaderboard">
         <thead>
             <tr>
                 <th>{{ trans('ratting-manager::leaderboard.rank') }}</th>
                 <th>{{ trans('ratting-manager::dashboard.player') }}</th>
-                <th class="text-right">{{ trans('ratting-manager::dashboard.income') }}</th>
+                <th class="text-right" title="{{ trans('ratting-manager::dashboard.' . ($ratted ? 'isk_ratted_title' : 'income_title')) }}">{{ trans('ratting-manager::dashboard.' . ($ratted ? 'isk_ratted' : 'income')) }}</th>
+                <th class="text-right" title="{{ trans('ratting-manager::dashboard.ratting_tax_title') }}">{{ trans('ratting-manager::dashboard.ratting_tax') }}</th>
                 <th class="text-right">{{ trans('ratting-manager::dashboard.hours') }}</th>
                 <th class="text-right">{{ trans('ratting-manager::dashboard.isk_per_hour') }}</th>
                 <th class="text-right" title="{{ trans('ratting-manager::dashboard.vs_median_title') }}">{{ trans('ratting-manager::dashboard.vs_median') }}</th>
@@ -37,14 +42,15 @@
                         @endif
                     </td>
                     <td class="text-right">
-                        @if($row['estimated'] > 0)
-                            <span class="rm-estimated" title="{{ trans('ratting-manager::common.worked_out_title') }}">@rmisk($row['income'])</span>
+                        @if(!$ratted && $row['estimated'] > 0)
+                            <span class="rm-estimated" title="{{ trans('ratting-manager::common.worked_out_title') }}">@rmisk($row['value'] ?? $row['income'])</span>
                         @else
-                            @rmisk($row['income'])
+                            @rmisk($row['value'] ?? $row['income'])
                         @endif
                     </td>
+                    <td class="text-right">@rmisk($row['corp_tax'])</td>
                     <td class="text-right">{{ \RattingManager\Support\Format::hours($row['minutes']) }}</td>
-                    <td class="text-right">@rmisk($row['isk_per_hour'])</td>
+                    <td class="text-right">@rmisk($row['value_per_hour'] ?? $row['isk_per_hour'])</td>
                     <td class="text-right">
                         @if($row['efficiency'] === null)
                             <span class="text-muted">-</span>
@@ -68,7 +74,7 @@
                     <td>@include('ratting-manager::partials.coverage-badge', ['coverage' => $row['coverage']])</td>
                 </tr>
             @empty
-                <tr><td colspan="10" class="text-center text-muted">{{ trans('ratting-manager::common.no_data') }}</td></tr>
+                <tr><td colspan="11" class="text-center text-muted">{{ trans('ratting-manager::common.no_data') }}</td></tr>
             @endforelse
         </tbody>
     </table>

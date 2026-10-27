@@ -184,9 +184,9 @@ class RattingReports
 
         $size = max(1, (int) $this->settings->get('notifications.rankings_size'));
 
-        $byIncome = self::ranked($rows, 'income', fn ($r) => $r['income'] > 0);
+        $byIncome = self::ranked($rows, 'value', fn ($r) => $r['value'] > 0);
         $message->field($t('rank_income'), self::rankLines($byIncome, $size, fn ($r, $rank) => $t('rank_income_line', [
-            'rank' => $rank, 'name' => $r['name'], 'isk' => Format::isk($r['income']), 'tax' => Format::isk($r['corp_tax']),
+            'rank' => $rank, 'name' => $r['name'], 'isk' => Format::isk($r['value']), 'tax' => Format::isk($r['corp_tax']),
         ])), false);
 
         $byHours = self::ranked($rows, 'minutes', fn ($r) => $r['minutes'] > 0);

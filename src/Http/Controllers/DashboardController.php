@@ -112,6 +112,7 @@ class DashboardController extends Controller
             'period' => $period,
             'totals' => $board['totals'],
             'leaderboard' => $board['rows'],
+            'incomeMode' => $board['mode'],
             'median' => $board['median_isk_per_hour'],
             'systems' => $this->charts->systems($scope, $period),
             'goneQuiet' => $this->metrics->goneQuiet($corporations),

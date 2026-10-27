@@ -19,11 +19,13 @@ class RattingMetrics
 {
     private Players $players;
     private Settings $settings;
+    private IncomeView $view;
 
-    public function __construct(Players $players, Settings $settings)
+    public function __construct(Players $players, Settings $settings, IncomeView $view)
     {
         $this->players = $players;
         $this->settings = $settings;
+        $this->view = $view;
     }
 
     /**
@@ -55,27 +57,41 @@ class RattingMetrics
      */
     public function leaderboard(Scope $scope, Period $period): array
     {
+        $ratted = $this->view->isRatted();
         $current = $this->collect($scope, $period->start, $period->end);
-        $previous = $this->income($scope, $period->previousStart, $period->previousEnd);
+        $previous = $this->income($scope, $period->previousStart, $period->previousEnd, $ratted);
 
         $rows = array_values($current['players']);
+
+        // The figure the board ranks by. ISK ratted counts only what the
+        // corporation took a cut of, so a player it took nothing from is not
+        // on the board, as in the corporation's own reports.
+        if ($ratted) {
+            $rows = array_values(array_filter($rows, fn ($r) => $r['corp_tax'] > 0));
+        }
+        foreach ($rows as &$row) {
+            $row['value'] = $ratted ? $row['gross'] : $row['income'];
+            $row['value_per_hour'] = $ratted ? $row['gross_per_hour'] : $row['isk_per_hour'];
+        }
+        unset($row);
+
         $rates = array_values(array_filter(array_map(
-            fn ($r) => $r['minutes'] >= 60 ? $r['isk_per_hour'] : null,
+            fn ($r) => $r['minutes'] >= 60 ? $r['value_per_hour'] : null,
             $rows
         ), fn ($v) => $v !== null));
         $median = $this->median($rates);
 
         foreach ($rows as &$row) {
-            $row['efficiency'] = $median > 0 && $row['minutes'] >= 60 ? round($row['isk_per_hour'] / $median * 100) : null;
+            $row['efficiency'] = $median > 0 && $row['minutes'] >= 60 ? round($row['value_per_hour'] / $median * 100) : null;
             $before = $previous[$row['main_id']] ?? 0.0;
             $row['previous_income'] = $before;
-            $row['change'] = $before > 0 ? round(($row['income'] - $before) / $before * 100) : null;
+            $row['change'] = $before > 0 ? round(($row['value'] - $before) / $before * 100) : null;
         }
         unset($row);
 
-        usort($rows, fn ($a, $b) => $b['income'] <=> $a['income']);
+        usort($rows, fn ($a, $b) => $b['value'] <=> $a['value']);
 
-        return ['rows' => $rows, 'median_isk_per_hour' => $median, 'totals' => $current['totals']];
+        return ['rows' => $rows, 'median_isk_per_hour' => $median, 'totals' => $current['totals'], 'mode' => $this->view->mode()];
     }
 
     /**
@@ -201,13 +217,17 @@ class RattingMetrics
         return $list;
     }
 
-    /** @return array<int, float> main_id => income, ISK only, for the change column */
-    private function income(Scope $scope, Carbon $from, Carbon $to): array
+    /**
+     * @param bool $ratted ISK ratted (the corporation's count) instead of income received
+     * @return array<int, float> main_id => income or ISK ratted, for the change column
+     */
+    private function income(Scope $scope, Carbon $from, Carbon $to, bool $ratted = false): array
     {
+        $column = $ratted ? 'bounty_gross + ess_gross' : 'bounty_net + ess_net';
         $rows = $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->whereBetween('date', [$from->toDateString(), $to->toDateString()])
             ->groupBy('character_id')
-            ->selectRaw('character_id, SUM(bounty_net + ess_net) as income')
+            ->selectRaw("character_id, SUM({$column}) as income")
             ->get();
 
         $this->players->load($rows->pluck('character_id')->map(fn ($id) => (int) $id)->all());
@@ -226,7 +246,7 @@ class RattingMetrics
         $money = $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->whereBetween('date', [$from->toDateString(), $to->toDateString()])
             ->groupBy('character_id')
-            ->selectRaw('character_id, SUM(bounty_net) as bounty, SUM(bounty_estimated) as bounty_estimated, SUM(ess_net) as ess, SUM(ess_estimated) as ess_estimated, SUM(bounty_corp_tax + ess_corp_tax) as corp_tax')
+            ->selectRaw('character_id, SUM(bounty_net) as bounty, SUM(bounty_estimated) as bounty_estimated, SUM(ess_net) as ess, SUM(ess_estimated) as ess_estimated, SUM(bounty_corp_tax + ess_corp_tax) as corp_tax, SUM(bounty_gross + ess_gross) as gross')
             ->get()
             ->keyBy('character_id');
 
@@ -240,8 +260,8 @@ class RattingMetrics
             'main_id' => $main,
             'name' => '',
             'characters' => [],
-            'income' => 0.0, 'bounty' => 0.0, 'ess' => 0.0, 'estimated' => 0.0, 'corp_tax' => 0.0,
-            'ticks' => 0, 'minutes' => 0, 'isk_per_hour' => 0.0, 'rats' => 0, 'active_days' => 0,
+            'income' => 0.0, 'bounty' => 0.0, 'ess' => 0.0, 'estimated' => 0.0, 'corp_tax' => 0.0, 'gross' => 0.0,
+            'ticks' => 0, 'minutes' => 0, 'isk_per_hour' => 0.0, 'gross_per_hour' => 0.0, 'rats' => 0, 'active_days' => 0,
             'coverage' => null, 'wallet_token' => false, 'last_tick' => null,
         ];
 
@@ -254,6 +274,7 @@ class RattingMetrics
             $p['ess'] += (float) $m->ess;
             $p['estimated'] += (float) $m->bounty_estimated + (float) $m->ess_estimated;
             $p['corp_tax'] += (float) $m->corp_tax;
+            $p['gross'] += (float) $m->gross;
             unset($p);
         }
 
@@ -311,7 +332,7 @@ class RattingMetrics
         }
 
         $totals = [
-            'income' => 0.0, 'bounty' => 0.0, 'ess' => 0.0, 'estimated' => 0.0, 'corp_tax' => 0.0,
+            'income' => 0.0, 'bounty' => 0.0, 'ess' => 0.0, 'estimated' => 0.0, 'corp_tax' => 0.0, 'gross' => 0.0,
             'ticks' => 0, 'minutes' => 0, 'rats' => $allRats, 'players' => 0, 'characters' => 0,
             'seen_by_corp' => array_sum($seenByCorp), 'paired' => array_sum($paired),
         ];
@@ -320,6 +341,8 @@ class RattingMetrics
             $p['income'] = round($p['bounty'] + $p['ess'], 2);
             $p['minutes'] = isset($counters[$main]) ? $counters[$main]->minutes() : 0;
             $p['isk_per_hour'] = $p['minutes'] > 0 ? round($p['income'] / ($p['minutes'] / 60), 2) : 0.0;
+            $p['gross'] = round($p['gross'], 2);
+            $p['gross_per_hour'] = $p['minutes'] > 0 ? round($p['gross'] / ($p['minutes'] / 60), 2) : 0.0;
             $p['rats'] = $rats[$main] ?? 0;
             $p['active_days'] = count($days[$main] ?? []);
             $p['coverage'] = isset($seenByCorp[$main]) ? round(($paired[$main] ?? 0) / $seenByCorp[$main] * 100) : null;
@@ -327,7 +350,7 @@ class RattingMetrics
             $p['last_tick'] = isset($last[$main]) ? gmdate('Y-m-d H:i:s', $last[$main]) : null;
             $p['wallet_token'] = (bool) array_filter($p['characters'], fn ($id) => $this->players->hasWalletToken($id));
 
-            foreach (['income', 'bounty', 'ess', 'estimated', 'corp_tax', 'ticks', 'minutes'] as $f) {
+            foreach (['income', 'bounty', 'ess', 'estimated', 'corp_tax', 'gross', 'ticks', 'minutes'] as $f) {
                 $totals[$f] += $p[$f];
             }
             $totals['characters'] += count($p['characters']);

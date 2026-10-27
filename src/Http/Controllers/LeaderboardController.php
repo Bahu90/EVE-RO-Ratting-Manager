@@ -48,6 +48,7 @@ class LeaderboardController extends Controller
                 'isDirector' => true,
                 'isAdmin' => Access::isAdmin(),
                 'rows' => $board['rows'],
+                'incomeMode' => $board['mode'],
                 'median' => $board['median_isk_per_hour'],
                 'totals' => $board['totals'],
                 'ownMain' => $main,

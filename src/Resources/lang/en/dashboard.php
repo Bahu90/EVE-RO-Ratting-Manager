@@ -129,4 +129,9 @@ return [
     'not_on_seat' => 'Not on SeAT',
     'worked_out_income' => 'Income (worked out)',
     'nobody' => 'Nobody.',
+    'isk_ratted' => 'ISK ratted',
+    'isk_ratted_title' => "The corporation's cut of bounties and ESS payouts over its tax rate: what the corporation taxed, before tax.",
+    'income_title' => 'Bounties and ESS payouts received, after corporation tax.',
+    'ratting_tax' => 'Ratting tax',
+    'ratting_tax_title' => "The corporation's cut of bounties and ESS payouts.",
 ];
