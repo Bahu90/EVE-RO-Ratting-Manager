@@ -46,6 +46,7 @@ class FigureWarmer
         $this->metrics->goneQuiet($corporations);
         $this->metrics->untracked($corporations);
         $this->charts->systems($scope, $period);
+        $this->charts->spaceCounts($scope, $period);
         $this->charts->kills($scope, $period);
         $this->charts->spawns($scope, ListController::DASHBOARD_ROWS);
         $this->charts->spawnCount($scope);

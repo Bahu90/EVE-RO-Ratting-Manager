@@ -115,6 +115,7 @@ class DashboardController extends Controller
             'incomeMode' => $board['mode'],
             'median' => $board['median_isk_per_hour'],
             'systems' => $this->charts->systems($scope, $period),
+            'space' => $this->charts->spaceCounts($scope, $period),
             'goneQuiet' => $this->metrics->goneQuiet($corporations),
             'untracked' => $this->metrics->untracked($corporations),
             'spawns' => $this->charts->spawns($scope, ListController::DASHBOARD_ROWS),

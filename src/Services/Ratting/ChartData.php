@@ -15,11 +15,13 @@ class ChartData
 {
     private Players $players;
     private SolarSystems $systems;
+    private IncomeView $view;
 
-    public function __construct(Players $players, SolarSystems $systems)
+    public function __construct(Players $players, SolarSystems $systems, IncomeView $view)
     {
         $this->players = $players;
         $this->systems = $systems;
+        $this->view = $view;
     }
 
     /**
@@ -68,6 +70,36 @@ class ChartData
         return $data;
     }
 
+    /**
+     * How many systems, constellations and regions saw ratting in the
+     * period: with ISK ratted (or income received, by the setting) above 0.
+     *
+     * @return array{systems: int, constellations: int, regions: int}
+     */
+    public function spaceCounts(Scope $scope, Period $period): array
+    {
+        $mode = $this->view->mode();
+        $column = $mode === IncomeView::RATTED ? 'd.bounty_gross + d.ess_gross' : 'd.bounty_net + d.ess_net';
+
+        return FigureCache::remember(
+            'chart:space:' . $scope->cacheKey() . ':' . FigureCache::range($period->start, $period->end) . ':' . $mode,
+            function () use ($scope, $period, $column) {
+                $rows = $scope->apply(DB::table('ratting_manager_daily_summaries as d'), 'd')
+                    ->join('solar_systems as s', 's.system_id', '=', 'd.solar_system_id')
+                    ->whereBetween('d.date', [$period->start->toDateString(), $period->end->toDateString()])
+                    ->groupBy('d.solar_system_id', 's.constellation_id', 's.region_id')
+                    ->havingRaw("SUM({$column}) > 0")
+                    ->get(['d.solar_system_id', 's.constellation_id', 's.region_id']);
+
+                return [
+                    'systems' => $rows->count(),
+                    'constellations' => $rows->pluck('constellation_id')->unique()->count(),
+                    'regions' => $rows->pluck('region_id')->unique()->count(),
+                ];
+            }
+        );
+    }
+
     /** Income per day across the period, with a trailing seven-day average. */
     public function daily(Scope $scope, Period $period): array
     {
@@ -93,20 +125,25 @@ class ChartData
         return $data;
     }
 
-    /** Where the ISK was made, best systems first. */
+    /**
+     * Where the ISK was made, best systems first: by ISK ratted or by income
+     * received, as set under Settings. 'value' is the figure ranked by.
+     */
     public function systems(Scope $scope, Period $period, int $limit = 15): array
     {
-        $rows = $this->rows('systems', $scope, FigureCache::range($period->start, $period->end) . ':' . $limit, fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
+        $mode = $this->view->mode();
+        $rows = $this->rows('systems', $scope, FigureCache::range($period->start, $period->end) . ':' . $limit . ':' . $mode, fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->whereBetween('date', [$period->start->toDateString(), $period->end->toDateString()])
             ->groupBy('solar_system_id')
-            ->selectRaw('solar_system_id, SUM(bounty_net + ess_net) as income, SUM(ticks) as ticks, COUNT(DISTINCT character_id) as characters')
-            ->orderByDesc('income')
+            ->selectRaw('solar_system_id, SUM(bounty_net + ess_net) as income, SUM(bounty_gross + ess_gross) as gross, SUM(ticks) as ticks, COUNT(DISTINCT character_id) as characters')
+            ->orderByDesc($mode === IncomeView::RATTED ? 'gross' : 'income')
             ->limit($limit)
             ->get());
+        $ratted = $mode === IncomeView::RATTED;
 
         $details = $this->systems->details($rows->pluck('solar_system_id')->map(fn ($id) => (int) $id)->filter()->all());
 
-        return $rows->map(function ($r) use ($details) {
+        return $rows->map(function ($r) use ($details, $ratted) {
             $id = (int) $r->solar_system_id;
 
             return [
@@ -114,6 +151,8 @@ class ChartData
                 'name' => $id ? ($details[$id]['name'] ?? 'System #' . $id) : trans('ratting-manager::common.system_not_given'),
                 'security' => $id ? ($details[$id]['security'] ?? null) : null,
                 'income' => round((float) $r->income, 2),
+                'gross' => round((float) $r->gross, 2),
+                'value' => round((float) ($ratted ? $r->gross : $r->income), 2),
                 'ticks' => (int) $r->ticks,
                 'characters' => (int) $r->characters,
             ];

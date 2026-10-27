@@ -101,6 +101,12 @@
                         </div>
                     </div>
                 </div>
+                @isset($space)
+                    <p class="text-muted mb-0 rm-space-counts">
+                        <i class="fas fa-globe"></i>
+                        {{ trans('ratting-manager::dashboard.space_counts', ['systems' => number_format($space['systems']), 'constellations' => number_format($space['constellations']), 'regions' => number_format($space['regions'])]) }}
+                    </p>
+                @endisset
             </div>
         </div>
     </div>

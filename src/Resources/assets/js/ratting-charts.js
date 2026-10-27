@@ -432,7 +432,7 @@
             if (!d) return;
             R.incomeMonthly('rm-chart-monthly', d.monthly, t);
             R.dailyIncome('rm-chart-daily', d.daily, t);
-            R.horizontalBar('rm-chart-systems', d.systems.map(function (s) { return s.name; }), d.systems.map(function (s) { return s.income; }), t.series_income, true);
+            R.horizontalBar('rm-chart-systems', d.systems.map(function (s) { return s.name; }), d.systems.map(function (s) { return s.value !== undefined ? s.value : s.income; }), t.series_income, true);
             R.horizontalBar('rm-chart-factions', d.kills.factions.labels, d.kills.factions.values, t.rats, false);
             R.horizontalBar('rm-chart-sizes', d.kills.sizes.labels, d.kills.sizes.values, t.rats, false);
             R.sessions('rm-chart-sessions', d.sessions, t);
@@ -448,7 +448,7 @@
             if (!d) return;
             R.incomeMonthly('rm-corp-monthly', d.monthly, t);
             R.dailyIncome('rm-corp-daily', d.daily, t);
-            R.horizontalBar('rm-corp-systems', d.systems.map(function (s) { return s.name; }), d.systems.map(function (s) { return s.income; }), t.series_income, true);
+            R.horizontalBar('rm-corp-systems', d.systems.map(function (s) { return s.name; }), d.systems.map(function (s) { return s.value !== undefined ? s.value : s.income; }), t.series_income, true);
             R.horizontalBar('rm-corp-factions', d.kills.factions.labels, d.kills.factions.values, t.rats, false);
             R.horizontalBar('rm-corp-sizes', d.kills.sizes.labels, d.kills.sizes.values, t.rats, false);
             R.activeRatters('rm-corp-active', d.movement, t);
