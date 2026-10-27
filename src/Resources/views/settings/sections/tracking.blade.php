@@ -76,6 +76,12 @@
     </div>
     <div class="card-body">
         <p class="text-muted">{{ trans('ratting-manager::settings.income_intro') }}</p>
+        @if(!empty($untaxed) && $values['income'] === 'ratted')
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                {{ trans($allUntaxed ? 'ratting-manager::settings.untaxed_all' : 'ratting-manager::settings.untaxed_some', ['names' => implode(', ', $untaxed)]) }}
+            </div>
+        @endif
         <div class="row">
             <div class="col-md-6 form-group">
                 @foreach(['ratted', 'received'] as $mode)

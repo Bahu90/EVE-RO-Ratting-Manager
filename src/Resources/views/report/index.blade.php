@@ -42,6 +42,9 @@
             </div>
             <div class="card-body">
                 <p class="text-muted small mb-3">{{ trans('ratting-manager::report.intro') }}</p>
+                @if(!empty(app(\RattingManager\Services\Ratting\IncomeView::class)->untaxedCorporations()))
+                    <div class="alert alert-warning small"><i class="fas fa-exclamation-triangle"></i> {{ trans('ratting-manager::report.untaxed') }}</div>
+                @endif
                 <div class="row">
                     @foreach([
                         ['isk_ratted', $fmt::isk($totals['gross'] ?? 0), 'fa-coins', 'bg-gradient-success'],

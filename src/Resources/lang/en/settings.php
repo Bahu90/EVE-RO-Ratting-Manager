@@ -98,4 +98,6 @@ return [
     'website_export' => 'Website export',
     'website_export_label' => 'Show the Website export button on the Monthly Report',
     'website_export_help' => 'Downloads the month as YYYY-MM.json in the layout EVE-RO\'s ratting page reads. Only useful with a website built to read it.',
+    'untaxed_all' => ':names takes no ratting tax (0% in SeAT). ISK ratted is worked out from the corporation\'s cut, so the pages show what pilots received instead, whatever is picked here. The Monthly Report counts ISK ratted only and stays empty.',
+    'untaxed_some' => ':names takes no ratting tax (0% in SeAT). With ISK ratted picked, their members\' ratting is left out of the figures; pick Received to count it.',
 ];

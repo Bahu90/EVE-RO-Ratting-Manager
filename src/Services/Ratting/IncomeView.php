@@ -26,9 +26,45 @@ final class IncomeView
         $this->settings = $settings;
     }
 
+    /** @var int[]|null tracked corporations whose tax rate SeAT holds as 0% now */
+    private ?array $untaxed = null;
+
+    /**
+     * The mode picked in Settings, except that ISK ratted is worked out from
+     * the corporation's cut: with every tracked corporation at 0% tax there
+     * is no cut and every figure would be 0, so the pages show what pilots
+     * received instead.
+     */
     public function mode(): string
     {
-        return $this->settings->get('display.income') === self::RECEIVED ? self::RECEIVED : self::RATTED;
+        if ($this->settings->get('display.income') === self::RECEIVED) {
+            return self::RECEIVED;
+        }
+
+        $tracked = $this->settings->configuredCorporations();
+
+        return $tracked !== [] && count($this->untaxedCorporations()) === count($tracked) ? self::RECEIVED : self::RATTED;
+    }
+
+    /**
+     * The tracked corporations at 0% tax now, by SeAT's corporation sheet.
+     * A corporation SeAT holds no rate for is not counted as untaxed.
+     *
+     * @return int[]
+     */
+    public function untaxedCorporations(): array
+    {
+        if ($this->untaxed === null) {
+            $tracked = $this->settings->configuredCorporations();
+            $this->untaxed = $tracked === [] ? [] : \Illuminate\Support\Facades\DB::table('corporation_infos')
+                ->whereIn('corporation_id', $tracked)
+                ->where('tax_rate', '<=', 0)
+                ->pluck('corporation_id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+        }
+
+        return $this->untaxed;
     }
 
     public function isRatted(): bool

@@ -21,4 +21,5 @@ return [
     'download_json_title' => 'The month as YYYY-MM.json in the EVE-RO ratting page layout (generate-ratting-report.mjs), for a website that reads it.',
     'csv_hours' => 'Hours',
     'csv_characters' => 'Characters',
+    'untaxed' => 'A tracked corporation takes no ratting tax (0% in SeAT), so its members\' ratting can\'t be counted here. The dashboards show what they received.',
 ];

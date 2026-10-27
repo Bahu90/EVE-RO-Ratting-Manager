@@ -39,6 +39,11 @@ class SettingsController extends Controller
                 'theme' => $settings->get('display.theme'),
                 'website_export' => (bool) $settings->get('display.website_export'),
             ],
+            'untaxed' => array_values(array_map(
+                fn ($id) => collect($tracked)->firstWhere('id', $id)['name'] ?? ('Corporation ' . $id),
+                app(\RattingManager\Services\Ratting\IncomeView::class)->untaxedCorporations()
+            )),
+            'allUntaxed' => count(app(\RattingManager\Services\Ratting\IncomeView::class)->untaxedCorporations()) === count($settings->configuredCorporations()),
             'lastProcessAt' => $settings->get('state.last_process_at'),
             'lastReport' => $settings->get('state.last_process_report'),
             'initializedAt' => $settings->get('state.initialized_at'),
