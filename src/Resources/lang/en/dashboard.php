@@ -143,4 +143,8 @@ return [
     'hours_sub' => ':rate per hour, :days active day(s)',
     'members_sub' => ':count characters',
     'hours_corp_sub' => 'Median :rate per hour',
+    'sub_overview' => 'Overview',
+    'sub_activity' => 'Activity',
+    'sub_space' => 'Space',
+    'sub_members' => 'Members',
 ];

@@ -22,12 +22,15 @@
                     <i class="fas fa-crosshairs"></i>
                     {{ $heading ?? trans('ratting-manager::dashboard.my_ratting') }} - {{ $period->label() }}
                 </h3>
-                <div class="card-tools">
-                    @include('ratting-manager::partials.period-picker', [
-                        'characterOptions' => $characterOptions ?? [],
-                        'pickedCharacter' => $pickedCharacter ?? null,
-                    ])
-                </div>
+                {{-- On the directors' dashboard one picker above both tabs sets the period. --}}
+                @if($showPicker ?? true)
+                    <div class="card-tools">
+                        @include('ratting-manager::partials.period-picker', [
+                            'characterOptions' => $characterOptions ?? [],
+                            'pickedCharacter' => $pickedCharacter ?? null,
+                        ])
+                    </div>
+                @endif
             </div>
             <div class="card-body">
                 {{-- Four boxes: what was made, what the corporation took, how long, and where that ranks. --}}
