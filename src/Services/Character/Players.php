@@ -157,8 +157,20 @@ class Players
      */
     public function shownPending(): array
     {
-        return array_keys($this->pending);
+        $ids = array_keys($this->pending);
+
+        // The page's watcher may only ask about the characters it was shown
+        // (CharacterLookupController), so they are noted in the session.
+        if ($ids !== [] && !app()->runningInConsole() && request()->hasSession()) {
+            $seen = (array) request()->session()->get(self::SHOWN_PENDING, []);
+            request()->session()->put(self::SHOWN_PENDING, array_slice(array_values(array_unique(array_merge($ids, $seen))), 0, 2000));
+        }
+
+        return $ids;
     }
+
+    /** Session key: character IDs pages showed as in progress to this user. */
+    public const SHOWN_PENDING = 'ratting-manager.shown-pending';
 
     /** The corporation the character is in now, from SeAT or the lookups. */
     public function currentCorporationName(int $characterId): ?string

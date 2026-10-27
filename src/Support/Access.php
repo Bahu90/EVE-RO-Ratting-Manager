@@ -14,6 +14,15 @@ final class Access
 {
     public const TIERS = ['view', 'member', 'director', 'admin'];
 
+    /** @var array<string, int[]> characters => corporations they are in now, for this request */
+    private static array $corporationsNow = [];
+
+    /** Forget the affiliations read so far, between queued jobs or in tests. */
+    public static function forgetAffiliations(): void
+    {
+        self::$corporationsNow = [];
+    }
+
     public static function atLeast(string $tier, $user = null): bool
     {
         $user = $user ?? auth()->user();
@@ -56,12 +65,21 @@ final class Access
             return [];
         }
 
-        $now = \Illuminate\Support\Facades\DB::table('character_affiliations')
-            ->whereIn('character_id', $characters)
-            ->pluck('corporation_id')
-            ->map(fn ($id) => (int) $id)
-            ->all();
+        // Asked several times per request (the tier check, the director's
+        // corporations, the page head), so each set of characters is read once.
+        sort($characters);
+        $key = implode(',', $characters);
+        if (!array_key_exists($key, self::$corporationsNow)) {
+            if (count(self::$corporationsNow) > 50) {
+                self::$corporationsNow = [];
+            }
+            self::$corporationsNow[$key] = \Illuminate\Support\Facades\DB::table('character_affiliations')
+                ->whereIn('character_id', $characters)
+                ->pluck('corporation_id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+        }
 
-        return array_values(array_intersect($tracked, $now));
+        return array_values(array_intersect($tracked, self::$corporationsNow[$key]));
     }
 }

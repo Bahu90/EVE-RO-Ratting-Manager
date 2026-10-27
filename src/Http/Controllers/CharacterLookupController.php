@@ -14,8 +14,12 @@ class CharacterLookupController extends Controller
 {
     public function pending(Request $request, AffiliationResolutionService $resolver)
     {
-        $ids = array_slice(explode(',', (string) $request->query('ids', '')), 0, 500);
+        // Only characters a page showed this user as in progress, so the
+        // endpoint can't be used to ask about anyone else.
+        $shown = array_map('intval', (array) $request->session()->get(\RattingManager\Services\Character\Players::SHOWN_PENDING, []));
+        $asked = array_map('intval', array_slice(explode(',', (string) $request->query('ids', '')), 0, 500));
+        $ids = array_values(array_intersect($asked, $shown));
 
-        return response()->json(['pending' => $resolver->stillPending($ids)]);
+        return response()->json(['pending' => $ids === [] ? [] : $resolver->stillPending($ids)]);
     }
 }

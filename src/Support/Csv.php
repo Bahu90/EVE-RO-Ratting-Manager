@@ -39,10 +39,11 @@ final class Csv
             return number_format($value, 2, '.', '');
         }
 
-        // A cell starting with =, +, - or @ would be run as a formula by a
-        // spreadsheet; character names cannot start with those, but a quote
-        // in front keeps any such text as text.
-        if (is_string($value) && $value !== '' && in_array($value[0], ['=', '+', '-', '@'], true)) {
+        // A cell starting with =, +, - or @ (or a tab or line break before
+        // one) would be run as a formula by a spreadsheet; character names
+        // cannot start with those, but a quote in front keeps any such text
+        // as text.
+        if (is_string($value) && $value !== '' && in_array($value[0], ['=', '+', '-', '@', "\t", "\r", "\n"], true)) {
             return "'" . $value;
         }
 
