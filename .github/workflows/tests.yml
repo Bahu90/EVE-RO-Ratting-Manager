@@ -1,0 +1,37 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.1', '8.2', '8.3', '8.4']
+    name: PHP ${{ matrix.php }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php: ${{ matrix.php }}
+          extensions: bcmath, intl, mbstring, pdo_mysql, redis
+          coverage: none
+
+      - name: Lint every PHP file
+        run: find src tests -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+
+      # The unit tests only need PHPUnit and Carbon; SeAT itself isn't
+      # installed, so the plugin's SeAT requirements are left out here.
+      - name: Install PHPUnit and Carbon
+        run: |
+          composer remove --no-update --dev orchestra/testbench
+          composer remove --no-update eveseat/web eveseat/services laravel/framework
+          composer require --no-update "nesbot/carbon:^2.72"
+          composer update --no-interaction --prefer-dist --no-progress
+
+      - name: Run the unit tests
+        run: vendor/bin/phpunit
