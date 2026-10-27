@@ -68,3 +68,20 @@
 @if(app(\RattingManager\Services\Configuration\Settings::class)->get('display.theme') === 'seat')
     <link rel="stylesheet" href="{{ \RattingManager\Support\Asset::url('css/rm-skin-seat.css') }}">
 @endif
+<script>
+// Every period, month, corporation and character list on the plugin's pages
+// applies as soon as something is picked, with no Apply button. requestSubmit
+// runs the form's own submit handlers, so the Corporation view's picker still
+// reloads only that view.
+document.addEventListener('change', function (e) {
+    var form = e.target && e.target.closest && e.target.closest('form.rm-filters');
+    if (!form || e.target.tagName !== 'SELECT') {
+        return;
+    }
+    if (typeof form.requestSubmit === 'function') {
+        form.requestSubmit();
+    } else {
+        form.submit();
+    }
+});
+</script>

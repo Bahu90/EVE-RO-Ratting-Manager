@@ -23,7 +23,7 @@
                         <option value="{{ $key }}" @if($pickedMonth === $key) selected @endif>{{ $label }}</option>
                     @endforeach
                 </select>
-                <button type="submit" class="btn btn-sm btn-rm-primary">{{ trans('ratting-manager::insights.show_month') }}</button>
+                <noscript><button type="submit" class="btn btn-sm btn-rm-primary">{{ trans('ratting-manager::insights.show_month') }}</button></noscript>
             </form>
         </div>
     </div>

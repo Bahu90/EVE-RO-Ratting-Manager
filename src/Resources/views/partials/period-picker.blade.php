@@ -34,5 +34,6 @@
         {{-- Which dashboard tab was open, so it opens again after the reload. --}}
         <input type="hidden" name="tab" value="{{ $tabInput }}" id="rm-tab-input">
     @endisset
-    <button type="submit" class="btn btn-sm btn-rm-primary">{{ trans('ratting-manager::common.apply') }}</button>
+    {{-- Picking from a list applies it (partials/head); the button is only for browsers without JavaScript. --}}
+    <noscript><button type="submit" class="btn btn-sm btn-rm-primary">{{ trans('ratting-manager::common.apply') }}</button></noscript>
 </form>
