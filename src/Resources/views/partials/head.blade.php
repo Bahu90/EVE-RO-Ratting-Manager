@@ -1,9 +1,6 @@
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;500;600;700&display=swap">
 <link rel="stylesheet" href="{{ \RattingManager\Support\Asset::url('css/ratting-manager.css') }}">
 <style>
-/* Forced inline as Mining Manager does (in the EVE-RO theme's colours): some SeAT skins lighten cards and
+/* Forced inline as Mining Manager does (in the theme's colours, from rm-theme.css): some SeAT skins lighten cards and
    tables after the stylesheet loads, and the plugin's light text all but
    vanishes on them. */
 .ratting-manager-dashboard .tab-content {
@@ -14,29 +11,29 @@
 .ratting-manager-dashboard .card-dark .card-body,
 .ratting-manager-dashboard .card.card-dark .card-body,
 .ratting-manager-dashboard div.card-body {
-    background-color: #0d1016 !important;
-    color: #eef2f7 !important;
+    background-color: var(--rm-surface) !important;
+    color: var(--rm-text) !important;
 }
 
 .ratting-manager-dashboard .card.card-dark,
 .ratting-manager-dashboard .card-dark {
-    background-color: #0d1016 !important;
-    border-color: #0d1016 !important;
+    background-color: var(--rm-surface) !important;
+    border-color: var(--rm-surface) !important;
 }
 
 .ratting-manager-dashboard .card-dark .card-header,
 .ratting-manager-dashboard .card.card-dark .card-header {
     background-color: transparent !important;
-    border-bottom: 1px solid #1b2029 !important;
+    border-bottom: 1px solid var(--rm-line) !important;
 }
 
 .ratting-manager-dashboard .table {
-    color: #eef2f7 !important;
+    color: var(--rm-text) !important;
 }
 
 .ratting-manager-dashboard .table thead th {
     background-color: transparent !important;
-    color: #a7b0be !important;
+    color: var(--rm-label) !important;
 }
 
 .ratting-manager-dashboard canvas {
@@ -65,5 +62,9 @@
     min-width: 150px;
 }
 </style>
-{{-- The EVE-RO look (black ground, Oxanium, blue and green), after everything above. --}}
+{{-- The page layout and the EVE-RO look (black ground, Oxanium, blue and green), after everything above.
+     With the standard SeAT look picked under Settings, the second sheet swaps the colours and typeface. --}}
 <link rel="stylesheet" href="{{ \RattingManager\Support\Asset::url('css/rm-theme.css') }}">
+@if(app(\RattingManager\Services\Configuration\Settings::class)->get('display.theme') === 'seat')
+    <link rel="stylesheet" href="{{ \RattingManager\Support\Asset::url('css/rm-skin-seat.css') }}">
+@endif

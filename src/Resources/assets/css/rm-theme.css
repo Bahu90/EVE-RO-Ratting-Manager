@@ -8,6 +8,17 @@
    wrappers, so it restyles only Ratting Manager pages and never SeAT's own.
    ============================================ */
 
+/* Oxanium ships with the plugin (SIL Open Font License, see
+   fonts/Oxanium-OFL.txt), so no page calls out to Google Fonts. One
+   variable file covers every weight used. */
+@font-face {
+    font-family: 'Oxanium';
+    src: url('../fonts/Oxanium-Variable.woff') format('woff');
+    font-weight: 200 800;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     --rm-ground: #050608;
     --rm-surface: #0d1016;

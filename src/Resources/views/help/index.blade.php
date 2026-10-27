@@ -587,7 +587,7 @@
                     <h3><i class="fas fa-sync-alt"></i> Recent changes</h3>
                     <ul>
                         <li><strong>ISK ratted</strong>, the way the corporation counts it: its cut of bounties and ESS over its tax rate. The dashboards, the leaderboard and the reports lead with it by default; <em>Settings, Income figures</em> switches back to what pilots received.</li>
-                        <li><strong>Monthly Report</strong> for directors: one calendar month as the corporation reports it, with CSV and JSON downloads.</li>
+                        <li><strong>Monthly Report</strong> for directors: one calendar month as the corporation reports it, with a CSV download, and a JSON website export when an admin turns it on.</li>
                         <li><strong>Pick any month</strong> of the last 24 from the period picker.</li>
                         <li><strong>Tidier dashboards</strong>: four headline boxes, six insights, the Corporation tab in four sub-tabs, one period for both tabs, and charts drawn only when they come into view.</li>
                         <li><strong>ISK written as 57.38 B</strong>, 788.07 M, 660.60 K, and <strong>Wallet: Linked / Not linked</strong> in place of Coverage.</li>
@@ -701,7 +701,7 @@
                     <h4>Downloads</h4>
                     <ul>
                         <li><strong>Download CSV</strong>: the member table, for a spreadsheet.</li>
-                        <li><strong>Download JSON</strong>: the month as <code>YYYY-MM.json</code>, in the layout the corporation's website reads (month, overview, ratting_source, systems, history for every day, members). Every amount is the corporation's cut, or that cut over the tax rate for <code>isk_ratted</code>, in whole ISK.</li>
+                        <li><strong>Website export</strong> (shown when an admin turns it on under Settings &gt; Display): the month as <code>YYYY-MM.json</code>, in the layout EVE-RO's ratting page reads (month, overview, ratting_source, systems, history for every day, members). Every amount is the corporation's cut, or that cut over the tax rate for <code>isk_ratted</code>, in whole ISK.</li>
                     </ul>
                 </div>
             </div>

@@ -97,6 +97,34 @@
 
 <div class="card card-dark">
     <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-palette"></i> {{ trans('ratting-manager::settings.display') }}</h3>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 form-group">
+                <label>{{ trans('ratting-manager::settings.theme') }}</label>
+                @foreach(['eve-ro', 'seat'] as $theme)
+                    <div class="custom-control custom-radio">
+                        <input type="radio" class="custom-control-input" id="rm-theme-{{ $theme }}" name="theme" value="{{ $theme }}" @checked(old('theme', $values['theme']) === $theme)>
+                        <label class="custom-control-label" for="rm-theme-{{ $theme }}">{{ trans('ratting-manager::settings.theme_' . str_replace('-', '_', $theme)) }}</label>
+                        <small class="form-text text-muted">{{ trans('ratting-manager::settings.theme_' . str_replace('-', '_', $theme) . '_help') }}</small>
+                    </div>
+                @endforeach
+            </div>
+            <div class="col-md-6 form-group">
+                <label>{{ trans('ratting-manager::settings.website_export') }}</label>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="rm-website-export" name="website_export" value="1" @checked(old('website_export', $values['website_export']))>
+                    <label class="custom-control-label" for="rm-website-export">{{ trans('ratting-manager::settings.website_export_label') }}</label>
+                    <small class="form-text text-muted">{{ trans('ratting-manager::settings.website_export_help') }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card card-dark">
+    <div class="card-header">
         <h3 class="card-title"><i class="fas fa-user-shield"></i> {{ trans('ratting-manager::settings.access') }}</h3>
     </div>
     <div class="card-body">

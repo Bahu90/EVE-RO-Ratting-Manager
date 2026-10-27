@@ -22,10 +22,10 @@
         s2: token('--rm-series-2', '#0a6fae'),
         s3: token('--rm-series-3', '#3ddc84'),
         s4: token('--rm-series-4', '#f5a524'),
-        text: '#a7b0be',
-        grid: '#1b2029',
-        surface: '#0d1016',
-        muted: '#8b95a5'
+        text: token('--rm-label', '#a7b0be'),
+        grid: token('--rm-line', '#1b2029'),
+        surface: token('--rm-surface', '#0d1016'),
+        muted: token('--rm-muted', '#8b95a5')
     };
 
     /** Same as Format::isk() on the server: 57.38 B, 788.07 M, 660.60 K. */
@@ -388,7 +388,7 @@
     if (typeof Chart !== 'undefined') {
         Chart.defaults.color = COLORS.text;
         Chart.defaults.borderColor = COLORS.grid;
-        Chart.defaults.font.family = "'Oxanium', 'Source Sans Pro', system-ui, -apple-system, 'Segoe UI', sans-serif";
+        Chart.defaults.font.family = token('--rm-font', "'Source Sans Pro', system-ui, -apple-system, 'Segoe UI', sans-serif");
     }
 
     window.RattingCharts = R;

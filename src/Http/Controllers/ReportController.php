@@ -38,6 +38,7 @@ class ReportController extends Controller
             'notConfigured' => false,
             'choices' => Period::monthChoices(),
             'corporations' => $this->corporationNames($settings),
+            'websiteExport' => (bool) $settings->get('display.website_export'),
         ]);
     }
 
@@ -75,6 +76,7 @@ class ReportController extends Controller
     public function json(Request $request, Settings $settings, \RattingManager\Services\Character\Players $players)
     {
         abort_if($settings->configuredCorporations() === [], 404);
+        abort_unless((bool) $settings->get('display.website_export'), 404);
 
         $period = self::month($request);
         $scope = new Scope($this->pickedCorporations($request, $settings));

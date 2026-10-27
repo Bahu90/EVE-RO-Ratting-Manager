@@ -87,4 +87,15 @@ return [
     'members' => 'Members',
     'member_needs_corporation' => 'Only players in a tracked corporation',
     'member_needs_corporation_help' => 'The ratting pages need a character in a tracked corporation now, on top of the SeAT permission, so a member who leaves loses them at once. Off leaves it to SeAT\'s roles, for example a squad that only holds corporation members. Admins are never locked out, and Help stays open.',
+
+    // Display.
+    'display' => 'Display',
+    'theme' => 'Look',
+    'theme_eve_ro' => 'EVE-RO',
+    'theme_eve_ro_help' => 'Black ground, the Oxanium typeface, ISK in blue and tax in green, as EVE-RO\'s ratting page.',
+    'theme_seat' => 'Standard SeAT',
+    'theme_seat_help' => 'SeAT\'s dark cards and its own typeface, on SeAT\'s page background.',
+    'website_export' => 'Website export',
+    'website_export_label' => 'Show the Website export button on the Monthly Report',
+    'website_export_help' => 'Downloads the month as YYYY-MM.json in the layout EVE-RO\'s ratting page reads. Only useful with a website built to read it.',
 ];

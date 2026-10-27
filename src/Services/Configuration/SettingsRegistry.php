@@ -49,7 +49,14 @@ final class SettingsRegistry
         'display.income' => [self::INSTALL, 'string', 'ratted'],
         // The alliance's share of ISK ratted, in percent, shown as Alliance
         // tax beside the corporation's totals. 0 hides it.
-        'display.alliance_tax_percent' => [self::INSTALL, 'string', '7.5'],
+        'display.alliance_tax_percent' => [self::INSTALL, 'string', '0'],
+        // The pages' look: "eve-ro" (black ground, Oxanium, blue and green,
+        // as EVE-RO's ratting page) or "seat" (AdminLTE's dark cards and
+        // SeAT's font).
+        'display.theme' => [self::INSTALL, 'string', 'eve-ro'],
+        // The Monthly Report's "Website export" button: the month as JSON in
+        // the layout EVE-RO's ratting page reads. Off hides it.
+        'display.website_export' => [self::INSTALL, 'bool', false],
 
         // Special spawns: this rank and above, capitals, and the watch list.
         // A spawn older than the age limit when it is first imported is not

@@ -36,6 +36,8 @@ class SettingsController extends Controller
                 'watch_type_ids' => implode(', ', $settings->get('spawns.watch_type_ids')),
                 'director_scope' => $settings->get('access.director_scope'),
                 'member_needs_corporation' => (bool) $settings->get('access.member_needs_corporation'),
+                'theme' => $settings->get('display.theme'),
+                'website_export' => (bool) $settings->get('display.website_export'),
             ],
             'lastProcessAt' => $settings->get('state.last_process_at'),
             'lastReport' => $settings->get('state.last_process_report'),
@@ -127,6 +129,7 @@ class SettingsController extends Controller
             'income' => ['required', 'in:ratted,received'],
             'alliance_tax_percent' => ['required', 'numeric', 'min:0', 'max:99'],
             'director_scope' => ['required', 'in:own,all'],
+            'theme' => ['required', 'in:eve-ro,seat'],
         ]);
 
         $settings->set('data.session_gap_minutes', $data['session_gap_minutes']);
@@ -137,6 +140,8 @@ class SettingsController extends Controller
         $settings->set('display.alliance_tax_percent', (string) (float) $data['alliance_tax_percent']);
         $settings->set('access.director_scope', $data['director_scope']);
         $settings->set('access.member_needs_corporation', $request->boolean('member_needs_corporation'));
+        $settings->set('display.theme', $data['theme']);
+        $settings->set('display.website_export', $request->boolean('website_export'));
 
         preg_match_all('/\d+/', (string) ($data['watch_type_ids'] ?? ''), $ids);
         $settings->set('spawns.watch_type_ids', $ids[0]);
