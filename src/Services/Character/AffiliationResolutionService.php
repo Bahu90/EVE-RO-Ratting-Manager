@@ -54,7 +54,7 @@ class AffiliationResolutionService
      */
     public const ESI_ERROR_BUDGET_FLOOR = 15;
 
-    private const USER_AGENT = 'SeAT Ratting Manager (https://github.com/MattFalahe/Ratting-Manager)';
+    private const USER_AGENT = 'SeAT Ratting Manager (https://github.com/Bahu90/EVE-RO-Ratting-Manager)';
 
     /** Set when ESI says the error budget is low: no ESI calls until then. */
     private ?Carbon $esiPausedUntil = null;

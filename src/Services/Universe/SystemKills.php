@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
  */
 class SystemKills
 {
-    private const USER_AGENT = 'SeAT Ratting Manager (https://github.com/MattFalahe/Ratting-Manager)';
+    private const USER_AGENT = 'SeAT Ratting Manager (https://github.com/Bahu90/EVE-RO-Ratting-Manager)';
 
     /** Kept long enough for Diagnostics to show a month. */
     public const KEEP_DAYS = 30;

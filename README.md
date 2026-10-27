@@ -5,7 +5,7 @@
 
 A ratting plugin for SeAT 5.x. It tracks one thing: who rats, where, when, how much they earn and what they kill. Every member sees their own ratting, and directors see the same for the whole corporation.
 
-Ratting Manager 1.0 is in preparation. There is no release on Packagist yet.
+This is Bahu90's edition of Ratting Manager, maintained for EVE-RO and open to any corporation. It started as a fork of [Matt Falahe's Ratting Manager](https://github.com/MattFalahe/Ratting-Manager), whose work it is built on; the two can't be installed side by side.
 
 Release history lives in the [CHANGELOG](CHANGELOG.md).
 
@@ -37,7 +37,7 @@ Release history lives in the [CHANGELOG](CHANGELOG.md).
 ## Installation
 
 ```bash
-composer require mattfalahe/ratting-manager
+composer require bahu90/ratting-manager
 php artisan migrate
 php artisan db:seed --class=RattingManager\\Database\\Seeders\\ScheduleSeeder
 ```
@@ -168,6 +168,10 @@ A tick reaches the pages about one to two hours after it pays out: ESI caches th
 
 Dashboard figures are cached until the next import changes them, so a page shows the same figures between imports however often it is opened.
 
+## Credits
+
+Ratting Manager was written by [Matt Falahe](https://github.com/MattFalahe/Ratting-Manager). This edition is maintained by [Bahu90](https://github.com/Bahu90) and adds the figures and look of EVE-RO's ratting page, the Monthly Report and its exports, and the settings other corporations need to run it on their own SeAT.
+
 ## License
 
-GPL-2.0-or-later. See [LICENSE](LICENSE).
+GPL-2.0-or-later, as the original. See [LICENSE](LICENSE).
