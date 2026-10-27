@@ -43,61 +43,23 @@
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
-                        <div class="info-box bg-gradient-info">
-                            <span class="info-box-icon"><i class="fas fa-tachometer-alt"></i></span>
-                            <div class="info-box-content">
-                                <span class="info-box-text">{{ trans('ratting-manager::dashboard.median_isk_per_hour') }}</span>
-                                <span class="info-box-number">@rmisk($median)</span>
-                                <small>{{ trans('ratting-manager::dashboard.median_hint') }}</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
                         <div class="info-box bg-gradient-primary">
-                            <span class="info-box-icon"><i class="fas fa-user-check"></i></span>
+                            <span class="info-box-icon"><i class="fas fa-users"></i></span>
                             <div class="info-box-content">
-                                <span class="info-box-text">{{ trans('ratting-manager::dashboard.tracked_share') }}</span>
-                                <span class="info-box-number">{{ $totals['coverage'] === null ? '-' : $totals['coverage'] . '%' }}</span>
-                                <small>{{ trans('ratting-manager::dashboard.tracked_hint') }}</small>
+                                <span class="info-box-text">{{ trans('ratting-manager::dashboard.active_players') }}</span>
+                                <span class="info-box-number">{{ number_format($totals['players']) }}</span>
+                                <small>{{ trans('ratting-manager::dashboard.members_sub', ['count' => number_format($totals['characters'])]) }}</small>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-3 col-md-6">
-                        <div class="small-box bg-primary">
-                            <div class="inner">
-                                <h3>{{ $totals['players'] }}</h3>
-                                <p>{{ trans('ratting-manager::dashboard.active_players') }} <small>({{ trans('ratting-manager::dashboard.active_characters', ['count' => $totals['characters']]) }})</small></p>
+                        <div class="info-box bg-gradient-info">
+                            <span class="info-box-icon"><i class="fas fa-clock"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">{{ trans('ratting-manager::dashboard.hours_ratted') }}</span>
+                                <span class="info-box-number">{{ \RattingManager\Support\Format::hours((int) $totals['minutes']) }}</span>
+                                <small title="{{ trans('ratting-manager::dashboard.median_hint') }}">{{ trans('ratting-manager::dashboard.hours_corp_sub', ['rate' => \RattingManager\Support\Format::isk($median)]) }}</small>
                             </div>
-                            <div class="icon"><i class="fas fa-users"></i></div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="small-box bg-success">
-                            <div class="inner">
-                                <h3>{{ \RattingManager\Support\Format::hours((int) $totals['minutes']) }}</h3>
-                                <p>{{ trans('ratting-manager::dashboard.hours_ratted') }}</p>
-                            </div>
-                            <div class="icon"><i class="fas fa-clock"></i></div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="small-box bg-info">
-                            <div class="inner">
-                                <h3>@rmisk($totals['ess'])</h3>
-                                <p>{{ trans('ratting-manager::dashboard.ess_payouts') }}</p>
-                            </div>
-                            <div class="icon"><i class="fas fa-university"></i></div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="small-box bg-warning">
-                            <div class="inner">
-                                <h3>{{ number_format($totals['rats']) }}</h3>
-                                <p>{{ trans('ratting-manager::dashboard.rats_killed') }}</p>
-                            </div>
-                            <div class="icon"><i class="fas fa-skull-crossbones"></i></div>
                         </div>
                     </div>
                 </div>
@@ -163,28 +125,6 @@
     <div class="col-lg-6">
         <div class="card card-dark">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-landmark"></i> {{ trans('ratting-manager::insights.earned_and_taxed') }}</h3>
-            </div>
-            <div class="card-body">
-                <div class="rm-chart"><canvas id="rm-corp-months"></canvas></div>
-                <p class="rm-chart-note">{{ trans('ratting-manager::insights.earned_and_taxed_note') }}</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="card card-dark">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-users"></i> {{ trans('ratting-manager::dashboard.active_ratters') }}</h3>
-            </div>
-            <div class="card-body"><div class="rm-chart"><canvas id="rm-corp-active"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.active_ratters_note') }}</p></div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-lg-6">
-        <div class="card card-dark">
-            <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-chart-line"></i> {{ trans('ratting-manager::dashboard.daily_income') }}</h3>
             </div>
             <div class="card-body"><div class="rm-chart"><canvas id="rm-corp-daily"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.daily_income_note') }}</p></div>
@@ -204,85 +144,15 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-6">
-        <div class="card card-dark">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-calendar-week"></i> {{ trans('ratting-manager::insights.by_weekday') }}</h3>
-            </div>
-            <div class="card-body">
-                <div class="rm-chart"><canvas id="rm-corp-weekdays"></canvas></div>
-                <p class="rm-chart-note">{{ trans('ratting-manager::insights.time_note') }}</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="card card-dark">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-user-clock"></i> {{ trans('ratting-manager::insights.players_by_hour') }}</h3>
-            </div>
-            <div class="card-body">
-                <div class="rm-chart"><canvas id="rm-corp-hours"></canvas></div>
-                <p class="rm-chart-note">{{ trans('ratting-manager::insights.players_by_hour_note') }}</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-lg-6">
-        <div class="card card-dark">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-map-marker-alt"></i> {{ trans('ratting-manager::dashboard.systems') }}</h3>
-            </div>
-            <div class="card-body"><div class="rm-chart-tall"><canvas id="rm-corp-systems"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.systems_note') }}</p></div>
-        </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="card card-dark">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-bolt"></i> {{ trans('ratting-manager::insights.efficiency') }}</h3>
-            </div>
-            <div class="card-body">
-                <div class="rm-chart-tall"><canvas id="rm-corp-efficiency"></canvas></div>
-                <p class="rm-chart-note">{{ trans('ratting-manager::insights.efficiency_note') }} {{ trans('ratting-manager::insights.efficiency_top', ['count' => \RattingManager\Http\Controllers\DashboardController::EFFICIENCY_SYSTEMS_CORPORATION]) }}</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
     <div class="col-12">
         @include('ratting-manager::partials.systems-table', ['rows' => $insights['systems'], 'corporation' => true, 'limit' => \RattingManager\Http\Controllers\ListController::DASHBOARD_ROWS, 'moreUrl' => $listUrl('systems')])
     </div>
 </div>
 
 <div class="row">
-    <div class="col-lg-8">
-        <div class="card card-dark">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-skull"></i> {{ trans('ratting-manager::dashboard.what_we_kill') }}</h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6 class="text-muted">{{ trans('ratting-manager::dashboard.by_faction') }}</h6>
-                        <div class="rm-chart" style="height: 260px;"><canvas id="rm-corp-factions"></canvas></div>
-                    </div>
-                    <div class="col-md-6">
-                        <h6 class="text-muted">{{ trans('ratting-manager::dashboard.by_size') }}</h6>
-                        <div class="rm-chart" style="height: 260px;"><canvas id="rm-corp-sizes"></canvas></div>
-                    </div>
-                </div>
-                <p class="rm-chart-note">{{ trans('ratting-manager::dashboard.kills_note') }}</p>
-            </div>
-        </div>
+    <div class="col-lg-6">
+        @include('ratting-manager::partials.npc-table', ['npcs' => $insights['npcs'], 'rats' => $totals['rats']])
     </div>
-    <div class="col-lg-4">
-        @include('ratting-manager::partials.npc-table', ['npcs' => $insights['npcs']])
-    </div>
-</div>
-
-<div class="row">
     <div class="col-lg-6">
         <div class="card card-dark">
             <div class="card-header">
@@ -291,16 +161,19 @@
             <div class="card-body"><div class="rm-chart"><canvas id="rm-corp-movement"></canvas></div><p class="rm-chart-note">{{ trans('ratting-manager::dashboard.ratter_movement_note') }}</p></div>
         </div>
     </div>
-    <div class="col-lg-6">
-        @include('ratting-manager::dashboard.partials.gone-quiet', ['rows' => $goneQuiet, 'limit' => \RattingManager\Http\Controllers\ListController::DASHBOARD_ROWS, 'moreUrl' => $listUrl('gone-quiet')])
-    </div>
 </div>
 
 <div class="row">
     <div class="col-lg-6">
-        @include('ratting-manager::dashboard.partials.untracked', ['rows' => $untracked, 'limit' => \RattingManager\Http\Controllers\ListController::DASHBOARD_ROWS, 'moreUrl' => $listUrl('untracked')])
+        @include('ratting-manager::dashboard.partials.gone-quiet', ['rows' => $goneQuiet, 'limit' => \RattingManager\Http\Controllers\ListController::DASHBOARD_ROWS, 'moreUrl' => $listUrl('gone-quiet')])
     </div>
     <div class="col-lg-6">
+        @include('ratting-manager::dashboard.partials.untracked', ['rows' => $untracked, 'limit' => \RattingManager\Http\Controllers\ListController::DASHBOARD_ROWS, 'moreUrl' => $listUrl('untracked')])
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
         @include('ratting-manager::dashboard.partials.spawns', ['spawns' => $spawns, 'total' => $spawnTotal, 'showCharacter' => true, 'moreUrl' => $listUrl('spawns')])
     </div>
 </div>

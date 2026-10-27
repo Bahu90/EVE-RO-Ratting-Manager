@@ -20,8 +20,6 @@ class DashboardController extends Controller
     use ResolvesViewer;
 
     /** How many of the most-ratted systems the ISK per hour charts compare. */
-    public const EFFICIENCY_SYSTEMS_PERSONAL = 10;
-    public const EFFICIENCY_SYSTEMS_CORPORATION = 15;
 
     private RattingMetrics $metrics;
     private ChartData $charts;
@@ -114,13 +112,11 @@ class DashboardController extends Controller
             'leaderboard' => $board['rows'],
             'incomeMode' => $board['mode'],
             'median' => $board['median_isk_per_hour'],
-            'systems' => $this->charts->systems($scope, $period),
             'space' => $this->charts->spaceCounts($scope, $period),
             'goneQuiet' => $this->metrics->goneQuiet($corporations),
             'untracked' => $this->metrics->untracked($corporations),
             'spawns' => $this->charts->spawns($scope, ListController::DASHBOARD_ROWS),
             'spawnTotal' => $this->charts->spawnCount($scope),
-            'kills' => $this->charts->kills($scope, $period),
             'insights' => $insights = $this->insights->for($scope, $period, true),
             'heatmap' => $insights['heatmap'],
             'months' => $this->monthly->corporationMonths($scope),
@@ -136,14 +132,8 @@ class DashboardController extends Controller
             'charts' => [
                 'monthly' => $this->charts->monthly($scope, true),
                 'daily' => $this->charts->daily($scope, $period),
-                'systems' => $data['systems'],
-                'kills' => $data['kills'],
                 'movement' => $this->charts->ratterMovement($scope),
                 'concentration' => $this->charts->concentration($board['rows']),
-                'weekdays' => $insights['weekdays'],
-                'hours' => $insights['hours'],
-                'efficiency' => array_slice($insights['systems'], 0, self::EFFICIENCY_SYSTEMS_CORPORATION),
-                'months' => array_reverse($data['months']),
             ],
         ]);
     }
@@ -177,13 +167,8 @@ class DashboardController extends Controller
             'personalCharts' => [
                 'monthly' => $this->charts->monthly($scope, true),
                 'daily' => $this->charts->daily($scope, $period),
-                'systems' => $this->charts->systems($scope, $period, 10),
-                'kills' => $this->charts->kills($scope, $period),
                 'characters' => $this->charts->byCharacter($scope, $period),
                 'sessions' => $sessions['points'],
-                'weekdays' => $insights['weekdays'],
-                'hours' => $insights['hours'],
-                'efficiency' => array_slice($insights['systems'], 0, self::EFFICIENCY_SYSTEMS_PERSONAL),
             ],
         ];
     }

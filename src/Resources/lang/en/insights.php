@@ -91,4 +91,6 @@ return [
     'chart_active_days' => 'Active days',
     'received' => 'Received',
     'received_title' => 'Bounties and ESS payouts the pilots received, after corporation tax. Worked out tick by tick, so it can be shown per system and per hour.',
+    'players_per_day_sub' => ':count players on an average active day',
+    'longest_streak_sub' => 'longest streak :count day(s)',
 ];

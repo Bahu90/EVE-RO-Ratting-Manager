@@ -138,4 +138,9 @@ return [
     'alliance_tax_line' => 'Alliance tax :amount (:rate% of ISK ratted)',
     'alliance_tax_title' => "The alliance's share of ISK ratted, at the rate set under Settings.",
     'space_counts' => 'Ratted in :systems systems, :constellations constellations and :regions regions.',
+    'rats_total' => ':count rats',
+    'bounty_ess_split' => 'Bounties :bounty, ESS :ess received',
+    'hours_sub' => ':rate per hour, :days active day(s)',
+    'members_sub' => ':count characters',
+    'hours_corp_sub' => 'Median :rate per hour',
 ];

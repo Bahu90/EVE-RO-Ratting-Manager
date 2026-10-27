@@ -305,26 +305,6 @@
             });
         },
 
-        /** Players and characters per month. */
-        activeRatters: function (id, d, t) {
-            return make(id, {
-                type: 'line',
-                data: {
-                    labels: d.labels,
-                    datasets: [
-                        { label: t.series_players, data: d.players, borderColor: COLORS.s1, backgroundColor: COLORS.s1, borderWidth: 2, pointRadius: 3, tension: 0.2 },
-                        { label: t.series_characters, data: d.characters, borderColor: COLORS.s2, backgroundColor: COLORS.s2, borderWidth: 2, pointRadius: 3, tension: 0.2 }
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    scales: { x: categoryScale(false), y: { beginAtZero: true, ticks: { color: COLORS.text, precision: 0 }, grid: { color: COLORS.grid } } },
-                    plugins: { legend: legend(true) }
-                }
-            });
-        },
-
         /** New, returning and continuing players above the line, those who stopped below it. */
         movement: function (id, d, t) {
             return make(id, {
@@ -353,154 +333,22 @@
             });
         },
 
-        /**
-         * Time in each slot of the week or the day: hours ratted by default,
-         * or another count through opts.value. The tooltip adds the slot's
-         * bounties and their ISK per hour.
-         */
-        timeBars: function (id, rows, t, opts) {
-            opts = opts || {};
-            rows = rows || [];
-            var i = t.insights || {};
-            var valueOf = opts.value || function (r) { return r.minutes / 60; };
-            return make(id, {
-                type: 'bar',
-                data: {
-                    labels: rows.map(opts.label || function (r) { return r.label; }),
-                    datasets: [bar(opts.series || i.chart_hours, rows.map(valueOf), COLORS.s1, { borderWidth: 0, barPercentage: 0.85, categoryPercentage: 0.9 })]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: {
-                        x: categoryScale(false),
-                        y: {
-                            beginAtZero: true,
-                            ticks: { color: COLORS.text, callback: opts.tick || function (v) { return hm(v * 60); } },
-                            grid: { color: COLORS.grid }
-                        }
-                    },
-                    plugins: {
-                        legend: legend(false),
-                        tooltip: {
-                            callbacks: {
-                                label: function (ctx) {
-                                    var r = rows[ctx.dataIndex];
-                                    var lines = opts.extra ? opts.extra(r) : [];
-                                    lines.push(' ' + i.chart_hours + ': ' + hm(r.minutes));
-                                    lines.push(' ' + i.chart_bounty + ': ' + formatISK(r.bounty) + ' ISK');
-                                    if (r.minutes > 0) {
-                                        lines.push(' ' + i.chart_bounty_rate + ': ' + formatISK(r.isk_per_hour) + ' ISK');
-                                    }
-                                    return lines;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        },
-
-        /** ISK per hour in each of the most-ratted systems, best paying first. */
-        efficiency: function (id, rows, t) {
-            var i = t.insights || {};
-            rows = (rows || []).filter(function (r) { return r.minutes > 0; })
-                .sort(function (a, b) { return b.isk_per_hour - a.isk_per_hour; });
-            return make(id, {
-                type: 'bar',
-                data: {
-                    labels: rows.map(function (r) { return r.name; }),
-                    datasets: [bar(i.chart_rate, rows.map(function (r) { return r.isk_per_hour; }), COLORS.s1, { borderWidth: 0, barPercentage: 0.75 })]
-                },
-                options: {
-                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-                    scales: { x: iskScale(false), y: { ticks: { color: COLORS.text }, grid: { display: false } } },
-                    plugins: {
-                        legend: legend(false),
-                        tooltip: {
-                            callbacks: {
-                                label: function (ctx) {
-                                    var r = rows[ctx.dataIndex];
-                                    return [
-                                        ' ' + i.chart_rate + ': ' + formatISK(r.isk_per_hour) + ' ISK',
-                                        ' ' + i.chart_hours + ': ' + hm(r.minutes),
-                                        ' ' + i.chart_income + ': ' + formatISK(r.income) + ' ISK'
-                                    ];
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        },
-
-        /** What the players received each month beside what landed in the corporation's wallet, on one ISK axis. */
-        earnedAndTaxed: function (id, rows, t) {
-            var i = t.insights || {};
-            rows = rows || [];
-            var tooltip = iskTooltip();
-            tooltip.callbacks.footer = function (items) {
-                var r = rows[items[0].dataIndex];
-                return r.tax_share === null ? '' : i.tax_rate + ': ' + r.tax_share + '%';
-            };
-            return make(id, {
-                type: 'bar',
-                data: {
-                    labels: rows.map(function (r) { return r.label; }),
-                    datasets: [
-                        bar(i.earned, rows.map(function (r) { return r.income; }), COLORS.s1),
-                        bar(i.tax_landed, rows.map(function (r) { return r.corp_tax; }), COLORS.s3)
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    scales: { x: categoryScale(false), y: iskScale(false) },
-                    plugins: { legend: legend(true), tooltip: tooltip }
-                }
-            });
-        },
-
         personal: function (d, t) {
             if (!d) return;
             R.incomeMonthly('rm-chart-monthly', d.monthly, t);
             R.dailyIncome('rm-chart-daily', d.daily, t);
-            R.horizontalBar('rm-chart-systems', d.systems.map(function (s) { return s.name; }), d.systems.map(function (s) { return s.value !== undefined ? s.value : s.income; }), t.series_income, true);
-            R.horizontalBar('rm-chart-factions', d.kills.factions.labels, d.kills.factions.values, t.rats, false);
-            R.horizontalBar('rm-chart-sizes', d.kills.sizes.labels, d.kills.sizes.values, t.rats, false);
             R.sessions('rm-chart-sessions', d.sessions, t);
             if (d.characters && d.characters.labels.length > 1) {
                 R.horizontalBar('rm-chart-characters', d.characters.labels, d.characters.values, t.series_income, true);
             }
-            R.timeBars('rm-chart-weekdays', d.weekdays, t, { label: function (r) { return r.short; } });
-            R.timeBars('rm-chart-hours', d.hours, t, { label: function (r) { return r.label.slice(0, 2); } });
-            R.efficiency('rm-chart-efficiency', d.efficiency, t);
         },
 
         corporation: function (d, t) {
             if (!d) return;
             R.incomeMonthly('rm-corp-monthly', d.monthly, t);
             R.dailyIncome('rm-corp-daily', d.daily, t);
-            R.horizontalBar('rm-corp-systems', d.systems.map(function (s) { return s.name; }), d.systems.map(function (s) { return s.value !== undefined ? s.value : s.income; }), t.series_income, true);
-            R.horizontalBar('rm-corp-factions', d.kills.factions.labels, d.kills.factions.values, t.rats, false);
-            R.horizontalBar('rm-corp-sizes', d.kills.sizes.labels, d.kills.sizes.values, t.rats, false);
-            R.activeRatters('rm-corp-active', d.movement, t);
             R.movement('rm-corp-movement', d.movement, t);
             R.doughnut('rm-corp-concentration', d.concentration.labels, d.concentration.values);
-
-            var i = t.insights || {};
-            R.timeBars('rm-corp-weekdays', d.weekdays, t, {
-                label: function (r) { return r.short; },
-                extra: function (r) { return [' ' + i.chart_players_per_day + ': ' + r.players_per_day]; }
-            });
-            R.timeBars('rm-corp-hours', d.hours, t, {
-                label: function (r) { return r.label.slice(0, 2); },
-                value: function (r) { return r.player_hours; },
-                series: i.chart_player_hours,
-                tick: function (v) { return Number.isInteger(v) ? v : ''; },
-                extra: function (r) { return [' ' + i.chart_player_hours + ': ' + r.player_hours]; }
-            });
-            R.efficiency('rm-corp-efficiency', d.efficiency, t);
-            R.earnedAndTaxed('rm-corp-months', d.months, t);
         }
     };
 

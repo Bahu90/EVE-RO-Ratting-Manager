@@ -2,6 +2,10 @@
 <div class="card card-dark">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-list-ol"></i> {{ trans('ratting-manager::insights.npcs_title') }}</h3>
+        @isset($rats)
+            {{-- The period's total, a fleet's shared payout counted once. --}}
+            <div class="card-tools"><span class="badge badge-secondary">{{ trans('ratting-manager::dashboard.rats_total', ['count' => number_format($rats)]) }}</span></div>
+        @endisset
     </div>
     <div class="card-body p-0 table-responsive">
         <table class="table table-sm table-hover mb-0">
