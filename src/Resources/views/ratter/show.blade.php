@@ -8,9 +8,21 @@
 @endsection
 
 @section('rm-body')
-    <p><a href="{{ route('ratting-manager.ratters.index') }}"><i class="fas fa-arrow-left"></i> {{ trans('ratting-manager::ratter.back') }}</a></p>
+    <div class="rm-page-head">
+        <div class="d-flex align-items-center" style="gap: 18px">
+            <img class="rm-portrait" style="width: 72px; height: 72px" src="https://images.evetech.net/characters/{{ $mainId }}/portrait?size=128" alt="" loading="lazy">
+            @include('ratting-manager::partials.page-title', [
+                'eyebrow' => trans('ratting-manager::ratter.eyebrow') . ' / ' . $period->label(),
+                'title' => $mainName,
+            ])
+        </div>
+        <div class="rm-page-actions">
+            <a class="btn rm-btn-outline btn-outline-secondary" href="{{ route('ratting-manager.ratters.index') }}">{{ trans('ratting-manager::ratter.back') }}</a>
+            @include('ratting-manager::partials.period-picker')
+        </div>
+    </div>
 
-    @include('ratting-manager::dashboard.partials.personal', ['heading' => $mainName])
+    @include('ratting-manager::dashboard.partials.personal', ['heading' => $mainName, 'headed' => true])
 
     <div class="row">
         <div class="col-12">
@@ -35,9 +47,17 @@
                         <tbody>
                             @foreach($sources as $source)
                                 <tr>
-                                    <td>{{ $source['name'] }}</td>
+                                    <td>
+                                        <img class="rm-portrait rm-portrait-sm mr-2" src="https://images.evetech.net/characters/{{ $source['character_id'] }}/portrait?size=64" alt="" loading="lazy">{{ $source['name'] }}
+                                    </td>
                                     <td>{{ $source['corporation'] ?? '-' }}</td>
-                                    <td>{{ $source['wallet_token'] ? trans('ratting-manager::ratter.yes') : trans('ratting-manager::ratter.no') }}</td>
+                                    <td>
+                                        @if($source['wallet_token'])
+                                            <span class="rm-wallet rm-wallet-linked">{{ trans('ratting-manager::ratter.linked') }}</span>
+                                        @else
+                                            <span class="rm-wallet rm-wallet-not">{{ trans('ratting-manager::ratter.not_linked') }}</span>
+                                        @endif
+                                    </td>
                                     <td class="text-right">{{ $source['counts']['paired'] }}</td>
                                     <td class="text-right">{{ $source['counts']['character'] }}</td>
                                     <td class="text-right">{{ $source['counts']['corporation'] }}</td>

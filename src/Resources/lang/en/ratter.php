@@ -20,4 +20,21 @@ return [
     'corporation_now' => 'Corporation now',
     'back' => 'Back to the lookup',
     'ratted_90d' => 'ISK ratted, 90 days',
+
+    // Redesigned lookup.
+    'eyebrow' => 'Ratting Manager / Ratter lookup',
+    'subtitle' => 'Every player who ratted in the period. Open one to see their ratting as they see it.',
+    'players' => 'Players',
+    'wallets_linked' => 'Wallets linked',
+    'wallets_not_linked' => 'Not linked',
+    'filter' => 'Wallet filter',
+    'filter_all' => 'All',
+    'filter_linked' => 'Wallet linked',
+    'filter_not' => 'Not linked',
+    'linked' => 'Linked',
+    'not_linked' => 'Not linked',
+    'days' => 'Days',
+    'ratted' => 'ISK ratted',
+    'income' => 'Income',
+    'characters_count' => '{1} :count character|[2,*] :count characters',
 ];

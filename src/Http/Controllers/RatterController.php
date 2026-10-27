@@ -17,14 +17,17 @@ class RatterController extends Controller
     use ResolvesViewer;
 
     /** Every player who ratted in the last 90 days, to search and open. */
-    public function index(RattingMetrics $metrics, Settings $settings)
+    /**
+     * Every player who ratted in the period (the last 90 days unless one is
+     * picked), biggest first, with how many have a wallet token on SeAT.
+     */
+    public function index(Request $request, RattingMetrics $metrics, Settings $settings)
     {
         $configured = $settings->configuredCorporations();
+        $period = Period::from($request->query('period', '90d'));
         $rows = $configured === []
             ? []
-            : array_values($metrics->collect(new Scope($configured), now()->subDays(89)->startOfDay(), now())['players']);
-
-        usort($rows, fn ($a, $b) => strcmp((string) $b['last_tick'], (string) $a['last_tick']));
+            : array_values($metrics->collect(new Scope($configured), $period->start, $period->end)['players']);
 
         $ratted = app(\RattingManager\Services\Ratting\IncomeView::class)->isRatted();
         foreach ($rows as &$row) {
@@ -33,9 +36,20 @@ class RatterController extends Controller
         }
         unset($row);
 
+        usort($rows, fn ($a, $b) => $b['value'] <=> $a['value']);
+
+        $linked = count(array_filter($rows, fn ($r) => $r['wallet_token']));
+
         return view('ratting-manager::ratter.index', [
+            'period' => $period,
             'incomeMode' => $ratted ? 'ratted' : 'received',
             'rows' => $rows,
+            'counts' => [
+                'players' => count($rows),
+                'characters' => array_sum(array_map(fn ($r) => count($r['characters']), $rows)),
+                'linked' => $linked,
+                'not_linked' => count($rows) - $linked,
+            ],
             'notConfigured' => $configured === [],
         ]);
     }
