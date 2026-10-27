@@ -2,6 +2,7 @@
 
 // A permission list means any one of them is enough, which is how a director
 // or admin sees the member pages without holding the member permission too.
+$any = ['ratting-manager.view', 'ratting-manager.member', 'ratting-manager.director', 'ratting-manager.admin'];
 $member = ['ratting-manager.member', 'ratting-manager.director', 'ratting-manager.admin'];
 $director = ['ratting-manager.director', 'ratting-manager.admin'];
 
@@ -12,7 +13,8 @@ return [
         'plural'        => true,
         'icon'          => 'fas fa-crosshairs',
         'route_segment' => 'ratting-manager',
-        'permission'    => $member,
+        // Any tier opens the menu: with only the view permission it holds Help alone.
+        'permission'    => $any,
         'entries'       => [
             [
                 'name'       => 'Dashboard',
@@ -54,7 +56,7 @@ return [
                 'label'      => 'ratting-manager::menu.help',
                 'icon'       => 'fas fa-question-circle',
                 'route'      => 'ratting-manager.help',
-                'permission' => ['ratting-manager.view', 'ratting-manager.member', 'ratting-manager.director', 'ratting-manager.admin'],
+                'permission' => $any,
             ],
         ],
     ],
