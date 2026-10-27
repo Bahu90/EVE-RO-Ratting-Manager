@@ -36,25 +36,64 @@ Release history lives in the [CHANGELOG](CHANGELOG.md).
 
 ## Installation
 
+### SeAT on Docker (the usual setup)
+
+1. Add the package to `SEAT_PLUGINS` in the `.env` next to your `docker-compose.yml`, comma-separated with any plugins you already have:
+
+   ```env
+   SEAT_PLUGINS=bahu90/ratting-manager
+   ```
+
+2. Restart the stack. SeAT installs the plugin, runs its migrations and adds its schedule as the containers start:
+
+   ```bash
+   docker compose up -d
+   ```
+
+3. Publish the plugin's styles, scripts and font (SeAT does this on start too; run it after an update if a page looks unstyled):
+
+   ```bash
+   docker compose exec front php artisan vendor:publish --tag=seat --force
+   ```
+
+### SeAT without Docker
+
 ```bash
 composer require bahu90/ratting-manager
 php artisan migrate
 php artisan db:seed --class=RattingManager\\Database\\Seeders\\ScheduleSeeder
+php artisan vendor:publish --tag=seat --force
 ```
 
-On SeAT Docker, migrations and the schedule seeder run when the containers restart.
+### What SeAT needs to hold
 
-After installation:
+- **The corporation wallet journal** of each corporation to track. SeAT reads it with a director's token that has the corporation wallet scope: one director of each corporation logging in to SeAT with the corporation scopes is enough. Without it, only members with their own wallet token are seen.
+- **Members' own wallet journals**, from members who log in with their character scopes. Optional: the corporation journal already names every ratter it taxes; members' own journals add what they received exactly instead of worked out from the corporation's cut.
 
-1. Open SeAT and go to **Ratting Manager > Settings**
-2. Add the **corporations to track**: search by name or ticker, or open the list, and check the corporation's details before confirming: ticker, alliance, tax rate, members, how many of its characters are on SeAT and whether SeAT holds its bounty rows
+### First steps
+
+1. Give roles the plugin's permissions under **Settings > Access Management** in SeAT (see [Permissions](#permissions)). An admin needs `ratting-manager.admin` to reach the plugin's settings.
+2. Open **Ratting Manager > Settings** and add the **corporations to track**: search by name or ticker, or open the list, and check the corporation's details before confirming: ticker, alliance, tax rate, members, how many of its characters are on SeAT and whether SeAT holds its bounty rows.
 3. Run the initial import, which brings in the last 365 days SeAT already holds, the most any page shows:
 
-```bash
-docker exec -it seat-docker-front-1 php artisan ratting-manager:initialize
-```
+   ```bash
+   docker compose exec front php artisan ratting-manager:initialize
+   ```
 
-Without it, the schedule brings in the last 31 days within a day.
+   Without it, the schedule brings in the last 31 days within a day.
+4. Go through the rest of Settings:
+
+   | Section | What it sets |
+   |---|---|
+   | **Income figures** | Whether pages lead with ISK ratted (the corporation's cut over its tax rate, as most corporations' ratting reports count it) or what pilots received. Also an alliance tax, shown beside the totals; 0 hides it. |
+   | **Display** | The look: EVE-RO's (black, Oxanium, blue and green) or standard SeAT. And whether the Monthly Report shows the Website export button (JSON in the layout EVE-RO's ratting page reads). |
+   | **Access** | Whether directors see only their own corporation or every tracked one, and whether the pages need a character in a tracked corporation now. |
+   | **Data** | Session gap, the Gone quiet lists and the members' leaderboard size. |
+   | **Webhooks, Notifications** | Discord and Slack alerts and reports, below. |
+
+### Updating
+
+On Docker, restart the stack (`docker compose up -d`) to pull the newest release within the version `SEAT_PLUGINS` allows, then publish the assets again. Every release is listed in the [CHANGELOG](CHANGELOG.md), and tagged on GitHub.
 
 ## Notifications
 
@@ -171,6 +210,15 @@ The schedules are added once. Changes you make to them in SeAT are kept on updat
 A tick reaches the pages about one to two hours after it pays out: ESI caches the wallet journal for an hour, SeAT pulls it about hourly, and the plugin reads it every half hour.
 
 Dashboard figures are cached until the next import changes them, so a page shows the same figures between imports however often it is opened.
+
+## Development
+
+The money and time formulas have unit tests:
+
+```bash
+composer install
+composer test
+```
 
 ## Credits
 

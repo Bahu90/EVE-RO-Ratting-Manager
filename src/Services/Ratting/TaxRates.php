@@ -193,9 +193,19 @@ class TaxRates
         return $result;
     }
 
+    /** What the character received, from the corporation's cut at its tax rate (0.15 for 15%). */
     public static function netFromCut(float $cut, float $rate): float
     {
         return round($cut * (1 - $rate) / $rate, 2);
+    }
+
+    /**
+     * ISK ratted as the corporation counts it: its cut over its tax rate,
+     * before tax. Not rounded, so daily sums add up exactly.
+     */
+    public static function grossFromCut(float $cut, float $rate): float
+    {
+        return $cut / $rate;
     }
 
     /** @return array<string, float> date => rate, oldest first */

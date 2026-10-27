@@ -125,8 +125,8 @@ class DailySummaryBuilder
         foreach ($rows as &$row) {
             $rate = $rates[$row['corporation_id']] ??= (float) $this->taxRates->rateFor($row['corporation_id'], $date);
             if ($rate > 0 && $rate < 1) {
-                $row['bounty_gross'] = $row['bounty_corp_tax'] / $rate;
-                $row['ess_gross'] = $row['ess_corp_tax'] / $rate;
+                $row['bounty_gross'] = TaxRates::grossFromCut($row['bounty_corp_tax'], $rate);
+                $row['ess_gross'] = TaxRates::grossFromCut($row['ess_corp_tax'], $rate);
             }
         }
         unset($row);

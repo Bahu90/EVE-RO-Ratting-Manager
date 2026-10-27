@@ -34,6 +34,17 @@ All notable changes to Ratting Manager will be documented in this file.
 - The dashboard, Leaderboard and Ratter Lookup follow the corporation's ratting page: black ground, the Oxanium typeface, ISK in blue and tax in green, a page head with the period as its title, and EVE portraits. The Corporation view opens on the ISK ratted, the ratting tax split by bounties and ESS, where the corporation ratted, and a daily chart of ISK ratted and tax.
 - **Help**, and **Diagnostics** with Health Checks, Master Test, Settings Health, Data Integrity, Tick Trace and Notification Testing.
 
+### Running it for any corporation
+
+- Published as `bahu90/ratting-manager`, Bahu90's edition of Matt Falahe's Ratting Manager.
+- **Settings > Access**: directors see their own corporation (the tracked corporations their characters are in now) or every tracked corporation; admins always see all. Optionally, the pages need a character in a tracked corporation now, so players who leave lose them at once.
+- **Settings > Display**: EVE-RO's look or standard SeAT's, and the Monthly Report's Website export button on or off.
+- Pages name the corporation (its ticker) when they cover one, show its tax rate, and drop the corporation pickers and wording that only matter with several.
+- Players who have left are tagged *Left corp* on the leaderboards, the Ratter Lookup and their ratter page.
+- The Oxanium font ships with the plugin; no page calls Google Fonts.
+- The menu shows to the view tier, so Help is reachable from it.
+- Unit tests for ISK ratted, worked-out income, ratting time, ISK formatting and periods.
+
 ### Notifications
 
 - Posts to Discord webhooks, and to Slack incoming webhooks as plain text. A webhook is for every tracked corporation or for one, and only gets that corporation's posts.
