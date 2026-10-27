@@ -21,8 +21,11 @@
             <div class="card-body p-0">
                 @include('ratting-manager::leaderboard.partials.director-table', ['rows' => $rows, 'ownMain' => $ownMain])
             </div>
-            <div class="card-footer text-muted small">
-                {{ trans('ratting-manager::dashboard.median_isk_per_hour') }}: @rmisk($median) ({{ trans('ratting-manager::dashboard.median_hint') }})
+            <div class="card-footer text-muted small d-flex justify-content-between align-items-center">
+                <span>{{ trans('ratting-manager::dashboard.median_isk_per_hour') }}: @rmisk($median) ({{ trans('ratting-manager::dashboard.median_hint') }})</span>
+                <a class="btn btn-sm btn-outline-secondary" href="{{ route('ratting-manager.leaderboard.csv', array_filter(['period' => $period->key, 'corporation' => $pickedCorporation])) }}">
+                    <i class="fas fa-file-csv"></i> {{ trans('ratting-manager::report.download_csv') }}
+                </a>
             </div>
         </div>
     @else

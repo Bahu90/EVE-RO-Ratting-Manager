@@ -102,6 +102,11 @@
                 <div class="card card-dark">
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-users"></i> {{ trans('ratting-manager::report.members', ['count' => count($members)]) }}</h3>
+                        <div class="card-tools">
+                            <a class="btn btn-sm btn-outline-secondary" href="{{ route('ratting-manager.report.csv', array_filter(['month' => $period->key, 'corporation' => count($corporations) > 1 ? $pickedCorporation : null])) }}">
+                                <i class="fas fa-file-csv"></i> {{ trans('ratting-manager::report.download_csv') }}
+                            </a>
+                        </div>
                     </div>
                     <div class="card-body p-0 table-responsive">
                         <table class="table table-sm table-hover mb-0">

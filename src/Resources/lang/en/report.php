@@ -16,4 +16,7 @@ return [
     'top_systems' => 'Top :count systems',
     'members' => 'Members (:count)',
     'member' => 'Member',
+    'download_csv' => 'Download CSV',
+    'csv_hours' => 'Hours',
+    'csv_characters' => 'Characters',
 ];

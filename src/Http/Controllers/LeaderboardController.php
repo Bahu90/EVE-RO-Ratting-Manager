@@ -17,6 +17,40 @@ class LeaderboardController extends Controller
     use ResolvesViewer;
 
     /**
+     * The directors' leaderboard as a CSV: every player, both income
+     * figures, ranked as the page ranks them. Directors only (route group).
+     */
+    public function csv(Request $request, RattingMetrics $metrics, Settings $settings)
+    {
+        abort_if($settings->configuredCorporations() === [], 404);
+
+        $period = Period::from($request->query('period'));
+        $board = $metrics->leaderboard(new Scope($this->pickedCorporations($request, $settings)), $period);
+
+        $rows = [];
+        foreach ($board['rows'] as $i => $r) {
+            $rows[] = [
+                $i + 1, $r['name'], count($r['characters']),
+                (float) ($r['gross'] ?? 0), (float) $r['corp_tax'], (float) $r['income'],
+                round($r['minutes'] / 60, 2), (float) $r['value_per_hour'],
+                (int) $r['rats'], (int) $r['active_days'],
+            ];
+        }
+
+        $t = fn (string $key) => trans('ratting-manager::' . $key);
+
+        return \RattingManager\Support\Csv::download(
+            'ratting-leaderboard-' . $period->start->format('Y-m-d') . '-' . $period->end->format('Y-m-d') . '.csv',
+            [
+                $t('leaderboard.rank'), $t('dashboard.player'), $t('report.csv_characters'),
+                $t('dashboard.isk_ratted'), $t('dashboard.ratting_tax'), $t('insights.received'),
+                $t('report.csv_hours'), $t('dashboard.isk_per_hour'), $t('dashboard.rats'), $t('dashboard.active_days'),
+            ],
+            $rows
+        );
+    }
+
+    /**
      * Members see rank and hours for their own corporation, ranked by hours,
      * and nobody's ISK. Directors see every column, for any configured
      * corporation or all of them.

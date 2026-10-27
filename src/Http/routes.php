@@ -65,6 +65,16 @@ Route::group([
             'uses' => 'ReportController@index',
         ]);
 
+        Route::get('/report/csv', [
+            'as' => 'ratting-manager.report.csv',
+            'uses' => 'ReportController@csv',
+        ]);
+
+        Route::get('/leaderboard/csv', [
+            'as' => 'ratting-manager.leaderboard.csv',
+            'uses' => 'LeaderboardController@csv',
+        ]);
+
         Route::get('/ratters', [
             'as' => 'ratting-manager.ratters.index',
             'uses' => 'RatterController@index',

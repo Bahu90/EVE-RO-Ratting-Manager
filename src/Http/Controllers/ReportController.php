@@ -41,6 +41,25 @@ class ReportController extends Controller
         ]);
     }
 
+    /** The month's members as a CSV, the same rows the page shows. */
+    public function csv(Request $request, Settings $settings, RattingMetrics $metrics, ChartData $charts)
+    {
+        abort_if($settings->configuredCorporations() === [], 404);
+
+        $f = $this->figures($request, $settings, $metrics, $charts);
+        $rows = [];
+        foreach ($f['members'] as $i => $m) {
+            $rows[] = [$i + 1, $m['name'], (float) $m['gross'], (float) $m['corp_tax'], round($m['minutes'] / 60, 2), count($m['characters'])];
+        }
+        $rows[] = ['', trans('ratting-manager::insights.total'), (float) ($f['totals']['gross'] ?? 0), (float) $f['totals']['corp_tax'], round($f['totals']['minutes'] / 60, 2), (int) $f['totals']['characters']];
+
+        return \RattingManager\Support\Csv::download(
+            'ratting-report-' . $f['period']->start->format('Y-m') . '.csv',
+            ['#', trans('ratting-manager::report.member'), trans('ratting-manager::report.isk_ratted'), trans('ratting-manager::report.ratting_tax'), trans('ratting-manager::report.csv_hours'), trans('ratting-manager::report.csv_characters')],
+            $rows
+        );
+    }
+
     /** The month's figures, for the page and for its CSV. */
     protected function figures(Request $request, Settings $settings, RattingMetrics $metrics, ChartData $charts): array
     {
