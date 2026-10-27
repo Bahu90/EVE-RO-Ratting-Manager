@@ -21,6 +21,11 @@
             @foreach(\RattingManager\Services\Ratting\Period::CHOICES as $choice)
                 <option value="{{ $choice }}" @if($period->key === $choice) selected @endif>{{ trans('ratting-manager::common.period_' . $choice) }}</option>
             @endforeach
+            <optgroup label="{{ trans('ratting-manager::common.period_months') }}">
+                @foreach(\RattingManager\Services\Ratting\Period::monthChoices() as $choice => $label)
+                    <option value="{{ $choice }}" @if($period->key === $choice) selected @endif>{{ $label }}</option>
+                @endforeach
+            </optgroup>
         </select>
     @else
         <input type="hidden" name="period" value="{{ $period->key }}">

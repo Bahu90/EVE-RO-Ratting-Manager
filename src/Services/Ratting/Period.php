@@ -12,6 +12,9 @@ final class Period
 {
     public const CHOICES = ['this_month', 'last_month', '30d', '90d', '12m'];
 
+    /** How many past months the picker offers, besides the rolling periods. */
+    public const MONTHS = 24;
+
     public string $key;
     public Carbon $start;
     public Carbon $end;
@@ -30,6 +33,21 @@ final class Period
     public static function from(?string $key, ?Carbon $now = null): self
     {
         $now = ($now ?? Carbon::now('UTC'))->copy();
+
+        // One calendar month, m-YYYY-MM, compared with the month before it.
+        if ($key !== null && preg_match('/^m-(\d{4})-(\d{2})$/', $key, $m) && (int) $m[2] >= 1 && (int) $m[2] <= 12) {
+            $start = Carbon::create((int) $m[1], (int) $m[2], 1, 0, 0, 0, 'UTC');
+            if ($start->lte($now)) {
+                $end = $start->copy()->endOfMonth();
+                if ($end->gt($now)) {
+                    $end = $now->copy();
+                }
+                $prevStart = $start->copy()->subMonthNoOverflow()->startOfMonth();
+
+                return new self($key, $start, $end, $prevStart, $prevStart->copy()->endOfMonth());
+            }
+        }
+
         $key = in_array($key, self::CHOICES, true) ? $key : 'this_month';
 
         switch ($key) {
@@ -81,7 +99,28 @@ final class Period
 
     public function label(): string
     {
+        if (str_starts_with($this->key, 'm-')) {
+            return $this->start->format('F Y');
+        }
+
         return trans('ratting-manager::common.period_' . $this->key);
+    }
+
+    /**
+     * The calendar months the picker offers, newest first.
+     *
+     * @return array<string, string> key (m-YYYY-MM) => label (September 2026)
+     */
+    public static function monthChoices(?Carbon $now = null): array
+    {
+        $month = ($now ?? Carbon::now('UTC'))->copy()->startOfMonth();
+        $choices = [];
+        for ($i = 0; $i < self::MONTHS; $i++) {
+            $choices['m-' . $month->format('Y-m')] = $month->format('F Y');
+            $month->subMonthNoOverflow();
+        }
+
+        return $choices;
     }
 
     public function cacheKey(): string

@@ -7,6 +7,7 @@ return [
     'period_30d' => 'Last 30 days',
     'period_90d' => 'Last 90 days',
     'period_12m' => 'Last 12 months',
+    'period_months' => 'Months',
     'period_week' => 'Week',
     'period_month' => 'Month',
 
