@@ -26,11 +26,12 @@ All notable changes to Ratting Manager will be documented in this file.
 - **Corporation tab** for directors: totals, the corporation's cut, median ISK per hour, coverage, the leaderboard, income by month and day, who earns the income, when the corporation rats, active ratters per month, ratters coming and going, what the corporation kills, untracked ratters, players who have gone quiet, and special spawns.
 - **Insights** on the Corporation tab: the same as on My Ratting for the whole corporation, plus the most players ratting at once, players per active day and income per player. Hours by day of the week, players ratting by hour, ISK per hour by system, every system with how many players ratted there and who ratted there most, and the NPCs killed most.
 - **Month by month** on the Corporation tab: what the players earned and what landed in the corporation's wallet each month, the tax rate that makes, players, characters, hours, ISK per hour and income per player, with a chart of earned against taxed.
-- **Leaderboard**: rank and hours for members, every column for directors.
+- **Leaderboard**: rank and hours for members, every column for directors. Directors get the top three on a podium, their own place, and every member as cards or as the full table, searchable.
 - Long lists on the dashboards (sessions, systems, special spawns, untracked ratters, players gone quiet and the Corporation tab's leaderboard) show their first 10 rows, with **View all** opening the whole list on its own page, searchable and sortable.
-- **Ratter Lookup** for directors.
+- **Ratter Lookup** for directors: every player who ratted in a period (the last 90 days by default), biggest first, with how many have a wallet token on SeAT and a filter for those who do and those who don't.
 - The Ratter Lookup, ratter pages, Leaderboard and full lists sit in the same dark body as the dashboard, under a tab naming the page.
 - **Settings**, in sections: corporations to track, picked by searching SeAT's corporations and confirming after a look at each one's ticker, alliance, tax rate, members, characters on SeAT and journal; session gap, the Gone quiet lists, the members' leaderboard size and extra NPC types to watch; Webhooks; Notifications; and the Routing Map.
+- The dashboard, Leaderboard and Ratter Lookup follow the corporation's ratting page: black ground, the Oxanium typeface, ISK in blue and tax in green, a page head with the period as its title, and EVE portraits. The Corporation view opens on the ISK ratted, the ratting tax split by bounties and ESS, where the corporation ratted, and a daily chart of ISK ratted and tax.
 - **Help**, and **Diagnostics** with Health Checks, Master Test, Settings Health, Data Integrity, Tick Trace and Notification Testing.
 
 ### Notifications
