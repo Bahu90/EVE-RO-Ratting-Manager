@@ -4,11 +4,18 @@
 --}}
 @php
     $fmt = \RattingManager\Support\Format::class;
+    // ISK ratted (the corporation's count) or income received, as set under Settings.
+    $ratted = ($incomeMode ?? 'received') === 'ratted';
+    $money = $ratted ? 'gross' : 'income';
+    $rate = $ratted ? 'gross_per_hour' : 'isk_per_hour';
+    $perPlayer = $ratted ? 'gross_per_player' : 'income_per_player';
     // Newest first; the months before the first ratting are left out.
     $active = array_keys(array_filter($months, fn ($m) => $m['income'] > 0 || $m['corp_tax'] > 0 || $m['players'] > 0));
     $months = $active === [] ? [] : array_slice($months, 0, max($active) + 1);
     $sum = fn ($field) => array_sum(array_column($months, $field));
-    $income = $sum('income');
+    $income = $sum($money);
+    // The tax share is always of what the ratting paid out: received + the cut.
+    $received = $sum('income');
     $tax = $sum('corp_tax');
     $minutes = $sum('minutes');
 @endphp
@@ -23,7 +30,7 @@
             <thead>
                 <tr>
                     <th>{{ trans('ratting-manager::insights.month') }}</th>
-                    <th class="text-right">{{ trans('ratting-manager::insights.earned') }}</th>
+                    <th class="text-right">{{ $ratted ? trans('ratting-manager::dashboard.isk_ratted') : trans('ratting-manager::insights.earned') }}</th>
                     <th class="text-right">{{ trans('ratting-manager::insights.ess') }}</th>
                     <th class="text-right">{{ trans('ratting-manager::insights.tax_landed') }}</th>
                     <th class="text-right">{{ trans('ratting-manager::insights.tax_rate') }}</th>
@@ -43,10 +50,10 @@
                         <tr>
                             <td>{{ $m['month'] }}</td>
                             <td class="text-right">
-                                @if($m['estimated'] > 0)
+                                @if(!$ratted && $m['estimated'] > 0)
                                     <span class="rm-estimated" title="{{ trans('ratting-manager::common.worked_out_title') }}">@rmisk($m['income'])</span>
                                 @else
-                                    @rmisk($m['income'])
+                                    @rmisk($m[$money] ?? 0)
                                 @endif
                             </td>
                             <td class="text-right">@rmisk($m['ess'])</td>
@@ -55,8 +62,8 @@
                             <td class="text-right">{{ $m['players'] }}</td>
                             <td class="text-right">{{ $m['characters'] }}</td>
                             <td class="text-right">{{ $fmt::hours($m['minutes']) }}</td>
-                            <td class="text-right">{{ $m['minutes'] > 0 ? $fmt::isk($m['isk_per_hour']) : '-' }}</td>
-                            <td class="text-right">{{ $m['players'] > 0 ? $fmt::isk($m['income_per_player']) : '-' }}</td>
+                            <td class="text-right">{{ $m['minutes'] > 0 ? $fmt::isk($m[$rate] ?? 0) : '-' }}</td>
+                            <td class="text-right">{{ $m['players'] > 0 ? $fmt::isk($m[$perPlayer] ?? 0) : '-' }}</td>
                         </tr>
                     @else
                         <tr class="text-muted">
@@ -73,7 +80,7 @@
                     <td class="text-right">@rmisk($income)</td>
                     <td class="text-right">@rmisk($sum('ess'))</td>
                     <td class="text-right">@rmisk($tax)</td>
-                    <td class="text-right">{{ ($income + $tax) > 0 ? number_format($tax / ($income + $tax) * 100, 1) . '%' : '-' }}</td>
+                    <td class="text-right">{{ ($received + $tax) > 0 ? number_format($tax / ($received + $tax) * 100, 1) . '%' : '-' }}</td>
                     <td class="text-right">-</td>
                     <td class="text-right">-</td>
                     <td class="text-right">{{ $fmt::hours($minutes) }}</td>

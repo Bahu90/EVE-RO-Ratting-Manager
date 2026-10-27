@@ -231,8 +231,9 @@ class MonthlyBreakdown
      */
     public function corporationMonths(Scope $scope, int $months = 12): array
     {
+        // months2 holds ISK ratted beside income received.
         return FigureCache::remember(
-            'months:' . $scope->cacheKey() . ':' . $months . ':' . now()->format('Y-m'),
+            'months2:' . $scope->cacheKey() . ':' . $months . ':' . now()->format('Y-m'),
             fn () => $this->computeCorporationMonths($scope, $months)
         );
     }
@@ -244,7 +245,7 @@ class MonthlyBreakdown
         $money = $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->where('date', '>=', $start->toDateString())
             ->groupBy(DB::raw("DATE_FORMAT(date, '%Y-%m')"))
-            ->selectRaw("DATE_FORMAT(date, '%Y-%m') as month, SUM(bounty_net) as bounty, SUM(ess_net) as ess, SUM(bounty_estimated + ess_estimated) as estimated, SUM(bounty_corp_tax + ess_corp_tax) as corp_tax")
+            ->selectRaw("DATE_FORMAT(date, '%Y-%m') as month, SUM(bounty_net) as bounty, SUM(ess_net) as ess, SUM(bounty_estimated + ess_estimated) as estimated, SUM(bounty_corp_tax + ess_corp_tax) as corp_tax, SUM(bounty_gross + ess_gross) as gross")
             ->get()
             ->keyBy('month');
 
@@ -287,6 +288,9 @@ class MonthlyBreakdown
                 'minutes' => $minutes,
                 'isk_per_hour' => $minutes > 0 ? round($income / ($minutes / 60), 2) : 0.0,
                 'income_per_player' => $players ? round($income / $players, 2) : 0.0,
+                'gross' => round((float) ($m->gross ?? 0), 2),
+                'gross_per_hour' => $minutes > 0 ? round((float) ($m->gross ?? 0) / ($minutes / 60), 2) : 0.0,
+                'gross_per_player' => $players ? round((float) ($m->gross ?? 0) / $players, 2) : 0.0,
             ];
         }
 
