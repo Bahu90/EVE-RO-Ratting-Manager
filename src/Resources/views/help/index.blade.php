@@ -831,7 +831,7 @@
                         <tbody>
                             <tr><td><code>ratting-manager.view</code></td><td>This Help page.</td></tr>
                             <tr><td><code>ratting-manager.member</code></td><td>My Ratting, and the leaderboard with rank and hours.</td></tr>
-                            <tr><td><code>ratting-manager.director</code></td><td>The Corporation tab, the full leaderboard with everyone's ISK, and the Ratter Lookup.</td></tr>
+                            <tr><td><code>ratting-manager.director</code></td><td>The Corporation tab, the full leaderboard with everyone's ISK and its CSV, the Monthly Report with its CSV and JSON, and the Ratter Lookup.</td></tr>
                             <tr><td><code>ratting-manager.admin</code></td><td>Settings and Diagnostics.</td></tr>
                         </tbody>
                     </table>
@@ -847,7 +847,11 @@
                     <h5>Why is some of my income marked as worked out?</h5>
                     <p>Those ticks are only in the corporation journal, usually because your wallet token is missing or new. Adding the token brings in the last 30 days of your journal, and the nightly run pairs them.</p>
                     <h5>Why is my ISK per hour lower in a fleet?</h5>
-                    <p>Fleets share bounties, so each member receives part of each payout. Your ISK per hour is what you received.</p>
+                    <p>Fleets share bounties, so each member receives part of each payout, and the corporation taxes each member's part. Your ISK per hour is your share over your own time.</p>
+                    <h5>Why is ISK ratted higher than what I received?</h5>
+                    <p>ISK ratted is counted before the corporation's tax: its cut over its tax rate. What you received is after it. At 15%, 10M ISK ratted is 8.5M received and 1.5M ratting tax. <em>Settings, Income figures</em> picks which one the pages lead with; the Monthly Report always shows ISK ratted.</p>
+                    <h5>Someone ratted but is not on the Monthly Report.</h5>
+                    <p>The report lists the players the corporation took a cut from. Ticks only in the pilot's own journal, with no cut from the corporation, are not ISK ratted; they still show on My Ratting and, with income received picked in Settings, on the leaderboard.</p>
                     <h5>A ratter shows as Character info in progress.</h5>
                     <p>SeAT does not know them and the journal did not give a name, so they are being looked up in the background. The page refreshes itself when they are in. If it stays that way for more than a few minutes, Diagnostics, Health Checks shows whether the lookup is running.</p>
                     <h5>An alert I expected was not sent.</h5>
