@@ -17,6 +17,8 @@ return [
     'members' => 'Members (:count)',
     'member' => 'Member',
     'download_csv' => 'Download CSV',
+    'download_json' => 'Download JSON',
+    'download_json_title' => 'The month in the same JSON layout as generate-ratting-report.mjs (YYYY-MM.json).',
     'csv_hours' => 'Hours',
     'csv_characters' => 'Characters',
 ];

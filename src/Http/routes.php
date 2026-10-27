@@ -65,6 +65,11 @@ Route::group([
             'uses' => 'ReportController@index',
         ]);
 
+        Route::get('/report/json', [
+            'as' => 'ratting-manager.report.json',
+            'uses' => 'ReportController@json',
+        ]);
+
         Route::get('/report/csv', [
             'as' => 'ratting-manager.report.csv',
             'uses' => 'ReportController@csv',
