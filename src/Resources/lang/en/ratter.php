@@ -22,7 +22,7 @@ return [
     'ratted_90d' => 'ISK ratted, 90 days',
 
     // Redesigned lookup.
-    'eyebrow' => 'Ratting Manager / Ratter lookup',
+    'eyebrow' => ':brand / Ratter lookup',
     'subtitle' => 'Every player who ratted in the period. Open one to see their ratting as they see it.',
     'players' => 'Players',
     'wallets_linked' => 'Wallets linked',

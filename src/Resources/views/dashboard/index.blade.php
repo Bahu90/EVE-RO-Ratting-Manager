@@ -14,7 +14,7 @@
     @elseif($isDirector)
         <div class="rm-page-head">
             @include('ratting-manager::partials.page-title', [
-                'eyebrow' => trans('ratting-manager::dashboard.eyebrow'),
+                'eyebrow' => trans('ratting-manager::dashboard.eyebrow', ['brand' => $brand ?? trans('ratting-manager::common.plugin_name')]),
                 'title' => $period->headline(),
                 'subtitle' => trans('ratting-manager::dashboard.subtitle'),
             ])
@@ -66,7 +66,7 @@
     @else
         <div class="rm-page-head">
             @include('ratting-manager::partials.page-title', [
-                'eyebrow' => trans('ratting-manager::dashboard.eyebrow'),
+                'eyebrow' => trans('ratting-manager::dashboard.eyebrow', ['brand' => $brand ?? trans('ratting-manager::common.plugin_name')]),
                 'title' => $period->headline(),
                 'subtitle' => trans('ratting-manager::dashboard.subtitle_member'),
             ])

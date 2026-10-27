@@ -37,7 +37,11 @@
                     <div class="info-box-content">
                         <span class="info-box-text" title="{{ trans('ratting-manager::dashboard.ratting_tax_title') }}">{{ trans('ratting-manager::dashboard.ratting_tax') }}</span>
                         <span class="info-box-number">@rmisk($totals['corp_tax'])</span>
-                        <small>{{ trans('ratting-manager::dashboard.corp_tax_hint') }}</small>
+                        @if(($taxRate ?? null) !== null)
+                            <small>{{ trans('ratting-manager::dashboard.tax_rate_now', ['rate' => \RattingManager\Support\Corporations::percent($taxRate)]) }}</small>
+                        @else
+                            <small>{{ trans('ratting-manager::dashboard.corp_tax_hint') }}</small>
+                        @endif
                     </div>
                 </div>
             </div>

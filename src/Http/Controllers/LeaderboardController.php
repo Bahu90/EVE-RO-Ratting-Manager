@@ -83,6 +83,8 @@ class LeaderboardController extends Controller
                 'isDirector' => true,
                 'isAdmin' => Access::isAdmin(),
                 'rows' => $board['rows'],
+                'brand' => \RattingManager\Support\Corporations::brand($corporations),
+                'taxRate' => \RattingManager\Support\Corporations::taxRate($corporations),
                 'incomeMode' => $board['mode'],
                 'median' => $board['median_isk_per_hour'],
                 'totals' => $board['totals'],
@@ -92,7 +94,8 @@ class LeaderboardController extends Controller
             ]);
         }
 
-        $board = $metrics->hoursBoard(new Scope($this->viewerCorporations($players, $settings)), $period, $main);
+        $memberCorporations = $this->viewerCorporations($players, $settings);
+        $board = $metrics->hoursBoard(new Scope($memberCorporations), $period, $main);
 
         // The top of the board, and the member's own row when it is further down.
         $rows = array_slice($board['rows'], 0, $size);
@@ -106,6 +109,7 @@ class LeaderboardController extends Controller
             'isDirector' => false,
             'isAdmin' => false,
             'rows' => $rows,
+            'brand' => \RattingManager\Support\Corporations::brand($memberCorporations),
             'ownMain' => $main,
             'ownRank' => $board['own_rank'],
             'playerCount' => $board['players'],

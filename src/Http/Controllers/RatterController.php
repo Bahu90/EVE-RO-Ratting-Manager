@@ -25,9 +25,10 @@ class RatterController extends Controller
     {
         $configured = $settings->configuredCorporations();
         $period = Period::from($request->query('period', '90d'));
+        $corporations = $configured === [] ? [] : $this->pickedCorporations($request, $settings);
         $rows = $configured === []
             ? []
-            : array_values($metrics->collect(new Scope($this->pickedCorporations($request, $settings)), $period->start, $period->end)['players']);
+            : array_values($metrics->collect(new Scope($corporations), $period->start, $period->end)['players']);
 
         $ratted = app(\RattingManager\Services\Ratting\IncomeView::class)->isRatted();
         foreach ($rows as &$row) {
@@ -42,6 +43,7 @@ class RatterController extends Controller
 
         return view('ratting-manager::ratter.index', [
             'period' => $period,
+            'brand' => \RattingManager\Support\Corporations::brand($corporations),
             'incomeMode' => $ratted ? 'ratted' : 'received',
             'rows' => $rows,
             'counts' => [
@@ -94,6 +96,7 @@ class RatterController extends Controller
 
         return view('ratting-manager::ratter.show', array_merge($personal, [
             'period' => $period,
+            'brand' => \RattingManager\Support\Corporations::brand($configured),
             'mainId' => $main,
             'mainName' => $players->name($main),
             'sources' => $sources,

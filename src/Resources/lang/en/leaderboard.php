@@ -11,7 +11,7 @@ return [
     'you' => 'You',
 
     // Redesigned page.
-    'eyebrow' => 'Ratting Manager / Leaderboard',
+    'eyebrow' => ':brand / Leaderboard',
     'subtitle' => 'Who ratted the most, and what it brought the corporation.',
     'subtitle_member' => 'Ranked by hours ratted.',
     'top_three' => 'Top three',

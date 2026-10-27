@@ -22,6 +22,8 @@
                         <small class="form-text">{{ trans('ratting-manager::notification_settings.url_help') }}</small>
                     </div>
                     <div class="form-row">
+                        {{-- With one corporation tracked there is nothing to pick: every webhook carries all of it. --}}
+                        @if(count($webhookCorporations) > 1)
                         <div class="form-group col-md-8">
                             <label for="rm-wh-corp">{{ trans('ratting-manager::notification_settings.corporation') }}</label>
                             <select class="form-control" id="rm-wh-corp" name="corporation_id">
@@ -31,6 +33,10 @@
                                 @endforeach
                             </select>
                         </div>
+                        @else
+                        <input type="hidden" id="rm-wh-corp" name="corporation_id" value="">
+                        <div class="col-md-8"></div>
+                        @endif
                         <div class="form-group col-md-4 d-flex align-items-end">
                             <div class="custom-control custom-switch mb-2">
                                 <input type="checkbox" class="custom-control-input" id="rm-wh-enabled" name="enabled" value="1" checked>

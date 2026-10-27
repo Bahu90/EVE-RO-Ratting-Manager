@@ -14,6 +14,7 @@ use RattingManager\Services\Ratting\Period;
 use RattingManager\Services\Ratting\RattingMetrics;
 use RattingManager\Services\Ratting\Scope;
 use RattingManager\Support\Access;
+use RattingManager\Support\Corporations;
 
 class DashboardController extends Controller
 {
@@ -83,8 +84,9 @@ class DashboardController extends Controller
             'period' => $period,
             'notConfigured' => false,
             // A director with no corporation to see gets the member dashboard.
-            'isDirector' => $this->seesCorporation($this->settings),
+            'isDirector' => $isDirector = $this->seesCorporation($this->settings),
             'isAdmin' => Access::isAdmin(),
+            'brand' => Corporations::brand($isDirector ? $this->directorCorporations($this->settings) : $this->viewerCorporations($this->players, $this->settings)),
             'ownRank' => $board['own_rank'],
             'rankedPlayers' => $board['players'],
             'characterOptions' => collect($characters)->mapWithKeys(fn ($id) => [$id => $this->players->name($id)])->sort()->all(),
@@ -118,6 +120,7 @@ class DashboardController extends Controller
             'median' => $board['median_isk_per_hour'],
             'space' => $this->charts->spaceCounts($scope, $period),
             'topSystems' => $this->charts->systems($scope, $period, self::HERO_SYSTEMS),
+            'taxRate' => Corporations::taxRate($corporations),
             'goneQuiet' => $this->metrics->goneQuiet($corporations),
             'untracked' => $this->metrics->untracked($corporations),
             'spawns' => $this->charts->spawns($scope, ListController::DASHBOARD_ROWS),

@@ -30,7 +30,7 @@
 
         <div class="rm-page-head">
             @include('ratting-manager::partials.page-title', [
-                'eyebrow' => trans('ratting-manager::leaderboard.eyebrow'),
+                'eyebrow' => trans('ratting-manager::leaderboard.eyebrow', ['brand' => $brand ?? trans('ratting-manager::common.plugin_name')]),
                 'title' => $period->headline(),
                 'subtitle' => trans('ratting-manager::leaderboard.subtitle'),
             ])
@@ -54,6 +54,9 @@
                 <div class="info-box rm-tile-tax"><div class="info-box-content">
                     <span class="info-box-text">{{ trans('ratting-manager::dashboard.ratting_tax') }}</span>
                     <span class="info-box-number">@rmisk($totals['corp_tax'])</span>
+                    @if(($taxRate ?? null) !== null)
+                        <small>{{ trans('ratting-manager::dashboard.tax_rate_now', ['rate' => \RattingManager\Support\Corporations::percent($taxRate)]) }}</small>
+                    @endif
                 </div></div>
             </div>
             <div class="col-lg-3 col-sm-6">
@@ -153,7 +156,7 @@
     @else
         <div class="rm-page-head">
             @include('ratting-manager::partials.page-title', [
-                'eyebrow' => trans('ratting-manager::leaderboard.eyebrow'),
+                'eyebrow' => trans('ratting-manager::leaderboard.eyebrow', ['brand' => $brand ?? trans('ratting-manager::common.plugin_name')]),
                 'title' => $period->headline(),
                 'subtitle' => trans('ratting-manager::leaderboard.subtitle_member'),
             ])

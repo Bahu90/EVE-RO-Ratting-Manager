@@ -7,7 +7,7 @@
         </div>
     </div>
     <div class="card-body p-0">
-        <p class="text-muted small px-3 pt-3 mb-2">{{ trans('ratting-manager::notification_settings.webhooks_intro') }}</p>
+        <p class="text-muted small px-3 pt-3 mb-2">{{ trans('ratting-manager::notification_settings.' . (count($webhookCorporations) > 1 ? 'webhooks_intro' : 'webhooks_intro_one')) }}</p>
         @if($webhooks->isEmpty())
             <div class="text-center text-muted py-4">
                 <i class="fas fa-inbox fa-2x mb-2"></i>

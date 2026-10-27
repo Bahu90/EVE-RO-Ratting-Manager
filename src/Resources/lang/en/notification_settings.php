@@ -21,6 +21,7 @@ return [
     'url' => 'Webhook URL',
     'url_help' => 'From Discord: channel settings, Integrations, Webhooks. Slack incoming webhooks work too, as plain text.',
     'url_invalid' => 'Not a Discord or Slack webhook URL. It has to start with https:// on discord.com or hooks.slack.com.',
+    'webhooks_intro_one' => 'Discord or Slack webhooks the plugin posts to. Tick which notifications each one carries.',
     'corporation' => 'Corporation',
     'all_corporations' => 'All tracked corporations',
     'enabled' => 'Enabled',

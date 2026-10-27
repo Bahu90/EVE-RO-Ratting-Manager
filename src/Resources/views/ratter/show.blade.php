@@ -12,7 +12,7 @@
         <div class="d-flex align-items-center" style="gap: 18px">
             <img class="rm-portrait" style="width: 72px; height: 72px" src="https://images.evetech.net/characters/{{ $mainId }}/portrait?size=128" alt="" loading="lazy">
             @include('ratting-manager::partials.page-title', [
-                'eyebrow' => trans('ratting-manager::ratter.eyebrow') . ' / ' . $period->label(),
+                'eyebrow' => trans('ratting-manager::ratter.eyebrow', ['brand' => $brand ?? trans('ratting-manager::common.plugin_name')]) . ' / ' . $period->label(),
                 'title' => $mainName,
             ])
         </div>

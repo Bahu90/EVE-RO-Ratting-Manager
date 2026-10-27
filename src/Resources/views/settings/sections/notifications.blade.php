@@ -115,7 +115,9 @@
                                                     </td>
                                                     <td>
                                                         {{ $wh->description ?: '#' . $wh->id }}
-                                                        <small class="text-muted">{{ $wh->corporation_id ? ($webhookCorporations[$wh->corporation_id] ?? '#' . $wh->corporation_id) : trans('ratting-manager::notification_settings.all_corporations') }}</small>
+                                                        @if(count($webhookCorporations) > 1 || $wh->corporation_id)
+                                                            <small class="text-muted">{{ $wh->corporation_id ? ($webhookCorporations[$wh->corporation_id] ?? '#' . $wh->corporation_id) : trans('ratting-manager::notification_settings.all_corporations') }}</small>
+                                                        @endif
                                                         @unless($wh->enabled)
                                                             <span class="badge badge-secondary">{{ trans('ratting-manager::notification_settings.off') }}</span>
                                                         @endunless

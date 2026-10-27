@@ -19,7 +19,7 @@
 
         <div class="rm-page-head">
             @include('ratting-manager::partials.page-title', [
-                'eyebrow' => trans('ratting-manager::ratter.eyebrow'),
+                'eyebrow' => trans('ratting-manager::ratter.eyebrow', ['brand' => $brand ?? trans('ratting-manager::common.plugin_name')]),
                 'title' => $period->headline(),
                 'subtitle' => trans('ratting-manager::ratter.subtitle'),
             ])
