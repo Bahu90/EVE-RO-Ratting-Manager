@@ -14,9 +14,12 @@ class MonthlyBreakdown
 {
     private Players $players;
 
-    public function __construct(Players $players)
+    private IncomeView $view;
+
+    public function __construct(Players $players, IncomeView $view)
     {
         $this->players = $players;
+        $this->view = $view;
     }
 
     /** @return array<string, string> 'YYYY-MM' => 'October 2026', newest first, for a month picker */
@@ -46,17 +49,26 @@ class MonthlyBreakdown
      */
     public function byCharacter(Scope $scope, Carbon $month): array
     {
+        // :2 holds ISK ratted beside income received.
         $result = FigureCache::remember(
-            'month-by-character:' . $scope->cacheKey() . ':' . $month->format('Y-m') . ':' . now()->format('Y-m'),
+            'month-by-character:2:' . $scope->cacheKey() . ':' . $month->format('Y-m') . ':' . now()->format('Y-m'),
             fn () => $this->computeByCharacter($scope, $month)
         );
 
-        // Names go on after the cache, as RattingMetrics::collect() does.
+        // Names go on after the cache, as RattingMetrics::collect() does,
+        // and so does the figure the setting picks.
+        $ratted = $this->view->isRatted();
         $this->players->load(array_column($result['rows'], 'character_id'));
         foreach ($result['rows'] as &$row) {
             $row['name'] = $this->players->name($row['character_id']);
+            $row['value'] = $ratted ? $row['gross'] : $row['income'];
+            $row['value_per_hour'] = $ratted ? $row['gross_per_hour'] : $row['isk_per_hour'];
         }
         unset($row);
+        usort($result['rows'], fn ($a, $b) => $b['value'] <=> $a['value']);
+        $result['total']['value'] = $ratted ? $result['total']['gross'] : $result['total']['income'];
+        $result['total']['value_per_hour'] = $ratted ? $result['total']['gross_per_hour'] : $result['total']['isk_per_hour'];
+        $result['mode'] = $this->view->mode();
 
         return $result;
     }
@@ -69,7 +81,7 @@ class MonthlyBreakdown
         $money = $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
             ->groupBy('character_id')
-            ->selectRaw('character_id, SUM(bounty_net) as bounty, SUM(ess_net) as ess, SUM(bounty_estimated + ess_estimated) as estimated, SUM(bounty_corp_tax + ess_corp_tax) as corp_tax, SUM(ticks) as ticks')
+            ->selectRaw('character_id, SUM(bounty_net) as bounty, SUM(ess_net) as ess, SUM(bounty_estimated + ess_estimated) as estimated, SUM(bounty_corp_tax + ess_corp_tax) as corp_tax, SUM(bounty_gross + ess_gross) as gross, SUM(ticks) as ticks')
             ->get()
             ->keyBy('character_id');
 
@@ -111,6 +123,7 @@ class MonthlyBreakdown
         foreach ($ids as $id) {
             $m = $money->get($id);
             $income = (float) ($m->bounty ?? 0) + (float) ($m->ess ?? 0);
+            $gross = (float) ($m->gross ?? 0);
             $minutes = isset($times[$id]) ? $times[$id]->minutes() : 0;
             $rows[] = [
                 'character_id' => $id,
@@ -123,6 +136,8 @@ class MonthlyBreakdown
                 'ticks' => (int) ($m->ticks ?? 0),
                 'minutes' => $minutes,
                 'isk_per_hour' => $minutes > 0 ? round($income / ($minutes / 60), 2) : 0.0,
+                'gross' => round($gross, 2),
+                'gross_per_hour' => $minutes > 0 ? round($gross / ($minutes / 60), 2) : 0.0,
                 'rats' => $rats[$id] ?? 0,
             ];
         }
@@ -134,11 +149,13 @@ class MonthlyBreakdown
             'income' => round(array_sum(array_column($rows, 'income')), 2),
             'estimated' => round(array_sum(array_column($rows, 'estimated')), 2),
             'corp_tax' => round(array_sum(array_column($rows, 'corp_tax')), 2),
+            'gross' => round(array_sum(array_column($rows, 'gross')), 2),
             'ticks' => array_sum(array_column($rows, 'ticks')),
             'minutes' => $allTime->minutes(),
             'rats' => $allRats,
         ];
         $total['isk_per_hour'] = $total['minutes'] > 0 ? round($total['income'] / ($total['minutes'] / 60), 2) : 0.0;
+        $total['gross_per_hour'] = $total['minutes'] > 0 ? round($total['gross'] / ($total['minutes'] / 60), 2) : 0.0;
 
         return ['month' => $start->format('F Y'), 'rows' => $rows, 'total' => $total];
     }
@@ -149,9 +166,10 @@ class MonthlyBreakdown
      */
     public function characterMatrix(Scope $scope, int $months = 12): array
     {
+        $ratted = $this->view->isRatted();
         $result = FigureCache::remember(
-            'character-matrix:' . $scope->cacheKey() . ':' . $months . ':' . now()->format('Y-m'),
-            fn () => $this->computeCharacterMatrix($scope, $months)
+            'character-matrix:' . $scope->cacheKey() . ':' . $months . ':' . now()->format('Y-m') . ':' . $this->view->mode(),
+            fn () => $this->computeCharacterMatrix($scope, $months, $ratted)
         );
 
         // Names go on after the cache, as RattingMetrics::collect() does.
@@ -164,14 +182,16 @@ class MonthlyBreakdown
         return $result;
     }
 
-    private function computeCharacterMatrix(Scope $scope, int $months): array
+    /** @param bool $ratted ISK ratted in each cell instead of income received */
+    private function computeCharacterMatrix(Scope $scope, int $months, bool $ratted = false): array
     {
+        $column = $ratted ? 'bounty_gross + ess_gross' : 'bounty_net + ess_net';
         $start = now()->subMonthsNoOverflow($months - 1)->startOfMonth();
 
         $rows = $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->where('date', '>=', $start->toDateString())
             ->groupBy('character_id', DB::raw("DATE_FORMAT(date, '%Y-%m')"))
-            ->selectRaw("character_id, DATE_FORMAT(date, '%Y-%m') as month, SUM(bounty_net + ess_net) as income")
+            ->selectRaw("character_id, DATE_FORMAT(date, '%Y-%m') as month, SUM({$column}) as income")
             ->get();
 
         $characters = $rows->pluck('character_id')->map(fn ($id) => (int) $id)->unique()->values()->all();

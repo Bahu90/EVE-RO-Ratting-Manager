@@ -26,7 +26,7 @@
                         <tr>
                             <th>{{ trans('ratting-manager::dashboard.player') }}</th>
                             <th class="text-right">{{ trans('ratting-manager::ratter.characters') }}</th>
-                            <th class="text-right">{{ trans('ratting-manager::ratter.income_90d') }}</th>
+                            <th class="text-right">{{ trans('ratting-manager::ratter.' . (($incomeMode ?? 'received') === 'ratted' ? 'ratted_90d' : 'income_90d')) }}</th>
                             <th class="text-right">{{ trans('ratting-manager::ratter.hours_90d') }}</th>
                             <th class="text-right">{{ trans('ratting-manager::dashboard.isk_per_hour') }}</th>
                             <th>{{ trans('ratting-manager::dashboard.last_tick') }}</th>
@@ -39,9 +39,9 @@
                             <tr>
                                 <td><a href="{{ route('ratting-manager.ratters.show', $row['main_id']) }}">{{ $row['name'] }}</a></td>
                                 <td class="text-right">{{ count($row['characters']) }}</td>
-                                <td class="text-right" data-order="{{ $row['income'] }}">@rmisk($row['income'])</td>
+                                <td class="text-right" data-order="{{ $row['value'] }}">@rmisk($row['value'])</td>
                                 <td class="text-right" data-order="{{ $row['minutes'] }}">{{ \RattingManager\Support\Format::hours($row['minutes']) }}</td>
-                                <td class="text-right" data-order="{{ $row['isk_per_hour'] }}">@rmisk($row['isk_per_hour'])</td>
+                                <td class="text-right" data-order="{{ $row['value_per_hour'] }}">@rmisk($row['value_per_hour'])</td>
                                 <td data-order="{{ $row['last_tick'] }}">{{ $row['last_tick'] ? substr($row['last_tick'], 0, 16) : '-' }}</td>
                                 <td>@include('ratting-manager::partials.coverage-badge', ['coverage' => $row['coverage']])</td>
                                 <td>{{ $row['wallet_token'] ? trans('ratting-manager::ratter.yes') : trans('ratting-manager::ratter.no') }}</td>

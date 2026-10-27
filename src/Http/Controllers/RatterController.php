@@ -26,7 +26,15 @@ class RatterController extends Controller
 
         usort($rows, fn ($a, $b) => strcmp((string) $b['last_tick'], (string) $a['last_tick']));
 
+        $ratted = app(\RattingManager\Services\Ratting\IncomeView::class)->isRatted();
+        foreach ($rows as &$row) {
+            $row['value'] = $ratted ? ($row['gross'] ?? 0.0) : $row['income'];
+            $row['value_per_hour'] = $ratted ? ($row['gross_per_hour'] ?? 0.0) : $row['isk_per_hour'];
+        }
+        unset($row);
+
         return view('ratting-manager::ratter.index', [
+            'incomeMode' => $ratted ? 'ratted' : 'received',
             'rows' => $rows,
             'notConfigured' => $configured === [],
         ]);

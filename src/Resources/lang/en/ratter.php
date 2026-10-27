@@ -19,4 +19,5 @@ return [
     'corporation_only' => 'Corporation only',
     'corporation_now' => 'Corporation now',
     'back' => 'Back to the lookup',
+    'ratted_90d' => 'ISK ratted, 90 days',
 ];

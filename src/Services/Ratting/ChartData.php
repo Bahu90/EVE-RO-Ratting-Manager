@@ -45,12 +45,23 @@ class ChartData
     {
         $start = now()->subMonthsNoOverflow(11)->startOfMonth();
 
-        $rows = $this->rows('monthly', $scope, $start->format('Y-m'), fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
+        // monthly2 holds ISK ratted beside income received.
+        $rows = $this->rows('monthly2', $scope, $start->format('Y-m'), fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->where('date', '>=', $start->toDateString())
             ->groupBy(DB::raw("DATE_FORMAT(date, '%Y-%m')"))
-            ->selectRaw("DATE_FORMAT(date, '%Y-%m') as month, SUM(bounty_net) as bounty, SUM(bounty_estimated) as bounty_estimated, SUM(ess_net) as ess, SUM(ess_estimated) as ess_estimated, SUM(bounty_corp_tax + ess_corp_tax) as corp_tax")
+            ->selectRaw("DATE_FORMAT(date, '%Y-%m') as month, SUM(bounty_net) as bounty, SUM(bounty_estimated) as bounty_estimated, SUM(ess_net) as ess, SUM(ess_estimated) as ess_estimated, SUM(bounty_corp_tax + ess_corp_tax) as corp_tax, SUM(bounty_gross) as bounty_gross, SUM(ess_gross) as ess_gross")
             ->get()
             ->keyBy('month'));
+
+        if ($this->view->isRatted()) {
+            // ISK ratted is worked out from the corporation's cut alone, so
+            // there is no read/worked-out split to stripe.
+            $rows = $rows->map(fn ($r) => (object) [
+                'bounty' => $r->bounty_gross, 'bounty_estimated' => 0,
+                'ess' => $r->ess_gross, 'ess_estimated' => 0,
+                'corp_tax' => $r->corp_tax,
+            ]);
+        }
 
         $data = ['labels' => [], 'bounty' => [], 'bounty_estimated' => [], 'ess' => [], 'ess_estimated' => [], 'corp_tax' => []];
         for ($m = $start->copy(); $m->lte(now()); $m->addMonthNoOverflow()) {
@@ -103,10 +114,11 @@ class ChartData
     /** Income per day across the period, with a trailing seven-day average. */
     public function daily(Scope $scope, Period $period): array
     {
-        $rows = $this->rows('daily', $scope, FigureCache::range($period->start, $period->end), fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
+        $column = $this->view->isRatted() ? 'bounty_gross + ess_gross' : 'bounty_net + ess_net';
+        $rows = $this->rows('daily', $scope, FigureCache::range($period->start, $period->end) . ':' . $this->view->mode(), fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->whereBetween('date', [$period->start->toDateString(), $period->end->toDateString()])
             ->groupBy('date')
-            ->selectRaw('date, SUM(bounty_net + ess_net) as income')
+            ->selectRaw("date, SUM({$column}) as income")
             ->pluck('income', 'date'));
 
         $data = ['labels' => [], 'income' => [], 'average' => []];
@@ -193,10 +205,11 @@ class ChartData
     /** Income per character, for a player with alts. */
     public function byCharacter(Scope $scope, Period $period): array
     {
-        $rows = $this->rows('by-character', $scope, FigureCache::range($period->start, $period->end), fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
+        $column = $this->view->isRatted() ? 'bounty_gross + ess_gross' : 'bounty_net + ess_net';
+        $rows = $this->rows('by-character', $scope, FigureCache::range($period->start, $period->end) . ':' . $this->view->mode(), fn () => $scope->apply(DB::table('ratting_manager_daily_summaries'))
             ->whereBetween('date', [$period->start->toDateString(), $period->end->toDateString()])
             ->groupBy('character_id')
-            ->selectRaw('character_id, SUM(bounty_net + ess_net) as income')
+            ->selectRaw("character_id, SUM({$column}) as income")
             ->orderByDesc('income')
             ->get());
 

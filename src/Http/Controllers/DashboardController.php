@@ -162,6 +162,7 @@ class DashboardController extends Controller
         $sessions = $this->charts->sessions($scope, $period, ListController::DASHBOARD_ROWS);
 
         return [
+            'incomeMode' => app(\RattingManager\Services\Ratting\IncomeView::class)->mode(),
             'totals' => $collected['totals'],
             'insights' => $insights,
             'heatmap' => $insights['heatmap'],

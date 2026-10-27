@@ -369,6 +369,7 @@ class RattingMetrics
 
         $totals['players'] = count($players);
         $totals['isk_per_hour'] = $totals['minutes'] > 0 ? round($totals['income'] / ($totals['minutes'] / 60), 2) : 0.0;
+        $totals['gross_per_hour'] = $totals['minutes'] > 0 ? round($totals['gross'] / ($totals['minutes'] / 60), 2) : 0.0;
         $totals['coverage'] = $totals['seen_by_corp'] > 0 ? round($totals['paired'] / $totals['seen_by_corp'] * 100) : null;
         $totals['active_days'] = count(array_replace(...array_values($days ?: [[]])));
 

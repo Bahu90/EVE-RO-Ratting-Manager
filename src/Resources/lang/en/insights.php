@@ -89,4 +89,6 @@ return [
     'chart_player_hours' => 'Player-hours',
     'chart_players_per_day' => 'Players per active day',
     'chart_active_days' => 'Active days',
+    'received' => 'Received',
+    'received_title' => 'Bounties and ESS payouts the pilots received, after corporation tax. Worked out tick by tick, so it can be shown per system and per hour.',
 ];

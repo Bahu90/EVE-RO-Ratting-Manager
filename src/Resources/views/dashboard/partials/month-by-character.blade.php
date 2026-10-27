@@ -6,6 +6,7 @@
 @php
     $fmt = \RattingManager\Support\Format::class;
     $b = $monthBreakdown;
+    $ratted = ($b['mode'] ?? 'received') === 'ratted';
 @endphp
 
 <div class="card card-dark">
@@ -34,7 +35,7 @@
                     <th>{{ trans('ratting-manager::common.character') }}</th>
                     <th class="text-right">{{ trans('ratting-manager::insights.bounties') }}</th>
                     <th class="text-right">{{ trans('ratting-manager::insights.ess') }}</th>
-                    <th class="text-right">{{ trans('ratting-manager::insights.income') }}</th>
+                    <th class="text-right">{{ $ratted ? trans('ratting-manager::dashboard.isk_ratted') : trans('ratting-manager::insights.income') }}</th>
                     <th class="text-right">{{ trans('ratting-manager::insights.corp_tax') }}</th>
                     <th class="text-right">{{ trans('ratting-manager::insights.hours') }}</th>
                     <th class="text-right">{{ trans('ratting-manager::insights.isk_per_hour') }}</th>
@@ -49,15 +50,15 @@
                         <td class="text-right">@rmisk($r['bounty'])</td>
                         <td class="text-right">@rmisk($r['ess'])</td>
                         <td class="text-right">
-                            @if($r['estimated'] > 0)
-                                <span class="rm-estimated" title="{{ trans('ratting-manager::common.worked_out_title') }}">@rmisk($r['income'])</span>
+                            @if(!$ratted && $r['estimated'] > 0)
+                                <span class="rm-estimated" title="{{ trans('ratting-manager::common.worked_out_title') }}">@rmisk($r['value'])</span>
                             @else
-                                @rmisk($r['income'])
+                                @rmisk($r['value'])
                             @endif
                         </td>
                         <td class="text-right">@rmisk($r['corp_tax'])</td>
                         <td class="text-right">{{ $fmt::hours($r['minutes']) }}</td>
-                        <td class="text-right">{{ $r['minutes'] > 0 ? $fmt::isk($r['isk_per_hour']) : '-' }}</td>
+                        <td class="text-right">{{ $r['minutes'] > 0 ? $fmt::isk($r['value_per_hour']) : '-' }}</td>
                         <td class="text-right">{{ number_format($r['ticks']) }}</td>
                         <td class="text-right">{{ number_format($r['rats']) }}</td>
                     </tr>
@@ -72,15 +73,15 @@
                         <td class="text-right">@rmisk($b['total']['bounty'])</td>
                         <td class="text-right">@rmisk($b['total']['ess'])</td>
                         <td class="text-right">
-                            @if($b['total']['estimated'] > 0)
-                                <span class="rm-estimated" title="{{ trans('ratting-manager::common.worked_out_title') }}">@rmisk($b['total']['income'])</span>
+                            @if(!$ratted && $b['total']['estimated'] > 0)
+                                <span class="rm-estimated" title="{{ trans('ratting-manager::common.worked_out_title') }}">@rmisk($b['total']['value'])</span>
                             @else
-                                @rmisk($b['total']['income'])
+                                @rmisk($b['total']['value'])
                             @endif
                         </td>
                         <td class="text-right">@rmisk($b['total']['corp_tax'])</td>
                         <td class="text-right">{{ $fmt::hours($b['total']['minutes']) }}</td>
-                        <td class="text-right">{{ $b['total']['minutes'] > 0 ? $fmt::isk($b['total']['isk_per_hour']) : '-' }}</td>
+                        <td class="text-right">{{ $b['total']['minutes'] > 0 ? $fmt::isk($b['total']['value_per_hour']) : '-' }}</td>
                         <td class="text-right">{{ number_format($b['total']['ticks']) }}</td>
                         <td class="text-right">{{ number_format($b['total']['rats']) }}</td>
                     </tr>

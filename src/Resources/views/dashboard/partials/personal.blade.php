@@ -4,6 +4,11 @@
 --}}
 @php
     $workedOut = $totals['estimated'] ?? 0;
+    // ISK ratted (the corporation's count) or income received, as set under Settings.
+    $ratted = ($incomeMode ?? 'received') === 'ratted';
+    $perHour = $ratted
+        ? ($totals['gross_per_hour'] ?? ($totals['minutes'] > 0 ? ($totals['gross'] ?? 0) / ($totals['minutes'] / 60) : 0))
+        : $totals['isk_per_hour'];
     // The corporation's cut as a share of everything the ratting paid out.
     $paidOut = $totals['income'] + $totals['corp_tax'];
     $taxShare = $totals['corp_tax'] > 0 && $paidOut > 0 ? number_format($totals['corp_tax'] / $paidOut * 100, 1) : null;
@@ -30,12 +35,18 @@
                         <div class="info-box bg-gradient-success">
                             <span class="info-box-icon"><i class="fas fa-coins"></i></span>
                             <div class="info-box-content">
+                                @if($ratted)
+                                <span class="info-box-text" title="{{ trans('ratting-manager::dashboard.isk_ratted_title') }}">{{ trans('ratting-manager::dashboard.isk_ratted') }}</span>
+                                <span class="info-box-number">@rmisk($totals['gross'] ?? 0)</span>
+                                <small>{{ trans('ratting-manager::dashboard.received_by_pilots', ['amount' => \RattingManager\Support\Format::isk($totals['income'])]) }}</small>
+                                @else
                                 <span class="info-box-text">{{ trans('ratting-manager::dashboard.ratting_income') }}</span>
                                 <span class="info-box-number">@rmisk($totals['income'])</span>
                                 @if($workedOut > 0)
                                     <small class="rm-estimated" title="{{ trans('ratting-manager::common.worked_out_title') }}">{{ trans('ratting-manager::dashboard.worked_out_share', ['amount' => \RattingManager\Support\Format::isk($workedOut)]) }}</small>
                                 @else
                                     <small>{{ trans('ratting-manager::dashboard.ratting_income_hint') }}</small>
+                                @endif
                                 @endif
                             </div>
                         </div>
@@ -45,7 +56,7 @@
                             <span class="info-box-icon"><i class="fas fa-tachometer-alt"></i></span>
                             <div class="info-box-content">
                                 <span class="info-box-text">{{ trans('ratting-manager::dashboard.isk_per_hour') }}</span>
-                                <span class="info-box-number">@rmisk($totals['isk_per_hour'])</span>
+                                <span class="info-box-number">@rmisk($perHour)</span>
                                 <small>{{ trans('ratting-manager::dashboard.isk_per_hour_hint', ['time' => \RattingManager\Support\Format::hours((int) $totals['minutes'])]) }}</small>
                             </div>
                         </div>

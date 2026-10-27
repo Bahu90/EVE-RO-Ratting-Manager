@@ -27,7 +27,7 @@
                     <th>{{ trans('ratting-manager::dashboard.system') }}</th>
                     <th class="text-right">{{ trans('ratting-manager::insights.hours') }}</th>
                     <th class="text-right">{{ trans('ratting-manager::insights.share') }}</th>
-                    <th class="text-right">{{ trans('ratting-manager::insights.income') }}</th>
+                    <th class="text-right" title="{{ trans('ratting-manager::insights.received_title') }}">{{ trans('ratting-manager::insights.received') }}</th>
                     <th class="text-right">{{ trans('ratting-manager::insights.isk_per_hour') }}</th>
                     <th class="text-right">{{ trans('ratting-manager::insights.rats') }}</th>
                     <th class="text-right">{{ trans('ratting-manager::insights.days_col') }}</th>
