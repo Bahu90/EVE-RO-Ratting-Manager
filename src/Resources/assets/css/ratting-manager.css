@@ -3455,6 +3455,13 @@ div.ratting-manager-wrapper div[class*="col-"] div.card-body {
 /* ============================================
    Leaderboard
    ============================================ */
+/* The viewer's own row repeated at the top of a long board, set off from the
+   ranking below it. */
+.ratting-manager-dashboard tr.rm-pinned-row td,
+.ratting-manager-wrapper tr.rm-pinned-row td {
+    border-bottom: 2px solid rgba(102, 126, 234, 0.6);
+}
+
 /* The signed-in member's own row, so they find themselves without reading
    the whole board. */
 .ratting-manager-dashboard tr.rm-own-row td,

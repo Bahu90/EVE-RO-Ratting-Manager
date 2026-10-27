@@ -116,7 +116,7 @@ return [
     'vs_median_title' => 'ISK per hour against the median of players who ratted at least an hour (100% is the median).',
     'change' => 'Change',
     'change_title' => 'Income against the same length of time just before this period.',
-    'coverage' => 'Coverage',
+    'coverage' => 'Wallet',
     'efficiency_by_system' => 'Efficiency by system',
     'players' => 'Players',
     'gone_quiet' => 'Gone quiet',

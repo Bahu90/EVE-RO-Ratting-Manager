@@ -34,8 +34,8 @@ class RattingManagerServiceProvider extends AbstractSeatPlugin
         $this->loadViewsFrom(__DIR__ . '/Resources/views/', 'ratting-manager');
         $this->loadMigrationsFrom(__DIR__ . '/Database/migrations/');
 
-        // ISK reads the same as in Mining Manager: 1.25B ISK, 340.50M ISK,
-        // 12,500 ISK. Blade directives are shared by every plugin, so this one
+        // ISK as the corporation's ratting reports write it: 57.38 B, 788.07 M,
+        // 660.60 K (Format::isk). Blade directives are shared by every plugin, so this one
         // has a name of its own rather than replacing Mining Manager's @isk.
         \Illuminate\Support\Facades\Blade::directive('rmisk', function ($expression) {
             return "<?php echo \\RattingManager\\Support\\Format::isk($expression); ?>";

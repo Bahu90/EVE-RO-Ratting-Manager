@@ -8,4 +8,5 @@ return [
     'not_ratted' => 'You have no ticks in this period yet.',
     'full_board' => 'Corporation leaderboard',
     'rank' => '#',
+    'you' => 'You',
 ];

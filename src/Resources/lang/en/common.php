@@ -34,10 +34,11 @@ return [
     'worked_out' => 'est.',
     'worked_out_title' => 'Worked out from the corporation\'s cut, because the character\'s own wallet journal is not on SeAT.',
 
-    'coverage_full' => 'Tracked',
-    'coverage_partial' => 'Partly tracked',
-    'coverage_none' => 'Untracked',
-    'coverage_title' => ':percent% of the ticks the corporation journal saw are also in the character\'s own journal.',
+    'coverage_full' => 'Linked',
+    'coverage_partial' => 'Partly linked',
+    'coverage_none' => 'Not linked',
+    'coverage_header_title' => 'Whether the player\'s wallet is linked on SeAT. Not linked means their income is worked out from the corporation\'s cut.',
+    'coverage_title' => 'Wallet linked on SeAT: :percent% of the ticks the corporation journal saw are also in the character\'s own journal. Not linked means their income is worked out from the corporation\'s cut.',
 
     'not_configured_title' => 'No corporation is set up yet',
     'not_configured_admin' => 'Pick the corporations to track on the Settings page, then run the initial import.',

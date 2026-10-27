@@ -68,7 +68,12 @@
                                         {{ $row['rank'] }}
                                     @endif
                                 </td>
-                                <td>{{ $row['name'] }}</td>
+                                <td>
+                                    {{ $row['name'] }}
+                                    @if($row['main_id'] === $ownMain)
+                                        <span class="badge badge-info ml-1">{{ trans('ratting-manager::leaderboard.you') }}</span>
+                                    @endif
+                                </td>
                                 <td class="text-right">{{ \RattingManager\Support\Format::hours($row['minutes']) }}</td>
                                 <td class="text-right">{{ $row['active_days'] }}</td>
                             </tr>

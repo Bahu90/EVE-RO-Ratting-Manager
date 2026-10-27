@@ -1,8 +1,35 @@
-{{-- Every column, for directors: the Corporation tab shows the top of it, the Leaderboard page all of it. --}}
+{{--
+    Every column, for directors: the Corporation tab shows the top of it, the
+    Leaderboard page all of it.
+
+    The viewer's own row is highlighted, and when it is further down than the
+    pinned limit it is also shown first, marked "You", so nobody has to
+    scroll to find themselves. On narrow screens only rank, player, the
+    money columns and hours show; the rest come back from the lg breakpoint.
+--}}
 @php
     $shown = isset($limit) ? array_slice($rows, 0, $limit) : $rows;
     // ISK ratted (the corporation's count) or income received, as set under Settings.
     $ratted = ($incomeMode ?? 'received') === 'ratted';
+
+    $ownIndex = null;
+    foreach ($rows as $i => $r) {
+        if (($ownMain ?? null) !== null && $r['main_id'] === $ownMain) {
+            $ownIndex = $i;
+            break;
+        }
+    }
+    $pinAfter = 10;
+    $lines = [];
+    if ($ownIndex !== null && $ownIndex >= $pinAfter) {
+        $lines[] = [$ownIndex, $rows[$ownIndex], true];
+    }
+    foreach ($shown as $i => $r) {
+        $lines[] = [$i, $r, false];
+    }
+
+    // Shown from lg up: secondary columns that crowd a phone screen.
+    $wide = 'd-none d-lg-table-cell';
 @endphp
 <div class="table-responsive">
     <table class="table table-sm table-hover mb-0 rm-leaderboard">
@@ -13,17 +40,17 @@
                 <th class="text-right" title="{{ trans('ratting-manager::dashboard.' . ($ratted ? 'isk_ratted_title' : 'income_title')) }}">{{ trans('ratting-manager::dashboard.' . ($ratted ? 'isk_ratted' : 'income')) }}</th>
                 <th class="text-right" title="{{ trans('ratting-manager::dashboard.ratting_tax_title') }}">{{ trans('ratting-manager::dashboard.ratting_tax') }}</th>
                 <th class="text-right">{{ trans('ratting-manager::dashboard.hours') }}</th>
-                <th class="text-right">{{ trans('ratting-manager::dashboard.isk_per_hour') }}</th>
-                <th class="text-right" title="{{ trans('ratting-manager::dashboard.vs_median_title') }}">{{ trans('ratting-manager::dashboard.vs_median') }}</th>
-                <th class="text-right">{{ trans('ratting-manager::dashboard.rats') }}</th>
-                <th class="text-right">{{ trans('ratting-manager::dashboard.active_days') }}</th>
-                <th class="text-right" title="{{ trans('ratting-manager::dashboard.change_title') }}">{{ trans('ratting-manager::dashboard.change') }}</th>
-                <th>{{ trans('ratting-manager::dashboard.coverage') }}</th>
+                <th class="text-right d-none d-md-table-cell">{{ trans('ratting-manager::dashboard.isk_per_hour') }}</th>
+                <th class="text-right {{ $wide }}" title="{{ trans('ratting-manager::dashboard.vs_median_title') }}">{{ trans('ratting-manager::dashboard.vs_median') }}</th>
+                <th class="text-right {{ $wide }}">{{ trans('ratting-manager::dashboard.rats') }}</th>
+                <th class="text-right {{ $wide }}">{{ trans('ratting-manager::dashboard.active_days') }}</th>
+                <th class="text-right {{ $wide }}" title="{{ trans('ratting-manager::dashboard.change_title') }}">{{ trans('ratting-manager::dashboard.change') }}</th>
+                <th class="{{ $wide }}" title="{{ trans('ratting-manager::common.coverage_header_title') }}">{{ trans('ratting-manager::dashboard.coverage') }}</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($shown as $i => $row)
-                <tr class="{{ ($ownMain ?? null) === $row['main_id'] ? 'rm-own-row' : '' }}">
+            @forelse($lines as [$i, $row, $pinned])
+                <tr class="{{ $i === $ownIndex ? 'rm-own-row' : '' }} {{ $pinned ? 'rm-pinned-row' : '' }}">
                     <td>
                         @if($i === 0)
                             <span class="badge badge-gold">1</span>
@@ -40,6 +67,9 @@
                         @if(count($row['characters']) > 1)
                             <small class="text-muted">(+{{ count($row['characters']) - 1 }})</small>
                         @endif
+                        @if($i === $ownIndex)
+                            <span class="badge badge-info ml-1">{{ trans('ratting-manager::leaderboard.you') }}</span>
+                        @endif
                     </td>
                     <td class="text-right">
                         @if(!$ratted && $row['estimated'] > 0)
@@ -50,8 +80,8 @@
                     </td>
                     <td class="text-right">@rmisk($row['corp_tax'])</td>
                     <td class="text-right">{{ \RattingManager\Support\Format::hours($row['minutes']) }}</td>
-                    <td class="text-right">@rmisk($row['value_per_hour'] ?? $row['isk_per_hour'])</td>
-                    <td class="text-right">
+                    <td class="text-right d-none d-md-table-cell">@rmisk($row['value_per_hour'] ?? $row['isk_per_hour'])</td>
+                    <td class="text-right {{ $wide }}">
                         @if($row['efficiency'] === null)
                             <span class="text-muted">-</span>
                         @elseif($row['efficiency'] >= 100)
@@ -60,9 +90,9 @@
                             <span class="rm-efficiency-down"><i class="fas fa-arrow-down"></i> {{ $row['efficiency'] }}%</span>
                         @endif
                     </td>
-                    <td class="text-right">{{ number_format($row['rats']) }}</td>
-                    <td class="text-right">{{ $row['active_days'] }}</td>
-                    <td class="text-right">
+                    <td class="text-right {{ $wide }}">{{ number_format($row['rats']) }}</td>
+                    <td class="text-right {{ $wide }}">{{ $row['active_days'] }}</td>
+                    <td class="text-right {{ $wide }}">
                         @if($row['change'] === null)
                             <span class="text-muted">-</span>
                         @elseif($row['change'] >= 0)
@@ -71,7 +101,7 @@
                             <span class="rm-efficiency-down"><i class="fas fa-caret-down"></i> {{ abs($row['change']) }}%</span>
                         @endif
                     </td>
-                    <td>@include('ratting-manager::partials.coverage-badge', ['coverage' => $row['coverage']])</td>
+                    <td class="{{ $wide }}">@include('ratting-manager::partials.coverage-badge', ['coverage' => $row['coverage']])</td>
                 </tr>
             @empty
                 <tr><td colspan="11" class="text-center text-muted">{{ trans('ratting-manager::common.no_data') }}</td></tr>

@@ -28,13 +28,14 @@
         muted: '#6c757d'
     };
 
+    /** Same as Format::isk() on the server: 57.38 B, 788.07 M, 660.60 K. */
     function formatISK(value) {
         var v = Math.abs(value);
         var sign = value < 0 ? '-' : '';
-        if (v >= 1e12) return sign + (v / 1e12).toFixed(2) + 'T';
-        if (v >= 1e9) return sign + (v / 1e9).toFixed(2) + 'B';
-        if (v >= 1e6) return sign + (v / 1e6).toFixed(1) + 'M';
-        if (v >= 1e3) return sign + (v / 1e3).toFixed(1) + 'K';
+        if (v >= 1e12) return sign + (v / 1e12).toFixed(2) + ' T';
+        if (v >= 1e9) return sign + (v / 1e9).toFixed(2) + ' B';
+        if (v >= 1e6) return sign + (v / 1e6).toFixed(2) + ' M';
+        if (v >= 1e3) return sign + (v / 1e3).toFixed(2) + ' K';
         return sign + Math.round(v);
     }
 
