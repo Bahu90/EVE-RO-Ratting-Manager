@@ -112,6 +112,14 @@
                     </div>
                 @endforeach
             </div>
+            <div class="col-md-6 form-group">
+                <label>{{ trans('ratting-manager::settings.members') }}</label>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="rm-member-needs-corp" name="member_needs_corporation" value="1" @checked(old('member_needs_corporation', $values['member_needs_corporation']))>
+                    <label class="custom-control-label" for="rm-member-needs-corp">{{ trans('ratting-manager::settings.member_needs_corporation') }}</label>
+                    <small class="form-text text-muted">{{ trans('ratting-manager::settings.member_needs_corporation_help') }}</small>
+                </div>
+            </div>
         </div>
     </div>
 </div>

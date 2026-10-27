@@ -35,6 +35,7 @@ class SettingsController extends Controller
                 'alliance_tax_percent' => $settings->get('display.alliance_tax_percent'),
                 'watch_type_ids' => implode(', ', $settings->get('spawns.watch_type_ids')),
                 'director_scope' => $settings->get('access.director_scope'),
+                'member_needs_corporation' => (bool) $settings->get('access.member_needs_corporation'),
             ],
             'lastProcessAt' => $settings->get('state.last_process_at'),
             'lastReport' => $settings->get('state.last_process_report'),
@@ -135,6 +136,7 @@ class SettingsController extends Controller
         $settings->set('display.income', $data['income']);
         $settings->set('display.alliance_tax_percent', (string) (float) $data['alliance_tax_percent']);
         $settings->set('access.director_scope', $data['director_scope']);
+        $settings->set('access.member_needs_corporation', $request->boolean('member_needs_corporation'));
 
         preg_match_all('/\d+/', (string) ($data['watch_type_ids'] ?? ''), $ids);
         $settings->set('spawns.watch_type_ids', $ids[0]);

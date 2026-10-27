@@ -37,6 +37,10 @@ final class SettingsRegistry
         // Which tracked corporations a director sees: "own", the ones their
         // characters are in now, or "all". Admins always see all of them.
         'access.director_scope' => [self::INSTALL, 'string', 'own'],
+        // Whether the ratting pages need a character in a tracked
+        // corporation now, on top of the SeAT permission. Off leaves it to
+        // SeAT's roles.
+        'access.member_needs_corporation' => [self::INSTALL, 'bool', false],
 
         // Which income the pages lead with. "ratted" is ISK ratted the way
         // the corporation counts it: its cut of bounties and ESS over its

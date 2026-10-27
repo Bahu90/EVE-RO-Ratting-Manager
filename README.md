@@ -129,6 +129,8 @@ Each tier includes the ones below it, so a director does not also need Member.
 
 **Which corporations a director sees** is set under **Settings > Access**: their own corporation (the tracked corporations their characters are in now, the default) or every tracked corporation. Admins always see all of them. A director with no character in a tracked corporation, while directors see only their own, gets the member pages.
 
+**Players who leave** keep the pages as long as SeAT gives them the role. To cut them off at once, tick **Only players in a tracked corporation** under **Settings > Access**: the pages then also need a character in a tracked corporation now. Admins are never locked out, and Help stays open.
+
 ## Artisan Commands
 
 | Command | Description |

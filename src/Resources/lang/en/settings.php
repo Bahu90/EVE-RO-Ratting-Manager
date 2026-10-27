@@ -84,4 +84,7 @@ return [
     'director_scope_own_help' => 'The tracked corporations their characters are in now. A director with no character in one sees only their own ratting. Best when several corporations share this SeAT.',
     'director_scope_all' => 'Every tracked corporation',
     'director_scope_all_help' => 'All tracked corporations, with a picker to look at one. For one corporation, or an alliance whose directors share figures.',
+    'members' => 'Members',
+    'member_needs_corporation' => 'Only players in a tracked corporation',
+    'member_needs_corporation_help' => 'The ratting pages need a character in a tracked corporation now, on top of the SeAT permission, so a member who leaves loses them at once. Off leaves it to SeAT\'s roles, for example a squad that only holds corporation members. Admins are never locked out, and Help stays open.',
 ];
