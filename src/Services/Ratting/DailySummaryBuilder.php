@@ -15,6 +15,13 @@ use Illuminate\Support\Facades\DB;
  */
 class DailySummaryBuilder
 {
+    private TaxRates $taxRates;
+
+    public function __construct(TaxRates $taxRates)
+    {
+        $this->taxRates = $taxRates;
+    }
+
     /** How many days rebuild() will go through, for a progress bar. */
     public static function dayCount(Carbon $from, ?Carbon $to = null): int
     {
@@ -75,8 +82,8 @@ class DailySummaryBuilder
         $blank = fn ($c, $corp, $s) => [
             'date' => $date, 'character_id' => $c, 'corporation_id' => $corp, 'solar_system_id' => (int) $s,
             'ticks' => 0, 'minutes' => 0,
-            'bounty_net' => 0.0, 'bounty_estimated' => 0.0, 'bounty_corp_tax' => 0.0,
-            'ess_net' => 0.0, 'ess_estimated' => 0.0, 'ess_corp_tax' => 0.0,
+            'bounty_net' => 0.0, 'bounty_estimated' => 0.0, 'bounty_corp_tax' => 0.0, 'bounty_gross' => 0.0,
+            'ess_net' => 0.0, 'ess_estimated' => 0.0, 'ess_corp_tax' => 0.0, 'ess_gross' => 0.0,
             'npc_kills' => 0, 'created_at' => $now, 'updated_at' => $now,
         ];
 
@@ -111,6 +118,18 @@ class DailySummaryBuilder
             $rows[$k]['ess_estimated'] += $p->net_is_estimated ? (float) $p->net_amount : 0.0;
             $rows[$k]['ess_corp_tax'] += (float) $p->corp_tax_amount;
         }
+
+        // ISK ratted as the corporation counts it: its cut over its tax rate
+        // that day. Income the corporation took no cut of adds nothing.
+        $rates = [];
+        foreach ($rows as &$row) {
+            $rate = $rates[$row['corporation_id']] ??= (float) $this->taxRates->rateFor($row['corporation_id'], $date);
+            if ($rate > 0 && $rate < 1) {
+                $row['bounty_gross'] = $row['bounty_corp_tax'] / $rate;
+                $row['ess_gross'] = $row['ess_corp_tax'] / $rate;
+            }
+        }
+        unset($row);
 
         // Rats killed per corporation and system, once per kill group, so a
         // fleet that shared a payout is not counted once per member.
@@ -154,7 +173,7 @@ class DailySummaryBuilder
 
             foreach (array_chunk(array_values($rows), 500) as $chunk) {
                 foreach ($chunk as &$row) {
-                    foreach (['bounty_net', 'bounty_estimated', 'bounty_corp_tax', 'ess_net', 'ess_estimated', 'ess_corp_tax'] as $f) {
+                    foreach (['bounty_net', 'bounty_estimated', 'bounty_corp_tax', 'bounty_gross', 'ess_net', 'ess_estimated', 'ess_corp_tax', 'ess_gross'] as $f) {
                         $row[$f] = round($row[$f], 2);
                     }
                 }

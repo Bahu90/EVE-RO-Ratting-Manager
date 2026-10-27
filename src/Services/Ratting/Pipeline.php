@@ -42,6 +42,13 @@ class Pipeline
         $this->summaries = $summaries;
     }
 
+    /**
+     * Bumped when the daily summaries gain a figure that older rows lack.
+     * The next run then rebuilds every day once, so history has it too.
+     * 1: ISK ratted (bounty_gross, ess_gross).
+     */
+    public const SUMMARY_VERSION = 1;
+
     /** How many steps run() reports, for a caller numbering them. */
     public const STEPS = 7;
 
@@ -126,7 +133,20 @@ class Pipeline
         $report['sessions'] = $this->sessions->rebuild($since, $progress, $sessionCharacters);
         $this->settings->set('state.session_gap_built', $gap);
 
-        if ($changed === null) {
+        $summaryVersion = (int) $this->settings->get('state.summary_version');
+        if ($summaryVersion < self::SUMMARY_VERSION) {
+            // Older summaries lack a figure this version adds: every day
+            // with ticks or payouts is built again, once.
+            $first = min(array_filter([
+                DB::table('ratting_manager_ticks')->min('ticked_at'),
+                DB::table('ratting_manager_ess_payouts')->min('paid_at'),
+            ]) ?: [$since->toDateTimeString()]);
+            $from = Carbon::parse($first)->startOfDay();
+            $progress->step('Daily summaries (all history, once)', $count ? DailySummaryBuilder::dayCount($from) : 0);
+            $report['daily'] = $this->summaries->rebuild($from, null, $progress);
+            $report['changed'] = 'all';
+            $this->settings->set('state.summary_version', self::SUMMARY_VERSION);
+        } elseif ($changed === null) {
             $progress->step('Daily summaries', $count ? DailySummaryBuilder::dayCount($since) : 0);
             $report['daily'] = $this->summaries->rebuild($since, null, $progress);
         } else {
@@ -140,6 +160,12 @@ class Pipeline
         $this->settings->set('state.last_process_report', $report);
 
         return $report;
+    }
+
+    /** Whether the next run will rebuild every daily summary once. */
+    public function summariesOutdated(): bool
+    {
+        return (int) $this->settings->get('state.summary_version') < self::SUMMARY_VERSION;
     }
 
     /**

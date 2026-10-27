@@ -34,7 +34,9 @@ class ProcessCommand extends Command
         // half hour between scheduled runs, so it holds the lock longer and a
         // :10 or :40 run that starts meanwhile waits its turn instead of
         // working on the same rows.
-        $wide = $this->option('from') || (int) $this->option('days') > 2;
+        // A run that rebuilds every daily summary once after an update is
+        // just as long.
+        $wide = $this->option('from') || (int) $this->option('days') > 2 || $pipeline->summariesOutdated();
         $lockSeconds = $wide ? 7200 : 1800;
 
         $status = $this->underLock($lockSeconds, function () use ($pipeline, &$ran) {

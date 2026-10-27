@@ -70,6 +70,9 @@ final class SettingsRegistry
         // The session gap the stored sessions were built with, so the
         // scheduled run knows to rebuild every character when it changes.
         'state.session_gap_built' => [self::STATE, 'int', 0],
+        // Pipeline::SUMMARY_VERSION the stored daily summaries were built
+        // under; a lower number makes the next run rebuild them all once.
+        'state.summary_version' => [self::STATE, 'int', 0],
     ];
 
     public static function has(string $key): bool
