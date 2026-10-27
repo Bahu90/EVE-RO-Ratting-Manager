@@ -19,6 +19,7 @@
                     <div class="form-group">
                         <label for="rm-wh-url">{{ trans('ratting-manager::notification_settings.url') }}</label>
                         <input type="url" class="form-control" id="rm-wh-url" name="webhook_url" maxlength="500" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" required>
+                        <small class="form-text rm-wh-url-keep" style="display: none">{{ trans('ratting-manager::notification_settings.url_keep') }}</small>
                         <small class="form-text">{{ trans('ratting-manager::notification_settings.url_help') }}</small>
                     </div>
                     <div class="form-row">

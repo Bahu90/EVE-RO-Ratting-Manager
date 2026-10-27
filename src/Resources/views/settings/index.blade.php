@@ -154,7 +154,8 @@
         $modal.find('.rm-modal-title-add').show();
         $modal.find('.rm-modal-title-edit').hide();
         $f.find('[name=description]').val('');
-        $f.find('[name=webhook_url]').val('');
+        $f.find('[name=webhook_url]').val('').prop('required', true).attr('placeholder', 'https://discord.com/api/webhooks/...');
+        $f.find('.rm-wh-url-keep').hide();
         $f.find('[name=corporation_id]').val('');
         $f.find('[name=enabled]').prop('checked', true);
         $f.find('.rm-wh-type').each(function () { this.checked = $(this).data('suggested') === 1; });
@@ -168,7 +169,9 @@
         $modal.find('.rm-modal-title-add').hide();
         $modal.find('.rm-modal-title-edit').show();
         $f.find('[name=description]').val($b.attr('data-description'));
-        $f.find('[name=webhook_url]').val($b.attr('data-webhook-url'));
+        // The stored URL never reaches the page: blank keeps it, a new one replaces it.
+        $f.find('[name=webhook_url]').val('').prop('required', false).attr('placeholder', $b.attr('data-masked-url'));
+        $f.find('.rm-wh-url-keep').show();
         $f.find('[name=corporation_id]').val($b.data('corporation') || '');
         $f.find('[name=enabled]').prop('checked', !!$b.data('enabled'));
         $f.find('.rm-wh-type').each(function () { this.checked = types.indexOf(this.value) !== -1; });

@@ -8,6 +8,9 @@ class Webhook extends Model
 {
     protected $table = 'ratting_manager_webhooks';
 
+    /** Never in JSON or arrays: the URL's token lets anyone post to the channel. */
+    protected $hidden = ['webhook_url'];
+
     protected $fillable = [
         'description',
         'webhook_url',
@@ -16,6 +19,7 @@ class Webhook extends Model
     ];
 
     protected $casts = [
+        'webhook_url' => Casts\EncryptedUrl::class,
         'corporation_id' => 'integer',
         'enabled' => 'boolean',
     ];

@@ -29,7 +29,7 @@ class NotificationSettingsController extends Controller
 
     public function store(Request $request)
     {
-        $data = $this->validateWebhook($request);
+        $data = $this->validateWebhook($request, true);
         NotificationTypes::ensureRows();
 
         $webhook = Webhook::create([
@@ -50,13 +50,15 @@ class NotificationSettingsController extends Controller
     public function edit(Request $request, int $webhook)
     {
         $model = Webhook::findOrFail($webhook);
-        $data = $this->validateWebhook($request);
+        $data = $this->validateWebhook($request, false);
         NotificationTypes::ensureRows();
 
         DB::transaction(function () use ($model, $data, $request) {
-            $model->update([
+            // The form never shows the stored URL; left blank, it is kept.
+            $model->update(array_filter([
                 'description' => $data['description'],
-                'webhook_url' => trim($data['webhook_url']),
+                'webhook_url' => trim((string) ($data['webhook_url'] ?? '')) ?: null,
+            ]) + [
                 'corporation_id' => ($data['corporation_id'] ?? null) ?: null,
                 'enabled' => $request->boolean('enabled'),
             ]);
@@ -196,13 +198,13 @@ class NotificationSettingsController extends Controller
         ];
     }
 
-    private function validateWebhook(Request $request): array
+    private function validateWebhook(Request $request, bool $creating): array
     {
         $configured = app(Settings::class)->configuredCorporations();
 
         return $request->validate([
             'description' => ['required', 'string', 'max:255'],
-            'webhook_url' => ['required', 'string', 'max:500', function ($attribute, $value, $fail) {
+            'webhook_url' => [$creating ? 'required' : 'nullable', 'string', 'max:500', function ($attribute, $value, $fail) {
                 if (!WebhookDeliveryService::isValidUrl(trim($value))) {
                     $fail(trans('ratting-manager::notification_settings.url_invalid'));
                 }

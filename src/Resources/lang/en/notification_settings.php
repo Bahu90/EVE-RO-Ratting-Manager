@@ -19,6 +19,7 @@ return [
     'name' => 'Name',
     'name_placeholder' => 'Directors channel',
     'url' => 'Webhook URL',
+    'url_keep' => 'Leave blank to keep the current URL. It is stored encrypted and never shown again.',
     'url_help' => 'From Discord: channel settings, Integrations, Webhooks. Slack incoming webhooks work too, as plain text.',
     'url_invalid' => 'Not a Discord or Slack webhook URL. It has to start with https:// on discord.com or hooks.slack.com.',
     'webhooks_intro_one' => 'Discord or Slack webhooks the plugin posts to. Tick which notifications each one carries.',

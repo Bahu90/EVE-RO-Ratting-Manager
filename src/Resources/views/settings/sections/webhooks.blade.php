@@ -80,7 +80,7 @@
                                     <button type="button" class="btn btn-xs btn-rm-secondary rm-webhook-edit" title="{{ trans('ratting-manager::notification_settings.edit') }}"
                                             data-url="{{ route('ratting-manager.settings.webhooks.update', $wh->id) }}"
                                             data-description="{{ $wh->description }}"
-                                            data-webhook-url="{{ $wh->webhook_url }}"
+                                            data-masked-url="{{ $wh->maskedUrl() }}"
                                             data-types="{{ json_encode(array_values($sends)) }}"
                                             data-corporation="{{ $wh->corporation_id }}"
                                             data-enabled="{{ $wh->enabled ? 1 : 0 }}"><i class="fas fa-edit"></i></button>
