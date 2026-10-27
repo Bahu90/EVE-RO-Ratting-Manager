@@ -58,7 +58,7 @@ class RatterController extends Controller
     }
 
     /** One player's ratting, as they see it on My Ratting, plus where each character's figures come from. */
-    public function show(Request $request, int $characterId, Players $players, Settings $settings, DashboardController $dashboard)
+    public function show(Request $request, int $characterId, Players $players, Settings $settings, DashboardController $dashboard, RattingMetrics $metrics)
     {
         $period = Period::from($request->query('period'));
         $characters = $players->charactersOfPlayer($characterId);
@@ -66,6 +66,10 @@ class RatterController extends Controller
         $main = $players->mainOf($characterId);
 
         $personal = $dashboard->personal(new Scope($configured, $characters), $period, $request->query('month'));
+
+        // The player's place by hours among everyone in the corporations this
+        // page covers, as the member sees it on their own dashboard.
+        $board = $metrics->hoursBoard(new Scope($configured), $period, $main);
 
         $kinds = DB::table('ratting_manager_ticks')
             ->whereIn('character_id', $characters)
@@ -98,6 +102,8 @@ class RatterController extends Controller
         return view('ratting-manager::ratter.show', array_merge($personal, [
             'period' => $period,
             'brand' => \RattingManager\Support\Corporations::brand($configured),
+            'ownRank' => $board['own_rank'],
+            'rankedPlayers' => $board['players'],
             'left' => \RattingManager\Support\Corporations::markLeft([['main_id' => $main, 'characters' => $characters]], $settings->configuredCorporations())[0]['left'],
             'mainId' => $main,
             'mainName' => $players->name($main),
