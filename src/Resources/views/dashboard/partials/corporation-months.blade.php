@@ -62,8 +62,8 @@
                             <td class="text-right">{{ $m['players'] }}</td>
                             <td class="text-right">{{ $m['characters'] }}</td>
                             <td class="text-right">{{ $fmt::hours($m['minutes']) }}</td>
-                            <td class="text-right">{{ $m['minutes'] > 0 ? $fmt::isk($m[$rate] ?? 0) : '-' }}</td>
-                            <td class="text-right">{{ $m['players'] > 0 ? $fmt::isk($m[$perPlayer] ?? 0) : '-' }}</td>
+                            <td class="text-right">{!! $m['minutes'] > 0 ? $fmt::iskHtml($m[$rate] ?? 0) : '-' !!}</td>
+                            <td class="text-right">{!! $m['players'] > 0 ? $fmt::iskHtml($m[$perPlayer] ?? 0) : '-' !!}</td>
                         </tr>
                     @else
                         <tr class="text-muted">
@@ -84,7 +84,7 @@
                     <td class="text-right">-</td>
                     <td class="text-right">-</td>
                     <td class="text-right">{{ $fmt::hours($minutes) }}</td>
-                    <td class="text-right">{{ $minutes > 0 ? $fmt::isk($income / ($minutes / 60)) : '-' }}</td>
+                    <td class="text-right">{!! $minutes > 0 ? $fmt::iskHtml($income / ($minutes / 60)) : '-' !!}</td>
                     <td class="text-right">-</td>
                 </tr>
             </tfoot>

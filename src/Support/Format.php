@@ -23,6 +23,23 @@ final class Format
         return number_format($value, 0);
     }
 
+    /**
+     * The same figure for a page: the number, then its unit smaller and
+     * dimmed, so "57.38 B" is never read as one number. Safe to print raw.
+     */
+    public static function iskHtml($value): string
+    {
+        $text = self::isk($value);
+        $space = strrpos($text, ' ');
+
+        if ($space === false) {
+            return '<span class="rm-isk-num">' . htmlspecialchars($text, ENT_QUOTES) . '</span>';
+        }
+
+        return '<span class="rm-isk-num">' . htmlspecialchars(substr($text, 0, $space), ENT_QUOTES) . '</span> '
+            . '<span class="rm-isk-unit">' . htmlspecialchars(substr($text, $space + 1), ENT_QUOTES) . '</span>';
+    }
+
     public static function hours(int $minutes): string
     {
         $h = intdiv($minutes, 60);

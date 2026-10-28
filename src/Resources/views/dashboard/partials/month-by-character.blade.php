@@ -58,7 +58,7 @@
                         </td>
                         <td class="text-right">@rmisk($r['corp_tax'])</td>
                         <td class="text-right">{{ $fmt::hours($r['minutes']) }}</td>
-                        <td class="text-right">{{ $r['minutes'] > 0 ? $fmt::isk($r['value_per_hour']) : '-' }}</td>
+                        <td class="text-right">{!! $r['minutes'] > 0 ? $fmt::iskHtml($r['value_per_hour']) : '-' !!}</td>
                         <td class="text-right">{{ number_format($r['ticks']) }}</td>
                         <td class="text-right">{{ number_format($r['rats']) }}</td>
                     </tr>
@@ -81,7 +81,7 @@
                         </td>
                         <td class="text-right">@rmisk($b['total']['corp_tax'])</td>
                         <td class="text-right">{{ $fmt::hours($b['total']['minutes']) }}</td>
-                        <td class="text-right">{{ $b['total']['minutes'] > 0 ? $fmt::isk($b['total']['value_per_hour']) : '-' }}</td>
+                        <td class="text-right">{!! $b['total']['minutes'] > 0 ? $fmt::iskHtml($b['total']['value_per_hour']) : '-' !!}</td>
                         <td class="text-right">{{ number_format($b['total']['ticks']) }}</td>
                         <td class="text-right">{{ number_format($b['total']['rats']) }}</td>
                     </tr>
@@ -118,7 +118,7 @@
                                     <td class="text-right rm-empty-cell">-</td>
                                 @endif
                             @endforeach
-                            <td class="text-right"><strong>{{ $m['total'] > 0 ? $fmt::isk($m['total']) : '-' }}</strong></td>
+                            <td class="text-right"><strong>{!! $m['total'] > 0 ? $fmt::iskHtml($m['total']) : '-' !!}</strong></td>
                         </tr>
                     @endforeach
                 </tbody>

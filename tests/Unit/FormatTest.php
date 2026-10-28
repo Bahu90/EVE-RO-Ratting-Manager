@@ -28,4 +28,13 @@ final class FormatTest extends TestCase
         $this->assertSame('1h 00m', Format::hours(60));
         $this->assertSame('12h 05m', Format::hours(725));
     }
+
+    public function test_the_unit_is_set_apart_on_pages(): void
+    {
+        $this->assertSame(
+            '<span class="rm-isk-num">52.70</span> <span class="rm-isk-unit">B</span>',
+            Format::iskHtml(52_700_000_000)
+        );
+        $this->assertSame('<span class="rm-isk-num">950</span>', Format::iskHtml(950));
+    }
 }

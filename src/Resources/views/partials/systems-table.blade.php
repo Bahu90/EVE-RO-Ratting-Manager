@@ -52,7 +52,7 @@
                             <span class="rm-share-bar" style="--rm-share: {{ min(100, $s['hours_share']) }}%;">{{ number_format($s['hours_share'], 1) }}%</span>
                         </td>
                         <td class="text-right" data-order="{{ $s['income'] }}">@rmisk($s['income'])</td>
-                        <td class="text-right" data-order="{{ $s['isk_per_hour'] }}">{{ $s['minutes'] > 0 ? $fmt::isk($s['isk_per_hour']) : '-' }}</td>
+                        <td class="text-right" data-order="{{ $s['isk_per_hour'] }}">{!! $s['minutes'] > 0 ? $fmt::iskHtml($s['isk_per_hour']) : '-' !!}</td>
                         <td class="text-right">{{ number_format($s['rats']) }}</td>
                         <td class="text-right">{{ $s['active_days'] }}</td>
                         @if($corporation)

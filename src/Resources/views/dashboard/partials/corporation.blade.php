@@ -121,7 +121,7 @@
                 <div class="rm-eyebrow mb-2">{{ trans('ratting-manager::dashboard.top_systems') }}</div>
                 <div class="rm-top-systems">
                     @foreach($topSystems as $system)
-                        <div><span>{{ $system['name'] }}</span><span>{{ \RattingManager\Support\Format::isk($system['value']) }}</span></div>
+                        <div><span>{{ $system['name'] }}</span><span>{!! \RattingManager\Support\Format::iskHtml($system['value']) !!}</span></div>
                     @endforeach
                 </div>
                 @endif

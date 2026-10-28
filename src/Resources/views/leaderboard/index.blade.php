@@ -87,7 +87,7 @@
                             </div>
                         </div>
                         <div class="rm-money">
-                            <strong>{{ $isk($value($row)) }}</strong>
+                            <strong>{!! \RattingManager\Support\Format::iskHtml($value($row)) !!}</strong>
                             <span>{{ trans('ratting-manager::leaderboard.tax_amount', ['amount' => $isk($row['corp_tax'])]) }}</span>
                         </div>
                         <div class="rm-meta">
@@ -106,7 +106,7 @@
                     <span class="rm-rank">#{{ $ownIndex + 1 }}</span>
                     <img class="rm-portrait rm-portrait-sm" src="{{ $portrait($own['main_id']) }}" alt="" loading="lazy">
                     <span class="rm-name">{{ $own['name'] }}</span>
-                    <span class="rm-isk">{{ $isk($value($own)) }}</span>
+                    <span class="rm-isk">{!! \RattingManager\Support\Format::iskHtml($value($own)) !!}</span>
                     <span class="rm-tax">{{ trans('ratting-manager::leaderboard.tax_amount', ['amount' => $isk($own['corp_tax'])]) }}</span>
                     <span class="rm-go">{{ trans('ratting-manager::leaderboard.show_my_row') }}</span>
                 </a>
@@ -138,9 +138,9 @@
                         <img class="rm-portrait" src="{{ $portrait($row['main_id']) }}" alt="" loading="lazy">
                         <span class="rm-body">
                             <span class="rm-name">{{ $i + 1 }}. {{ $row['name'] }}@if($row['left'] ?? false)<span class="rm-left-tag" title="{{ trans('ratting-manager::common.left_title') }}">{{ mb_strtoupper(trans('ratting-manager::common.left')) }}</span>@endif @if($i === $ownIndex)<span class="rm-you-tag">{{ mb_strtoupper(trans('ratting-manager::leaderboard.you')) }}</span>@endif</span>
-                            <span class="rm-money">{{ $isk($value($row)) }}</span>
+                            <span class="rm-money">{!! \RattingManager\Support\Format::iskHtml($value($row)) !!}</span>
                         </span>
-                        <span class="rm-cut">{{ $isk($row['corp_tax']) }}</span>
+                        <span class="rm-cut">{!! \RattingManager\Support\Format::iskHtml($row['corp_tax']) !!}</span>
                     </a>
                 @endforeach
             </div>

@@ -729,7 +729,7 @@
                     <p>
                         There are two ways to count ratting, and the plugin keeps both.
                         <strong>ISK ratted</strong> is the corporation's count: its cut of each bounty and ESS payout over its tax rate that day,
-                        <code>cut / rate</code>. At 15%, a cut of 1.5M ISK is 10M ISK ratted. It only counts what the corporation took a cut of.
+                        <code>cut / rate</code>. At 15%, a cut of 1.5 M ISK is 10 M ISK ratted. It only counts what the corporation took a cut of.
                         <strong>Income received</strong> is what the pilots got after tax, from their own wallet journals.
                         At 15%, ISK ratted is income received plus the ratting tax. <em>Settings, Income figures</em> picks which one the pages lead with.
                     </p>
@@ -737,7 +737,7 @@
                     <h4>Worked-out income</h4>
                     <p>
                         When only the corporation journal has a tick, the character's income is worked out from the cut:
-                        <code>cut x (1 - rate) / rate</code>. At 15% corporation tax, a cut of 1.5M ISK means the character received 8.5M ISK.
+                        <code>cut x (1 - rate) / rate</code>. At 15% corporation tax, a cut of 1.5 M ISK means the character received 8.5 M ISK.
                         The rate for each day is read back from that day's paired ticks, so a change of tax rate is followed.
                         Worked-out figures carry a dashed underline and appear striped in the charts.
                     </p>
@@ -861,7 +861,7 @@
                     <h5>Why is my ISK per hour lower in a fleet?</h5>
                     <p>Fleets share bounties, so each member receives part of each payout, and the corporation taxes each member's part. Your ISK per hour is your share over your own time.</p>
                     <h5>Why is ISK ratted higher than what I received?</h5>
-                    <p>ISK ratted is counted before the corporation's tax: its cut over its tax rate. What you received is after it. At 15%, 10M ISK ratted is 8.5M received and 1.5M ratting tax. <em>Settings, Income figures</em> picks which one the pages lead with; the Monthly Report always shows ISK ratted.</p>
+                    <p>ISK ratted is counted before the corporation's tax: its cut over its tax rate. What you received is after it. At 15%, 10 M ISK ratted is 8.5 M received and 1.5 M ratting tax. <em>Settings, Income figures</em> picks which one the pages lead with; the Monthly Report always shows ISK ratted.</p>
                     <h5>Someone ratted but is not on the Monthly Report.</h5>
                     <p>The report lists the players the corporation took a cut from. Ticks only in the pilot's own journal, with no cut from the corporation, are not ISK ratted; they still show on My Ratting and, with income received picked in Settings, on the leaderboard.</p>
                     <h5>A ratter shows as Character info in progress.</h5>

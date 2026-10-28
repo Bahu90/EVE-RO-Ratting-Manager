@@ -4154,3 +4154,15 @@ div.ratting-manager-wrapper div[class*="col-"] div.card-body {
 /* ============================================
    End of Ratting Manager design system
    ============================================ */
+
+/* Short ISK figures: the unit sits apart from the number, smaller and
+   dimmed, so "57.38 B" is not read as one number. */
+.rm-isk-num {
+    font-variant-numeric: tabular-nums;
+}
+
+.rm-isk-unit {
+    font-size: 0.78em;
+    opacity: 0.65;
+    letter-spacing: 0.04em;
+}
